@@ -1,5 +1,5 @@
 # Paste your vocal audio path here (absolute or relative)
-VOCAL_AUDIO_PATH="vocal_audio_test_data/output_27_75.wav"
+VOCAL_AUDIO_PATH="vocal_audio_test_data/chengron_15_62.wav"
 # text command for backing track generation (can be modified as needed)
 BACKING_TEXT_PROMPT="rock backing music, high quality, with bass guitar, drums, synthesizer"
 

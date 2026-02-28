@@ -1,4 +1,4 @@
-sudo apt-get install portaudio19-dev
+apt-get install portaudio19-dev
 pip install "pip<24.1"
 pip install torch==2.5.1 
 pip install torchaudio==2.5.1
@@ -10,3 +10,10 @@ pip install -r requirements.txt
 pip install torchcodec
 pip install chorder
 pip install miditok
+
+wget https://github.com/openvpi/SOME/releases/download/v1.0.0-baseline/0119_continuous128_5spk.zip -O /tmp/some_model.zip                                                         
+unzip /tmp/some_model.zip -d SOME/pretrained/                                                                                                    
+rm /tmp/some_model.zip 
+wget https://github.com/yxlllc/RMVPE/releases/download/230917/rmvpe.zip -O /tmp/RMVPE.zip      
+unzip /tmp/RMVPE.zip -d SOME/pretrained/                                                                                                    
+rm /tmp/RMVPE.zip  
