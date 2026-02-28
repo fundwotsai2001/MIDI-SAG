@@ -6,12 +6,11 @@
 checkpoint*/
 pretrained/
 
-# Large data files (AccoMontage2/chorderator static assets)
-*.npz
-*.pcls*
-*.pnt
-*.sf2
-*.mdch
+# # Large data files (AccoMontage2/chorderator static assets)
+# *.npz
+# *.pcls*
+# *.sf2
+# *.mdch
 
 
 # Python cache
