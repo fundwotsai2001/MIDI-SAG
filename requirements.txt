@@ -1,0 +1,44 @@
+# MuseControlLite
+git+https://github.com/fundwotsai2001/diffusers.git@v0.31.0-release
+git+https://github.com/YianLai0327/madmom.git
+soundfile
+accelerate
+transformers==4.46.1
+matplotlib
+# librosa
+torchsde
+gdown
+wandb
+
+#SOME
+click
+einops==0.6.1
+fairseq==0.12.2
+gradio==3.47.1
+h5py
+librosa<0.10.0
+lightning>=2.0.0
+mido
+MonkeyType==23.3.0
+numpy
+onnx==1.14.0
+onnxsim==0.4.31
+praat-parselmouth==0.4.3
+PyYAML
+scipy
+tensorboard
+tensorboardX
+torchmetrics
+tqdm
+
+# Accomontage2
+pandas
+pretty_midi
+six
+
+# 
+Cython
+sounddevice
+pyaudio
+s3prl
+dill

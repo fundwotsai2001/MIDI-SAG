@@ -1,0 +1,2683 @@
+from typing import Optional
+from miditok import REMI, TokenizerConfig
+from symusic import Score
+config = TokenizerConfig(num_velocities=16, use_chords=True, use_programs=True, use_tempos=True)
+tokenizer = REMI(config)
+import copy
+import mido
+import os
+
+from chorder import Dechorder
+import numpy as np
+
+
+def load_beat_times(beat_file_path):
+    """
+    Load beat times from a text file (SingNet format).
+    
+    Args:
+        beat_file_path: Path to beat_times.txt file
+    
+    Returns:
+        numpy array of beat times in seconds
+    """
+    beat_times = []
+    with open(beat_file_path, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                try:
+                    beat_times.append(float(line))
+                except ValueError:
+                    continue
+    return np.array(beat_times)
+
+
+def estimate_tempo_from_beats(beat_times, beats_per_bar=4, prefer_tempo_range=(60, 150), beat_subdivision=1):
+    """
+    Estimate tempo from beat times with octave correction.
+    
+    Args:
+        beat_times: Array of beat times in seconds
+        beats_per_bar: Number of beats per bar (default 4 for 4/4)
+        prefer_tempo_range: Preferred tempo range (min, max) for octave correction
+        beat_subdivision: What subdivision the beat_times represent (default 1 = quarter notes)
+                         - 1 = quarter notes (beats)
+                         - 2 = 8th notes
+                         - 4 = 16th notes
+                         If beat_times are 8th notes, set to 2 to get correct quarter note tempo.
+    
+    Returns:
+        dict: {
+            'tempo': float (BPM, in quarter notes per minute),
+            'mean_ibi': float (mean inter-beat interval in seconds, for quarter notes),
+            'bar_duration': float (beats_per_bar quarter notes in seconds),
+            'std_ibi': float (standard deviation of IBIs),
+            'beats_per_bar': int,
+            'octave_corrected': bool,
+            'beat_subdivision': int
+        }
+    """
+    if len(beat_times) < 2:
+        return {
+            'tempo': 120.0, 
+            'mean_ibi': 0.5, 
+            'bar_duration': 2.0, 
+            'std_ibi': 0.0,
+            'beats_per_bar': beats_per_bar,
+            'octave_corrected': False,
+            'beat_subdivision': beat_subdivision
+        }
+    
+    # Calculate inter-beat intervals
+    ibis = np.diff(beat_times)
+    
+    raw_mean_ibi = np.mean(ibis)
+    std_ibi = np.std(ibis)
+    
+    # Adjust for subdivision: if beat_times are 8th notes, multiply IBI by 2 to get quarter note IBI
+    mean_ibi = raw_mean_ibi * beat_subdivision
+    tempo = 60.0 / mean_ibi
+    
+    if beat_subdivision > 1:
+        print(f"  Beat subdivision: {beat_subdivision} (adjusting IBI from {raw_mean_ibi:.3f}s to {mean_ibi:.3f}s)")
+    
+    # Octave correction: if tempo is outside preferred range, try 2x or 0.5x
+    octave_corrected = False
+    min_tempo, max_tempo = prefer_tempo_range
+    
+    if tempo > max_tempo:
+        # Tempo too fast, try halving it
+        if tempo / 2 >= min_tempo:
+            tempo = tempo / 2
+            mean_ibi = mean_ibi * 2
+            octave_corrected = True
+            print(f"  Octave correction: tempo halved to {tempo:.1f} BPM")
+    elif tempo < min_tempo:
+        # Tempo too slow, try doubling it
+        if tempo * 2 <= max_tempo:
+            tempo = tempo * 2
+            mean_ibi = mean_ibi / 2
+            octave_corrected = True
+            print(f"  Octave correction: tempo doubled to {tempo:.1f} BPM")
+    
+    bar_duration = mean_ibi * beats_per_bar
+    
+    return {
+        'tempo': tempo,
+        'mean_ibi': mean_ibi,
+        'bar_duration': bar_duration,
+        'std_ibi': std_ibi,
+        'beats_per_bar': beats_per_bar,
+        'octave_corrected': octave_corrected,
+        'beat_subdivision': beat_subdivision
+    }
+
+
+def get_downbeat_times(beat_times, beats_per_bar=4, first_downbeat_idx=0):
+    """
+    Get downbeat (bar start) times from beat times.
+    
+    Args:
+        beat_times: Array of beat times in seconds
+        beats_per_bar: Number of beats per bar (default 4 for 4/4)
+        first_downbeat_idx: Index of the first downbeat in beat_times
+    
+    Returns:
+        Array of downbeat times in seconds
+    """
+    downbeats = []
+    for i in range(first_downbeat_idx, len(beat_times), beats_per_bar):
+        downbeats.append(beat_times[i])
+    return np.array(downbeats)
+
+
+def adjust_midi_to_beats(input_midi_path, output_midi_path, beat_times, beats_per_bar=4, beat_subdivision=1):
+    """
+    Adjust MIDI tempo based on beat times while PRESERVING absolute note timing (seconds).
+    
+    This function:
+    1. Estimates correct tempo from beat times
+    2. Rescales tick positions so notes stay at the SAME absolute seconds
+    3. Updates tempo metadata to match the beat grid
+    
+    The notes will NOT be quantized to the beat grid - they stay at their
+    original positions in seconds (as extracted from audio by SOME).
+    
+    Args:
+        input_midi_path: Path to input MIDI file
+        output_midi_path: Path to output MIDI file
+        beat_times: Array of beat times in seconds (from SingNet)
+        beats_per_bar: Number of beats per bar (default 4)
+        beat_subdivision: What subdivision the beat_times represent (default 1 = quarter notes)
+                         - 1 = quarter notes (beats)
+                         - 2 = 8th notes
+                         - 4 = 16th notes
+    
+    Returns:
+        dict with tempo info
+    """
+    from symusic import Score, Note, Track, Tempo
+    
+    # Get tempo from beats
+    tempo_info = estimate_tempo_from_beats(beat_times, beats_per_bar, beat_subdivision=beat_subdivision)
+    new_tempo = tempo_info['tempo']
+    
+    print(f"=== Adjusting MIDI Tempo (preserving absolute seconds) ===")
+    print(f"Estimated tempo from beats: {new_tempo:.1f} BPM")
+    
+    # Load original MIDI
+    score = Score(input_midi_path, ttype="tick")
+    original_tpq = score.ticks_per_quarter
+    
+    # Get original tempo
+    original_tempo = 120.0
+    if score.tempos:
+        original_tempo = score.tempos[0].qpm
+    
+    print(f"Original tempo: {original_tempo:.1f} BPM")
+    print(f"TPQ: {original_tpq}")
+    
+    # Calculate tick scaling factor to preserve absolute seconds
+    # Original: seconds = ticks / (tpq * original_tempo / 60)
+    # New: seconds = new_ticks / (tpq * new_tempo / 60)
+    # To keep same seconds: new_ticks = ticks * (new_tempo / original_tempo)
+    tempo_ratio = new_tempo / original_tempo
+    
+    print(f"Tempo ratio: {tempo_ratio:.3f}")
+    
+    # Create new score
+    new_score = Score(ttype="tick")
+    new_score.ticks_per_quarter = original_tpq
+    new_score.tempos = [Tempo(time=0, qpm=new_tempo)]
+    new_score.time_signatures = score.time_signatures.copy() if score.time_signatures else []
+    
+    # Scale all note positions to preserve absolute seconds
+    for track in score.tracks:
+        new_track = Track(name=track.name, program=track.program, is_drum=track.is_drum)
+        for note in track.notes:
+            new_start = int(round(note.time * tempo_ratio))
+            new_duration = int(round(note.duration * tempo_ratio))
+            if new_duration < 1:
+                new_duration = 1
+            
+            new_note = Note(
+                time=new_start,
+                duration=new_duration,
+                pitch=note.pitch,
+                velocity=note.velocity
+            )
+            new_track.notes.append(new_note)
+        new_track.notes.sort(key=lambda n: n.time)
+        new_score.tracks.append(new_track)
+    
+    new_score.dump_midi(output_midi_path)
+    
+    print(f"Adjusted MIDI saved (absolute seconds preserved)")
+    
+    return {
+        'original_tempo': original_tempo,
+        'new_tempo': new_tempo,
+        'tempo_ratio': tempo_ratio,
+        'mean_ibi': tempo_info['mean_ibi'],
+        'bar_duration': tempo_info['bar_duration']
+    }
+
+
+def warp_midi_to_beats(input_midi_path, output_midi_path, beat_times, beats_per_bar=4, 
+                       quantize_to_grid=True, grid_resolution=16):
+    """
+    Warp MIDI notes to align with beat times while preserving relative timing within beats.
+    
+    This function performs beat-aware warping:
+    1. For each note, find which beat interval it belongs to (in the original audio time)
+    2. Calculate the note's relative position within that beat interval (0 to 1)
+    3. Map the note to the corresponding position in the output MIDI beat grid
+    
+    This preserves the musical timing relative to beats while ensuring proper alignment.
+    
+    Args:
+        input_midi_path: Path to input MIDI file
+        output_midi_path: Path to output MIDI file  
+        beat_times: Array of beat times in seconds (from SingNet or other beat tracker)
+        beats_per_bar: Number of beats per bar (default 4 for 4/4)
+        quantize_to_grid: If True, quantize notes to nearest grid position (default True)
+        grid_resolution: Grid resolution in divisions per beat (default 16 = 1/16 note per beat)
+    
+    Returns:
+        dict with tempo info and adjustment details
+    """
+    from symusic import Score, Note, Track, Tempo
+    
+    # Get tempo info from beats
+    tempo_info = estimate_tempo_from_beats(beat_times, beats_per_bar)
+    new_tempo = tempo_info['tempo']
+    mean_ibi = tempo_info['mean_ibi']  # Mean inter-beat interval in seconds
+    
+    print(f"=== Beat-Aware MIDI Warping ===")
+    print(f"Estimated tempo from beats: {new_tempo:.1f} BPM")
+    print(f"Mean inter-beat interval: {mean_ibi:.3f}s")
+    print(f"Bar duration: {tempo_info['bar_duration']:.3f}s")
+    
+    # Load the original MIDI
+    score = Score(input_midi_path, ttype="tick")
+    original_tpq = score.ticks_per_quarter
+    
+    # Get original tempo (needed to convert ticks to seconds)
+    original_tempo = 120.0
+    if score.tempos:
+        original_tempo = score.tempos[0].qpm
+    
+    print(f"Original MIDI tempo: {original_tempo:.1f} BPM")
+    print(f"Original TPQ: {original_tpq}")
+    
+    # Calculate seconds per tick for original MIDI
+    original_secs_per_tick = 60.0 / (original_tempo * original_tpq)
+    
+    # Calculate ticks per beat for new MIDI
+    # At new_tempo BPM, one beat = 60/new_tempo seconds
+    # ticks_per_beat = tpq (since tpq = ticks per quarter note = ticks per beat in 4/4)
+    ticks_per_beat = original_tpq
+    ticks_per_grid = ticks_per_beat / grid_resolution
+    
+    print(f"Ticks per beat: {ticks_per_beat}")
+    print(f"Grid resolution: 1/{grid_resolution} beat ({ticks_per_grid:.1f} ticks)")
+    
+    # Create beat interval lookup
+    # beat_times[i] to beat_times[i+1] is beat interval i
+    beat_intervals = []
+    for i in range(len(beat_times) - 1):
+        beat_intervals.append({
+            'start': beat_times[i],
+            'end': beat_times[i + 1],
+            'duration': beat_times[i + 1] - beat_times[i]
+        })
+    # Add a final beat interval (estimate duration from mean IBI)
+    if len(beat_times) > 0:
+        beat_intervals.append({
+            'start': beat_times[-1],
+            'end': beat_times[-1] + mean_ibi,
+            'duration': mean_ibi
+        })
+    
+    def find_beat_and_position(time_seconds):
+        """
+        Find which beat interval a time belongs to and the relative position within it.
+        
+        Returns:
+            (beat_index, relative_position) where relative_position is 0 to 1
+        """
+        # Handle time before first beat
+        if time_seconds < beat_times[0]:
+            # Estimate beat before first beat
+            pre_beat_duration = mean_ibi
+            offset = beat_times[0] - time_seconds
+            beats_before = offset / pre_beat_duration
+            beat_idx = -int(np.ceil(beats_before))
+            rel_pos = 1.0 - (offset % pre_beat_duration) / pre_beat_duration
+            return beat_idx, rel_pos
+        
+        # Binary search for the beat interval
+        for i, interval in enumerate(beat_intervals):
+            if interval['start'] <= time_seconds < interval['end']:
+                rel_pos = (time_seconds - interval['start']) / interval['duration']
+                return i, min(1.0, max(0.0, rel_pos))
+        
+        # Time is after the last beat - extrapolate
+        time_after_last = time_seconds - beat_times[-1]
+        beats_after = time_after_last / mean_ibi
+        beat_idx = len(beat_times) - 1 + int(beats_after)
+        rel_pos = (beats_after % 1.0)
+        return beat_idx, rel_pos
+    
+    def quantize_to_nearest_grid(tick, grid_ticks):
+        """Quantize tick to nearest grid position."""
+        return int(round(tick / grid_ticks) * grid_ticks)
+    
+    # Create new score
+    new_score = Score(ttype="tick")
+    new_score.ticks_per_quarter = original_tpq
+    new_score.tempos = [Tempo(time=0, qpm=new_tempo)]
+    new_score.time_signatures = score.time_signatures.copy() if score.time_signatures else []
+    
+    # Process all notes
+    notes_processed = 0
+    notes_quantized = 0
+    
+    for track in score.tracks:
+        new_track = Track(name=track.name, program=track.program, is_drum=track.is_drum)
+        
+        for note in track.notes:
+            # Convert note start from ticks to seconds (original timing)
+            note_start_secs = note.time * original_secs_per_tick
+            note_end_secs = (note.time + note.duration) * original_secs_per_tick
+            
+            # Find beat position for start
+            start_beat_idx, start_rel_pos = find_beat_and_position(note_start_secs)
+            end_beat_idx, end_rel_pos = find_beat_and_position(note_end_secs)
+            
+            # Convert to new tick positions
+            # beat_idx * ticks_per_beat + rel_pos * ticks_per_beat
+            new_start_tick = (start_beat_idx + start_rel_pos) * ticks_per_beat
+            new_end_tick = (end_beat_idx + end_rel_pos) * ticks_per_beat
+            
+            # Handle negative beat indices (notes before first beat)
+            # We'll shift everything so first beat is at time 0
+            # This will be handled by note_shift in chorderator
+            
+            # Quantize if requested
+            if quantize_to_grid:
+                new_start_tick = quantize_to_nearest_grid(new_start_tick, ticks_per_grid)
+                new_end_tick = quantize_to_nearest_grid(new_end_tick, ticks_per_grid)
+                if new_end_tick <= new_start_tick:
+                    new_end_tick = new_start_tick + ticks_per_grid
+                notes_quantized += 1
+            
+            new_duration = int(new_end_tick - new_start_tick)
+            if new_duration < 1:
+                new_duration = 1
+            
+            new_note = Note(
+                time=int(new_start_tick),
+                duration=new_duration,
+                pitch=note.pitch,
+                velocity=note.velocity
+            )
+            new_track.notes.append(new_note)
+            notes_processed += 1
+        
+        new_track.notes.sort(key=lambda n: n.time)
+        new_score.tracks.append(new_track)
+    
+    # Shift all notes so the minimum start time is >= 0
+    all_notes = [n for t in new_score.tracks for n in t.notes]
+    if all_notes:
+        min_time = min(n.time for n in all_notes)
+        if min_time < 0:
+            shift_amount = -min_time
+            # Round up to nearest bar
+            ticks_per_bar = ticks_per_beat * beats_per_bar
+            shift_bars = int(np.ceil(shift_amount / ticks_per_bar))
+            actual_shift = shift_bars * ticks_per_bar
+            
+            print(f"Shifting notes by {shift_bars} bars ({actual_shift} ticks) to ensure positive times")
+            
+            for track in new_score.tracks:
+                for note in track.notes:
+                    note.time += actual_shift
+    
+    # Save the warped MIDI
+    new_score.dump_midi(output_midi_path)
+    
+    print(f"Processed {notes_processed} notes")
+    if quantize_to_grid:
+        print(f"Quantized to 1/{grid_resolution} beat grid")
+    print(f"Warped MIDI saved to: {output_midi_path}")
+    
+    return {
+        'original_tempo': original_tempo,
+        'new_tempo': new_tempo,
+        'mean_ibi': mean_ibi,
+        'bar_duration': tempo_info['bar_duration'],
+        'notes_processed': notes_processed,
+        'quantize_to_grid': quantize_to_grid,
+        'grid_resolution': grid_resolution
+    }
+
+
+def find_first_downbeat_for_melody(beat_times, first_note_time, beats_per_bar=4):
+    """
+    Find which beat is the first downbeat that the melody starts in or after.
+    
+    Args:
+        beat_times: Array of beat times in seconds
+        first_note_time: Time of first note in seconds
+        beats_per_bar: Number of beats per bar
+    
+    Returns:
+        tuple: (downbeat_idx, downbeat_time, bar_number)
+    """
+    # Find the beat just before or at the first note
+    beat_idx = 0
+    for i, bt in enumerate(beat_times):
+        if bt > first_note_time:
+            beat_idx = max(0, i - 1)
+            break
+        beat_idx = i
+    
+    # Find the downbeat (bar start) for this beat
+    # Assuming beat 0 is a downbeat
+    bar_number = beat_idx // beats_per_bar
+    downbeat_idx = bar_number * beats_per_bar
+    
+    # If first note is before the first beat, use bar 0
+    if first_note_time < beat_times[0]:
+        return 0, beat_times[0], 0
+    
+    return downbeat_idx, beat_times[downbeat_idx], bar_number
+
+
+# pitch to key
+pitch_to_key = {
+    0: 'C',
+    1: 'C#',
+    2: 'D',
+    3: 'D#',
+    4: 'E',
+    5: 'F',
+    6: 'F#',
+    7: 'G',
+    8: 'G#',
+    9: 'A',
+    10: 'A#',
+    11: 'B',
+}
+def get_segmentation(midi_obj):
+    pass
+
+def get_key(tokens):
+    """
+    Enhanced key detection using multiple methods:
+    1. Most frequent pitch class
+    2. Circle of fifths analysis
+    3. Scale degree analysis
+    
+    Returns a key string that can be used with cdt.Key class
+    """
+    # Extract all pitch classes
+    pitch_classes = []
+    for token in tokens:
+        if token.startswith('Pitch'):
+            pitch = int(token.split('_')[1])
+            pitch_classes.append(pitch % 12)
+    
+    if not pitch_classes:
+        return 'C'
+    
+    # Method 1: Most frequent pitch class
+    pitch_count = {}
+    for pc in pitch_classes:
+        note_name = pitch_to_key[pc]
+        pitch_count[note_name] = pitch_count.get(note_name, 0) + 1
+    
+    most_common_pitch = max(pitch_count, key=pitch_count.get)
+    
+    # Method 2: Circle of fifths analysis for major/minor determination
+    major_keys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F']
+    minor_keys = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F', 'C', 'G', 'D']
+    
+    # Count how many notes fit each key
+    key_scores = {}
+    
+    for key in major_keys:
+        key_pc = list(pitch_to_key.keys())[list(pitch_to_key.values()).index(key)]
+        # Major scale pattern: 0, 2, 4, 5, 7, 9, 11
+        major_scale = [(key_pc + interval) % 12 for interval in [0, 2, 4, 5, 7, 9, 11]]
+        score = sum(1 for pc in pitch_classes if pc in major_scale)
+        key_scores[f"{key}_major"] = score
+    
+    for key in minor_keys:
+        key_pc = list(pitch_to_key.keys())[list(pitch_to_key.values()).index(key)]
+        # Natural minor scale pattern: 0, 2, 3, 5, 7, 8, 10
+        minor_scale = [(key_pc + interval) % 12 for interval in [0, 2, 3, 5, 7, 8, 10]]
+        score = sum(1 for pc in pitch_classes if pc in minor_scale)
+        key_scores[f"{key}_minor"] = score
+    
+    # Find the best key
+    best_key = max(key_scores, key=key_scores.get)
+    best_score = key_scores[best_key]
+    
+    # If the best key has significantly higher score, use it
+    if best_score > len(pitch_classes) * 0.6:  # At least 60% of notes fit the key
+        return best_key.split('_')[0]  # Return just the note name
+    
+    # Otherwise, fall back to most common pitch
+    return most_common_pitch
+
+
+def get_key_for_cdt(tokens, key_analysis=None):
+    """
+    Get key that can be directly used with cdt.Key class.
+    Returns the appropriate cdt.Key attribute.
+    
+    Args:
+        tokens: MIDI tokens
+        key_analysis: Optional detailed key analysis result to use instead of basic detection
+    """
+    if key_analysis:
+        key_name = key_analysis['key']
+    else:
+        key_name = get_key(tokens)
+    
+    # Map key names to cdt.Key attributes
+    key_mapping = {
+        'C': 'C',
+        'C#': 'CSharp',
+        'Db': 'DFlat', 
+        'D': 'D',
+        'D#': 'DSharp',
+        'Eb': 'EFlat',
+        'E': 'E',
+        'F': 'F',
+        'F#': 'FSharp',
+        'Gb': 'GFlat',
+        'G': 'G',
+        'G#': 'GSharp',
+        'Ab': 'AFlat',
+        'A': 'A',
+        'A#': 'ASharp',
+        'Bb': 'BFlat',
+        'B': 'B'
+    }
+    
+    return key_mapping.get(key_name, 'C')
+
+
+def get_mode_for_cdt(tokens, key_analysis=None):
+    """
+    Get mode that can be directly used with cdt.Mode class.
+    Returns the appropriate cdt.Mode attribute.
+    
+    Args:
+        tokens: MIDI tokens
+        key_analysis: Optional detailed key analysis result to use instead of basic detection
+    """
+    if key_analysis:
+        mode_name = key_analysis['mode']
+    else:
+        # Fallback to basic detection
+        key_analysis = get_detailed_key_analysis(tokens)
+        mode_name = key_analysis['mode']
+    
+    # Map mode names to cdt.Mode attributes
+    mode_mapping = {
+        'major': 'MAJOR',
+        'minor': 'MINOR',
+        'maj': 'MAJOR',
+        'min': 'MINOR'
+    }
+    
+    return mode_mapping.get(mode_name, 'MAJOR')
+
+
+def get_detailed_key_analysis(tokens):
+    """
+    Detailed key analysis with confidence scores and mode detection.
+    """
+    # Extract all pitch classes
+    pitch_classes = []
+    for token in tokens:
+        if token.startswith('Pitch'):
+            pitch = int(token.split('_')[1])
+            pitch_classes.append(pitch % 12)
+    
+    if not pitch_classes:
+        return {'key': 'C', 'mode': 'major', 'confidence': 0.0, 'analysis': 'No notes found'}
+    
+    # Count pitch class occurrences
+    pc_count = {}
+    for pc in pitch_classes:
+        pc_count[pc] = pc_count.get(pc, 0) + 1
+    
+    # Major and minor key analysis
+    major_keys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F']
+    minor_keys = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F', 'C', 'G', 'D']
+    
+    key_analysis = {}
+    
+    # Analyze major keys
+    for key in major_keys:
+        key_pc = list(pitch_to_key.keys())[list(pitch_to_key.values()).index(key)]
+        major_scale = [(key_pc + interval) % 12 for interval in [0, 2, 4, 5, 7, 9, 11]]
+        
+        # Count notes that fit the scale
+        scale_notes = sum(1 for pc in pitch_classes if pc in major_scale)
+        total_notes = len(pitch_classes)
+        confidence = scale_notes / total_notes if total_notes > 0 else 0
+        
+        # Bonus for having the tonic
+        tonic_bonus = 0.1 if key_pc in pitch_classes else 0
+        
+        key_analysis[f"{key}_major"] = {
+            'key': key,
+            'mode': 'major',
+            'confidence': min(confidence + tonic_bonus, 1.0),
+            'scale_notes': scale_notes,
+            'total_notes': total_notes
+        }
+    
+    # Analyze minor keys
+    for key in minor_keys:
+        key_pc = list(pitch_to_key.keys())[list(pitch_to_key.values()).index(key)]
+        # Natural minor scale pattern: 0, 2, 3, 5, 7, 8, 10
+        minor_scale = [(key_pc + interval) % 12 for interval in [0, 2, 3, 5, 7, 8, 10]]
+        
+        scale_notes = sum(1 for pc in pitch_classes if pc in minor_scale)
+        total_notes = len(pitch_classes)
+        confidence = scale_notes / total_notes if total_notes > 0 else 0
+        
+        # Bonus for having the tonic
+        tonic_bonus = 0.1 if key_pc in pitch_classes else 0
+        
+        # Additional bonus for minor third (characteristic of minor keys)
+        minor_third = (key_pc + 3) % 12
+        minor_third_bonus = 0.05 if minor_third in pitch_classes else 0
+        
+        # Additional bonus for minor sixth (another characteristic of minor keys)
+        minor_sixth = (key_pc + 8) % 12
+        minor_sixth_bonus = 0.05 if minor_sixth in pitch_classes else 0
+        
+        key_analysis[f"{key}_minor"] = {
+            'key': key,
+            'mode': 'minor',
+            'confidence': min(confidence + tonic_bonus + minor_third_bonus + minor_sixth_bonus, 1.0),
+            'scale_notes': scale_notes,
+            'total_notes': total_notes
+        }
+    
+    # Find the best key
+    best_key_name = max(key_analysis, key=lambda k: key_analysis[k]['confidence'])
+    best_analysis = key_analysis[best_key_name]
+    
+    # Handle ties in confidence scores - prefer C major when tied
+    best_confidence = best_analysis['confidence']
+    tied_keys = [k for k, v in key_analysis.items() if abs(v['confidence'] - best_confidence) < 0.001]
+    
+    if len(tied_keys) > 1:
+        # Priority order: C major > other major keys > minor keys
+        if 'C_major' in tied_keys:
+            best_key_name = 'C_major'
+            best_analysis = key_analysis[best_key_name]
+        else:
+            # Check if there are both major and minor versions of the same key
+            major_keys_in_tie = [k for k in tied_keys if k.endswith('_major')]
+            minor_keys_in_tie = [k for k in tied_keys if k.endswith('_minor')]
+            
+            # If we have both major and minor of the same key, prefer major
+            for minor_key in minor_keys_in_tie:
+                key_name = minor_key.replace('_minor', '')
+                corresponding_major = f"{key_name}_major"
+                if corresponding_major in major_keys_in_tie:
+                    best_key_name = corresponding_major
+                    best_analysis = key_analysis[best_key_name]
+                    break
+            
+            # If no direct major/minor pair, prefer any major key over minor
+            if best_key_name.endswith('_minor') and major_keys_in_tie:
+                # Find the major key with highest confidence
+                best_major = max(major_keys_in_tie, key=lambda k: key_analysis[k]['confidence'])
+                best_key_name = best_major
+                best_analysis = key_analysis[best_key_name]
+    
+    # Get top 3 candidates
+    sorted_keys = sorted(key_analysis.items(), key=lambda x: x[1]['confidence'], reverse=True)
+    top_candidates = sorted_keys[:3]
+    
+    return {
+        'key': best_analysis['key'],
+        'mode': best_analysis['mode'],
+        'confidence': best_analysis['confidence'],
+        'analysis': f"Best fit: {best_analysis['key']} {best_analysis['mode']} (confidence: {best_analysis['confidence']:.2f})",
+        'top_candidates': [(name, data['confidence']) for name, data in top_candidates],
+        'all_analysis': key_analysis
+    }
+
+
+def analyze_chord_notes(notes, key=None):
+    """
+    Analyze a list of notes and return possible chord types with their root notes.
+    Now considers key context for better analysis.
+    
+    Args:
+        notes: List of MIDI note numbers or note names
+        key: Optional key context for better analysis
+    
+    Returns:
+        List of tuples (root_note, chord_type, confidence_score)
+    """
+    # Convert notes to pitch classes (0-11)
+    pitch_classes = set()
+    
+    for note in notes:
+        if isinstance(note, int):
+            # MIDI note number
+            pitch_classes.add(note % 12)
+        elif isinstance(note, str):
+            # Note name like 'C', 'C#', 'Db', etc.
+            if note in pitch_to_key.values():
+                # Find the MIDI number for this note
+                for midi_num, note_name in pitch_to_key.items():
+                    if note_name == note:
+                        pitch_classes.add(midi_num)
+                        break
+    
+    if len(pitch_classes) < 2:
+        return []
+    
+    # Define chord patterns
+    chord_patterns = {
+        # Major chords
+        'major': [0, 4, 7],
+        'major7': [0, 4, 7, 11],
+        'major9': [0, 4, 7, 11, 2],
+        'major6': [0, 4, 7, 9],
+        'major6/9': [0, 4, 7, 9, 2],
+        
+        # Minor chords
+        'minor': [0, 3, 7],
+        'minor7': [0, 3, 7, 10],
+        'minor9': [0, 3, 7, 10, 2],
+        'minor6': [0, 3, 7, 9],
+        'minor6/9': [0, 3, 7, 9, 2],
+        'minor_major7': [0, 3, 7, 11],
+        
+        # Dominant chords
+        'dominant7': [0, 4, 7, 10],
+        'dominant9': [0, 4, 7, 10, 2],
+        'dominant11': [0, 4, 7, 10, 2, 5],
+        'dominant13': [0, 4, 7, 10, 2, 5, 9],
+        
+        # Diminished chords
+        'diminished': [0, 3, 6],
+        'diminished7': [0, 3, 6, 9],
+        'half_diminished7': [0, 3, 6, 10],
+        
+        # Augmented chords
+        'augmented': [0, 4, 8],
+        'augmented7': [0, 4, 8, 10],
+        
+        # Suspended chords
+        'sus2': [0, 2, 7],
+        'sus4': [0, 5, 7],
+        'sus2/7': [0, 2, 7, 10],
+        'sus4/7': [0, 5, 7, 10],
+        
+        # Power chords
+        'power_chord': [0, 7],
+        'power_octave': [0, 12],  # Same note, different octave
+        'full_octave': [0, 7, 12],  # Root, fifth, octave
+        
+        # Cluster chords
+        'cluster': [0, 1, 2],  # Adjacent notes
+        'cluster_wide': [0, 1, 2, 3],  # Wider cluster
+        
+        # Inversions
+        'first_inversion': [0, 3, 8],  # Major first inversion
+        'second_inversion': [0, 5, 9],  # Major second inversion
+        
+        # Root note only
+        'root_note': [0],
+    }
+    
+    # Convert pitch classes to list for easier manipulation
+    pitch_list = sorted(list(pitch_classes))
+    
+    # Get key context for better analysis
+    key_pc = None
+    key_scale = None
+    if key and key in pitch_to_key.values():
+        key_pc = list(pitch_to_key.keys())[list(pitch_to_key.values()).index(key)]
+        # Assume major scale for now (could be enhanced to detect mode)
+        key_scale = [(key_pc + interval) % 12 for interval in [0, 2, 4, 5, 7, 9, 11]]
+    
+    # Find possible chords
+    possible_chords = []
+    
+    for root in range(12):
+        # Try each root note
+        for chord_name, pattern in chord_patterns.items():
+            # Transpose the pattern to the root
+            transposed_pattern = [(p + root) % 12 for p in pattern]
+            
+            # Calculate how many notes match
+            matches = len(set(transposed_pattern) & set(pitch_list))
+            total_notes = len(pattern)
+            
+            # Calculate confidence score
+            if matches >= 2:  # At least 2 notes must match
+                confidence = matches / total_notes
+                
+                # Bonus for having the root note
+                if root in pitch_list:
+                    confidence += 0.2
+                
+                # Bonus for having the third (major/minor indicator)
+                if (root + 4) % 12 in pitch_list or (root + 3) % 12 in pitch_list:
+                    confidence += 0.1
+                
+                # Bonus for having the fifth
+                if (root + 7) % 12 in pitch_list:
+                    confidence += 0.1
+                
+                # KEY CONTEXT BONUS: Prefer chords that fit the key
+                if key_scale and root in key_scale:
+                    confidence += 0.15  # Significant bonus for chords in key
+                
+                # Additional bonus for chord tones that are in the key scale
+                if key_scale:
+                    chord_tones_in_key = sum(1 for pc in transposed_pattern if pc in key_scale)
+                    key_bonus = (chord_tones_in_key / len(transposed_pattern)) * 0.1
+                    confidence += key_bonus
+                
+                # Cap confidence at 1.0
+                confidence = min(confidence, 1.0)
+                
+                root_note = pitch_to_key[root]
+                possible_chords.append((root_note, chord_name, confidence))
+    
+    # Sort by confidence score (highest first)
+    possible_chords.sort(key=lambda x: x[2], reverse=True)
+    
+    # Filter out very low confidence matches
+    possible_chords = [chord for chord in possible_chords if chord[2] >= 0.3]
+    
+    return possible_chords
+
+
+def get_chord_analysis(tokens, key=None):
+    """
+    Analyze chords from tokenized MIDI data and return possible chord types.
+    
+    Args:
+        tokens: List of tokens from MIDI tokenizer
+        key: Optional key context
+    
+    Returns:
+        Dictionary with chord analysis results
+    """
+    # Extract notes from tokens
+    notes = []
+    for token in tokens:
+        if token.startswith('Pitch'):
+            pitch = int(token.split('_')[1])
+            notes.append(pitch)
+    
+    if not notes:
+        return {'error': 'No notes found in tokens'}
+    
+    # Analyze chords
+    chord_analysis = analyze_chord_notes(notes, key)
+    
+    # Get the most common pitch as key if not provided
+    if key is None:
+        key = get_key(tokens)
+    
+    # Group by root note
+    chords_by_root = {}
+    for root, chord_type, confidence in chord_analysis:
+        if root not in chords_by_root:
+            chords_by_root[root] = []
+        chords_by_root[root].append((chord_type, confidence))
+    
+    # Sort chords within each root by confidence
+    for root in chords_by_root:
+        chords_by_root[root].sort(key=lambda x: x[1], reverse=True)
+    
+    return {
+        'key': key,
+        'notes': sorted(list(set([note % 12 for note in notes]))),
+        'note_names': [pitch_to_key[note % 12] for note in set(notes)],
+        'possible_chords': chord_analysis,
+        'chords_by_root': chords_by_root,
+        'top_chords': chord_analysis[:5]  # Top 5 most likely chords
+    }
+
+
+def get_advanced_chord_analysis(tokens, key=None, style_context=None):
+    """
+    Advanced chord analysis with style classification and AccoMontage integration.
+    
+    Args:
+        tokens: List of tokens from MIDI tokenizer
+        key: Optional key context
+        style_context: Optional style context for better analysis
+    
+    Returns:
+        Dictionary with comprehensive chord analysis including style suggestions
+    """
+    # Get basic chord analysis
+    basic_analysis = get_chord_analysis(tokens, key)
+    
+    if 'error' in basic_analysis:
+        return basic_analysis
+    
+    # Map chord types to AccoMontage chord styles
+    chord_style_mapping = {
+        'major': 'standard',
+        'minor': 'standard',
+        'major7': 'seventh',
+        'minor7': 'seventh',
+        'dominant7': 'seventh',
+        'sus2': 'sus2',
+        'sus4': 'sus4',
+        'power_chord': 'power-chord',
+        'power_octave': 'power-octave',
+        'full_octave': 'full-octave',
+        'cluster': 'cluster',
+        'cluster_wide': 'cluster',
+        'first_inversion': 'first-inversion',
+        'second_inversion': 'second-inversion',
+        'root_note': 'root-note',
+        'augmented': 'classy',
+        'diminished': 'classy',
+        'diminished7': 'classy',
+        'half_diminished7': 'classy',
+        'minor_major7': 'classy',
+        'major9': 'emotional',
+        'minor9': 'emotional',
+        'dominant9': 'emotional',
+        'dominant11': 'emotional',
+        'dominant13': 'emotional',
+    }
+    
+    # Analyze chord styles
+    chord_styles = {}
+    for root, chord_type, confidence in basic_analysis['possible_chords']:
+        if chord_type in chord_style_mapping:
+            style = chord_style_mapping[chord_type]
+            if style not in chord_styles:
+                chord_styles[style] = []
+            chord_styles[style].append((root, chord_type, confidence))
+    
+    # Sort styles by average confidence
+    style_rankings = []
+    for style, chords in chord_styles.items():
+        avg_confidence = sum(conf for _, _, conf in chords) / len(chords)
+        max_confidence = max(conf for _, _, conf in chords)
+        style_rankings.append((style, avg_confidence, max_confidence, len(chords)))
+    
+    style_rankings.sort(key=lambda x: (x[1], x[2], x[3]), reverse=True)
+    
+    # Suggest progression styles based on chord analysis
+    progression_style_suggestions = []
+    
+    # Count different chord types
+    major_count = sum(1 for _, chord_type, _ in basic_analysis['possible_chords'] 
+                     if 'major' in chord_type and 'minor' not in chord_type)
+    minor_count = sum(1 for _, chord_type, _ in basic_analysis['possible_chords'] 
+                     if 'minor' in chord_type)
+    seventh_count = sum(1 for _, chord_type, _ in basic_analysis['possible_chords'] 
+                       if '7' in chord_type)
+    sus_count = sum(1 for _, chord_type, _ in basic_analysis['possible_chords'] 
+                   if 'sus' in chord_type)
+    
+    # Suggest progression styles
+    if seventh_count > 2:
+        progression_style_suggestions.append(('r&b', 0.8))
+    if sus_count > 1:
+        progression_style_suggestions.append(('pop', 0.7))
+    if minor_count > major_count:
+        progression_style_suggestions.append(('dark', 0.6))
+    if major_count > minor_count and seventh_count < 2:
+        progression_style_suggestions.append(('pop', 0.7))
+    
+    # Default to pop if no clear pattern
+    if not progression_style_suggestions:
+        progression_style_suggestions.append(('pop', 0.5))
+    
+    progression_style_suggestions.sort(key=lambda x: x[1], reverse=True)
+    
+    # Add AccoMontage integration suggestions
+    accomontage_suggestions = {
+        'chord_styles': [style for style, _, _, _ in style_rankings[:3]],
+        'progression_styles': [style for style, _ in progression_style_suggestions[:3]],
+        'recommended_chord_style': style_rankings[0][0] if style_rankings else 'standard',
+        'recommended_progression_style': progression_style_suggestions[0][0] if progression_style_suggestions else 'pop'
+    }
+    
+    return {
+        **basic_analysis,
+        'chord_styles': chord_styles,
+        'style_rankings': style_rankings,
+        'progression_style_suggestions': progression_style_suggestions,
+        'accomontage_suggestions': accomontage_suggestions
+    }
+
+
+def calculate_chorderator_bars(midi_path, tempo=None, note_shift=0):
+    """
+    Calculate the total bars exactly as chorderator will see them.
+    
+    This mimics chorderator's __construct_melo_sequence logic:
+    1. Quantize note positions to 16th notes
+    2. Find max_end position
+    3. Apply fix_end to round up to multiple of 4 bars
+    
+    Args:
+        midi_path: Path to MIDI file
+        tempo: Tempo to use (if None, reads from MIDI)
+        note_shift: Note shift in 16th note positions (same as chorderator)
+    
+    Returns:
+        dict: {
+            'max_end_positions': int (max note end in 16th note positions),
+            'fixed_end_positions': int (rounded up to 4-bar boundary),
+            'fixed_end_bars': int (total bars chorderator will see),
+            'tempo': float,
+            'unit': float (seconds per 16th note)
+        }
+    """
+    from pretty_midi import PrettyMIDI
+    
+    midi = PrettyMIDI(midi_path)
+    
+    # Get tempo (same logic as chorderator)
+    if tempo is None:
+        tempo = midi.get_tempo_changes()[1][0]
+    
+    # Unit = seconds per 16th note (same as chorderator)
+    unit = 60 / tempo / 4
+    
+    def quantize_note(time, unit):
+        """Quantize time to nearest 16th note position (same as chorderator)."""
+        base = time // unit
+        return int(base if time % unit < unit / 2 else base + 1)
+    
+    def fix_end(max_end_bars):
+        """Round up to multiple of 4 bars (same as chorderator)."""
+        max_end_bars = int(max_end_bars)
+        return max_end_bars if max_end_bars % 4 == 0 else int(((max_end_bars // 4) + 1) * 4)
+    
+    # Find max note end position
+    all_end_positions = []
+    for instrument in midi.instruments:
+        for note in instrument.notes:
+            end_pos = quantize_note(note.end, unit) - note_shift
+            if end_pos > 0:
+                all_end_positions.append(end_pos)
+    
+    if not all_end_positions:
+        return {
+            'max_end_positions': 0,
+            'fixed_end_positions': 64,  # minimum 4 bars
+            'fixed_end_bars': 4,
+            'tempo': tempo,
+            'unit': unit
+        }
+    
+    max_end = max(all_end_positions)
+    max_end_bars = max_end / 16
+    fixed_end_bars = fix_end(max_end_bars)
+    fixed_end_positions = fixed_end_bars * 16
+    
+    return {
+        'max_end_positions': max_end,
+        'fixed_end_positions': fixed_end_positions,
+        'fixed_end_bars': fixed_end_bars,
+        'tempo': tempo,
+        'unit': unit
+    }
+
+
+def analyze_midi_structure_from_file(midi_path):
+    """
+    Analyze MIDI structure directly from file to get accurate bar counts.
+    
+    Args:
+        midi_path: Path to the MIDI file
+    
+    Returns:
+        dict with empty_bars, content_bars, note_shift, etc.
+    """
+    score = Score(midi_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    ticks_per_bar = tpq * 4  # 4/4 time
+    
+    # Get all notes
+    all_notes = []
+    for track in score.tracks:
+        all_notes.extend(track.notes)
+    
+    if not all_notes:
+        return {
+            'total_bars': 0,
+            'empty_bars': 0,
+            'content_bars': 4,
+            'note_shift': 0,
+            'segmentation': 'A4',
+        }
+    
+    # Find first and last note positions
+    first_note_tick = min(n.start for n in all_notes)
+    last_note_tick = max(n.end for n in all_notes)
+    
+    # Calculate bars
+    first_note_bar = first_note_tick / ticks_per_bar
+    last_note_bar = last_note_tick / ticks_per_bar
+    
+    # Empty bars = floor of first note bar (complete empty bars before first note)
+    empty_bars = int(first_note_bar)
+    
+    # Content bars = from first note bar to last note bar
+    # Use floor to ensure we don't claim more bars than we have content
+    content_bars = int(last_note_bar) - empty_bars
+    
+    # Ensure content_bars is at least 4
+    if content_bars < 4:
+        content_bars = 4
+    
+    # Note shift
+    note_shift = empty_bars * 16
+    
+    # Calculate segmentation (round DOWN to avoid empty phrases)
+    segmentation = calculate_segmentation(content_bars)
+    
+    return {
+        'total_bars': int(last_note_bar) + 1,
+        'empty_bars': empty_bars,
+        'content_bars': content_bars,
+        'note_shift': note_shift,
+        'segmentation': segmentation,
+        'first_note_bar': first_note_bar,
+        'last_note_bar': last_note_bar,
+    }
+
+
+def analyze_midi_structure(tokens):
+    """
+    Analyze MIDI structure to determine note_shift and segmentation
+    
+    NOTE: This token-based analysis may not be accurate. 
+    Consider using analyze_midi_structure_from_file() for better accuracy.
+    
+    Args:
+        tokens: List of tokens from tokenizer
+    
+    Returns:
+        dict: {
+            'total_bars': int,
+            'empty_bars': int,
+            'content_bars': int,
+            'note_shift': int,
+            'segmentation': str,
+            'first_note_position': int,
+            'bar_positions': list
+        }
+    """
+    # Find all bar positions
+    bar_positions = [i for i, token in enumerate(tokens) if token.startswith('Bar_None')]
+    total_bars = len(bar_positions)
+    
+    # Find first note position
+    first_note_position = None
+    for i, token in enumerate(tokens):
+        if token.startswith('Pitch_'):
+            first_note_position = i
+            break
+
+
+    empty_bars = 0
+    # Calculate empty bars before first note
+    # A bar is truly empty if the NEXT bar also starts before the first note
+    # (meaning no Pitch tokens exist in that bar)
+    if first_note_position is not None and len(bar_positions) >= 2:
+        for i in range(len(bar_positions) - 1):
+            # If the next bar also starts before the first note, this bar is empty
+            if bar_positions[i + 1] <= first_note_position:
+                empty_bars += 1
+            else:
+                # This bar contains the first note
+                break
+    
+    # Calculate content bars (bars with actual content)
+    content_bars = total_bars - empty_bars
+    
+    # Calculate note_shift (empty_bars * 16 positions per bar)
+    note_shift = empty_bars * 16
+    
+    # Calculate segmentation based on content_bars
+    segmentation = calculate_segmentation(content_bars)
+    
+    return {
+        'total_bars': total_bars,
+        'empty_bars': empty_bars,
+        'content_bars': content_bars,
+        'note_shift': note_shift,
+        'segmentation': segmentation,
+        'first_note_position': first_note_position,
+        'bar_positions': bar_positions
+    }
+
+
+def get_valid_bar_count(content_bars, round_up=False):
+    """
+    Get the nearest valid bar count that chorderator supports.
+    
+    Chorderator supports any phrase length that is a multiple of 4 bars (minimum 4 bars).
+    
+    Args:
+        content_bars: Actual number of bars with content
+        round_up: If True, round UP to nearest multiple of 4.
+                  If False (default), round DOWN to avoid empty phrases.
+    
+    Returns:
+        int: Nearest valid bar count (multiple of 4)
+    """
+    if content_bars <= 0:
+        return 4
+    
+    if content_bars <= 4:
+        return 4
+    
+    if round_up:
+        # Round UP to nearest multiple of 4
+        return ((content_bars + 3) // 4) * 4
+    else:
+        # Round DOWN to nearest multiple of 4 (safer - avoids empty phrases)
+        return (content_bars // 4) * 4
+
+
+def get_segmentation_splits(content_bars):
+    """
+    Get the segmentation splits for content_bars.
+    
+    Args:
+        content_bars: Number of bars with actual content
+    
+    Returns:
+        list: List of (start_bar, end_bar, segment_length) tuples
+              segment_length is the padded length for that segment
+    """
+    if content_bars <= 0:
+        return [(0, 4, 4)]
+    
+    # Simply pad to the valid bar count
+    padded_length = get_valid_bar_count(content_bars)
+    return [(0, content_bars, padded_length)]
+
+
+def calculate_segmentation(content_bars):
+    """
+    Calculate segmentation pattern based on content bars.
+    
+    Chorderator supports any phrase length that is a multiple of 4 bars (minimum 4 bars).
+    This function pads content_bars UP to the nearest multiple of 4.
+    
+    Args:
+        content_bars: Number of bars with actual content
+    
+    Returns:
+        str: Segmentation pattern (e.g., 'A8B8A8B8', 'A4', 'A8', 'A8B4')
+    """
+    if content_bars <= 0:
+        return 'A4'  # Default fallback
+    
+    # Get the valid (padded) total
+    valid_total = get_valid_bar_count(content_bars)
+    
+    if valid_total <= 4:
+        print(f"Content bars: {content_bars} -> Segmentation: A4 (total: 4)")
+        return 'A4'
+    
+    if valid_total <= 8:
+        print(f"Content bars: {content_bars} -> Segmentation: A8 (total: 8)")
+        return 'A8'
+    
+    # Build segments using 8s and 4s
+    segments = []
+    remaining = valid_total
+    
+    while remaining >= 8:
+        segments.append(8)
+        remaining -= 8
+    
+    if remaining == 4:
+        segments.append(4)
+    
+    # Build segmentation string with alternating A/B labels
+    seg_parts = []
+    for i, length in enumerate(segments):
+        label = chr(ord('A') + (i % 2))  # Alternate A, B, A, B, ...
+        seg_parts.append(f"{label}{length}")
+    
+    result = ''.join(seg_parts)
+    total = sum(segments)
+    
+    print(f"Content bars: {content_bars} -> Segmentation: {result} (total: {total})")
+    return result
+
+
+def get_auto_config(tokens, midi_path=None):
+    """
+    Get automatic configuration for AccoMontage based on MIDI analysis
+    
+    Args:
+        tokens: List of tokens from tokenizer
+        midi_path: Optional path to MIDI file for more accurate analysis
+    
+    Returns:
+        dict: {
+            'note_shift': int,
+            'segmentation': str,
+            'analysis': dict (from analyze_midi_structure)
+        }
+    """
+    # Use file-based analysis if midi_path is provided (more accurate)
+    if midi_path is not None:
+        analysis = analyze_midi_structure_from_file(midi_path)
+        
+        # Calculate what chorderator will actually see
+        # This is crucial: chorderator rounds UP to 4-bar boundaries
+        chorderator_bars = calculate_chorderator_bars(midi_path, note_shift=analysis['note_shift'])
+        
+        # Use chorderator's fixed_end_bars for segmentation
+        # This ensures our segmentation matches what chorderator will actually process
+        actual_bars_for_segmentation = chorderator_bars['fixed_end_bars']
+        
+        # Recalculate segmentation based on what chorderator sees
+        segmentation = calculate_segmentation_for_chorderator(actual_bars_for_segmentation)
+        
+        analysis['chorderator_bars'] = chorderator_bars
+        analysis['segmentation'] = segmentation
+    else:
+        analysis = analyze_midi_structure(tokens)
+        segmentation = analysis['segmentation']
+    
+    return {
+        'note_shift': analysis['note_shift'],
+        'segmentation': segmentation,
+        'analysis': analysis
+    }
+
+
+def calculate_segmentation_for_chorderator(total_bars):
+    """
+    Calculate segmentation pattern that exactly matches the given total bars.
+    
+    This is used when we know exactly how many bars chorderator will process
+    (from calculate_chorderator_bars).
+    
+    Args:
+        total_bars: Total bars that chorderator will see (already rounded to 4)
+    
+    Returns:
+        str: Segmentation pattern that covers exactly total_bars
+    """
+    if total_bars <= 0:
+        return 'A4'
+    
+    # Ensure it's a multiple of 4
+    if total_bars % 4 != 0:
+        total_bars = ((total_bars // 4) + 1) * 4
+    
+    if total_bars <= 4:
+        print(f"Chorderator bars: {total_bars} -> Segmentation: A4")
+        return 'A4'
+    
+    if total_bars <= 8:
+        print(f"Chorderator bars: {total_bars} -> Segmentation: A8")
+        return 'A8'
+    
+    # Build segments using 8s and 4s
+    segments = []
+    remaining = total_bars
+    
+    while remaining >= 8:
+        segments.append(8)
+        remaining -= 8
+    
+    if remaining == 4:
+        segments.append(4)
+    
+    # Build segmentation string with alternating A/B labels
+    seg_parts = []
+    for i, length in enumerate(segments):
+        label = chr(ord('A') + (i % 2))  # Alternate A, B, A, B, ...
+        seg_parts.append(f"{label}{length}")
+    
+    result = ''.join(seg_parts)
+    actual_total = sum(segments)
+    
+    print(f"Chorderator bars: {total_bars} -> Segmentation: {result} (total: {actual_total})")
+    return result
+
+
+def _build_tempo_map(midi):
+    """Build tempo map: list of (abs_ticks, us_per_beat).
+    Default tempo is 500000 us/beat until first set_tempo.
+    """
+    import mido
+    ticks_per_beat = midi.ticks_per_beat
+    merged = mido.merge_tracks(midi.tracks)
+    tempos = []
+    current_tick = 0
+    current_tempo = 500000  # default 120bpm
+
+    # Start with initial tempo at tick 0
+    tempos.append((0, current_tempo))
+
+    for msg in merged:
+        current_tick += msg.time
+        if msg.type == 'set_tempo':
+            current_tempo = msg.tempo
+            # Avoid duplicates at same tick
+            if tempos and tempos[-1][0] == current_tick:
+                tempos[-1] = (current_tick, current_tempo)
+            else:
+                tempos.append((current_tick, current_tempo))
+    return tempos, ticks_per_beat
+
+
+def _ticks_to_seconds(ticks, tempo_map, tpq):
+    """Convert absolute ticks to seconds using tempo map (list of (tick, us_per_beat))."""
+    seconds = 0.0
+    last_tick = 0
+    last_tempo = tempo_map[0][1] if tempo_map else 500000
+    for i in range(1, len(tempo_map)):
+        t_tick, t_tempo = tempo_map[i]
+        if ticks <= t_tick:
+            seg_ticks = ticks - last_tick
+            seconds += (seg_ticks / tpq) * (last_tempo / 1_000_000.0)
+            return seconds
+        # full segment
+        seg_ticks = t_tick - last_tick
+        seconds += (seg_ticks / tpq) * (last_tempo / 1_000_000.0)
+        last_tick = t_tick
+        last_tempo = t_tempo
+    # after last tempo change
+    seg_ticks = ticks - last_tick
+    seconds += (seg_ticks / tpq) * (last_tempo / 1_000_000.0)
+    return seconds
+
+
+def _quality_to_label(root: str, chord_type: str) -> str:
+    ct = chord_type.lower()
+    if ct == 'major':
+        return root
+    if ct == 'minor':
+        return f"{root}:min"
+    if ct == 'major7':
+        return f"{root}:maj7"
+    if ct == 'minor7':
+        return f"{root}:min7"
+    if ct == 'dominant7':
+        return f"{root}:7"
+    if ct == 'diminished':
+        return f"{root}:dim"
+    if ct == 'half_diminished7':
+        return f"{root}:ø"
+    if ct == 'diminished7':
+        return f"{root}:dim7"
+    if ct == 'augmented':
+        return f"{root}:aug"
+    if ct == 'sus2':
+        return f"{root}:sus2"
+    if ct == 'sus4':
+        return f"{root}:sus4"
+    if ct == 'major9':
+        return f"{root}:maj9"
+    if ct == 'minor9':
+        return f"{root}:min9"
+    if ct == 'dominant9':
+        return f"{root}:9"
+    if ct == 'dominant11':
+        return f"{root}:11"
+    if ct == 'dominant13':
+        return f"{root}:13"
+    if 'minor' in ct:
+        return f"{root}:min"
+    if 'sus' in ct:
+        return f"{root}:sus"
+    if 'aug' in ct:
+        return f"{root}:aug"
+    if 'dim' in ct:
+        return f"{root}:dim"
+    return root
+
+
+def _is_diatonic(root_note: str, chord_type: str, key_name: str, mode: str) -> bool:
+    try:
+        root_pc = list(pitch_to_key.keys())[list(pitch_to_key.values()).index(root_note)]
+    except ValueError:
+        return False
+    if key_name not in pitch_to_key.values():
+        return True
+    key_pc = list(pitch_to_key.keys())[list(pitch_to_key.values()).index(key_name)]
+    if (mode or '').lower().startswith('maj'):
+        degree_to_quality = {0: 'major', 2: 'minor', 4: 'minor', 5: 'major', 7: 'major', 9: 'minor', 11: 'diminished'}
+    else:
+        degree_to_quality = {0: 'minor', 2: 'diminished', 3: 'major', 5: 'minor', 7: 'minor', 8: 'major', 10: 'major'}
+    semitone = (root_pc - key_pc) % 12
+    expected_quality = degree_to_quality.get(semitone)
+    if expected_quality is None:
+        return False
+    ct = chord_type.lower()
+    # Treat root-only detection as acceptable (assume tonic chord tone context)
+    if ct == 'root_note':
+        return True
+    if ct.startswith('sus'):
+        return expected_quality in ('major', 'minor')
+    if expected_quality == 'major':
+        if ct in ('major', 'major7', 'major9'):
+            return True
+        if ct in ('dominant7', 'dominant9', 'dominant11', 'dominant13'):
+            return semitone == 7
+        return False
+    if expected_quality == 'minor':
+        return ct in ('minor', 'minor7', 'minor9')
+    if expected_quality == 'diminished':
+        return ct in ('diminished', 'half_diminished7', 'diminished7')
+    return False
+
+
+def _notes_to_chord_root_and_type(note_numbers, key_name=None, mode=None):
+    if not note_numbers:
+        return None
+    # Use key to bias candidates if available
+    possible = analyze_chord_notes(list(note_numbers), key=key_name) if key_name else analyze_chord_notes(list(note_numbers))
+    if not possible:
+        return None
+    # If key provided, prefer diatonic candidates when close in score, and avoid always picking tonic
+    if key_name is not None and mode is not None:
+        # prefer diatonic candidates; first, if same-root diatonic exists, choose best of them
+        # otherwise choose best diatonic within a reasonable margin; otherwise fallback to top
+        # find top score
+        top_score = possible[0][2]
+        # best diatonic overall
+        diatonic_all = [(r, ct, sc) for (r, ct, sc) in possible if _is_diatonic(r, ct, key_name, mode)]
+        if diatonic_all:
+            # prefer same-root diatonic when available
+            # get root of top candidate for tie-breaking
+            top_root = possible[0][0]
+            same_root_diatonic = [(r, ct, sc) for (r, ct, sc) in diatonic_all if r == top_root]
+            if same_root_diatonic:
+                r, ct, _ = same_root_diatonic[0]
+                return r, ct
+            # otherwise take highest-score diatonic, allowing larger margin
+            diatonic_all.sort(key=lambda x: x[2], reverse=True)
+            # try prefer non-tonic root if close to top, to avoid always C
+            non_tonic = [(r, ct, sc) for (r, ct, sc) in diatonic_all if r != key_name]
+            if non_tonic:
+                non_tonic.sort(key=lambda x: x[2], reverse=True)
+                r2, ct2, sc2 = non_tonic[0]
+                if (top_score - sc2) <= 0.18 or not _is_diatonic(possible[0][0], possible[0][1], key_name, mode):
+                    return r2, ct2
+            r, ct, sc = diatonic_all[0]
+            if (top_score - sc) <= 0.25 or not _is_diatonic(possible[0][0], possible[0][1], key_name, mode):
+                return r, ct
+    r, ct, _ = possible[0]
+    return r, ct
+
+
+def export_chords_txt(midi_file_path, output_txt_path=None, key_name=None, mode=None):
+    """
+    Extract chord track and export as a text file with lines:
+    start_sec end_sec chord_label
+
+    - start/end in seconds with 3 decimals
+    - chord_label like 'C', 'D:min', or 'N'
+    - saved next to the MIDI file if output_txt_path not provided
+    """
+    # Load with symusic for reliable note parsing (ticks)
+    score = Score(midi_file_path, ttype='tick')
+    if len(score.tracks) < 2:
+        # Still produce an empty file with N
+        from pathlib import Path
+        out = output_txt_path or str(Path(midi_file_path).with_suffix('')) + '_chords.txt'
+        with open(out, 'w', encoding='utf-8') as f:
+            f.write('0.000 0.000 N\n')
+        return out
+
+    # Identify chord track
+    chord_idx = None
+    for i, track in enumerate(score.tracks):
+        name = (track.name or '').lower()
+        if 'chord' in name or i == 1:
+            chord_idx = i
+            break
+    if chord_idx is None:
+        chord_idx = 1 if len(score.tracks) > 1 else 0
+
+    chord_notes = score.tracks[chord_idx].notes
+
+    # Detect key/mode if not provided
+    if key_name is None or mode is None:
+        pseudo_tokens = []
+        for tr in score.tracks:
+            for n in tr.notes:
+                pseudo_tokens.append(f"Pitch_{n.pitch}")
+        analysis = get_detailed_key_analysis(pseudo_tokens)
+        key_name = key_name or analysis['key']
+        mode = mode or analysis['mode']
+
+    # Build event list (start/end) in ticks
+    events = []  # (tick, type, note)
+    for n in chord_notes:
+        events.append((n.start, 1, n.pitch))  # 1 = note_on
+        events.append((n.end, 0, n.pitch))    # 0 = note_off
+    if not events:
+        from pathlib import Path
+        out = output_txt_path or str(Path(midi_file_path).with_suffix('')) + '_chords.txt'
+        with open(out, 'w', encoding='utf-8') as f:
+            f.write('0.000 0.000 N\n')
+        return out
+
+    # Sort by time, note_off before note_on at same tick to avoid zero-length segments
+    events.sort(key=lambda x: (x[0], x[1]))
+
+    # Prepare tempo map using mido
+    import mido
+    midi = mido.MidiFile(midi_file_path)
+    tempo_map, tpq = _build_tempo_map(midi)
+
+    # Sweep to build segments
+    active = set()
+    segments = []  # (start_tick, end_tick, label, out_of_key: bool)
+    last_tick = events[0][0]
+    for tick, typ, note in events:
+        if tick > last_tick:
+            rot = _notes_to_chord_root_and_type(active, key_name, mode)
+            if rot is None:
+                label = 'N'
+                out_of_key = False
+            else:
+                root, chord_type = rot
+                label = _quality_to_label(root, chord_type)
+                out_of_key = not _is_diatonic(root, chord_type, key_name, mode)
+            segments.append((last_tick, tick, label, out_of_key))
+            last_tick = tick
+        # Apply event
+        if typ == 1:
+            active.add(note)
+        else:
+            active.discard(note)
+
+    # Merge consecutive segments with same label and ignore zero-length
+    merged = []
+    for s in segments:
+        if s[0] == s[1]:
+            continue
+        if merged and merged[-1][2] == s[2] and merged[-1][3] == s[3] and merged[-1][1] == s[0]:
+            merged[-1] = (merged[-1][0], s[1], s[2], s[3])
+        else:
+            merged.append(s)
+
+    # Convert to seconds and write file
+    from pathlib import Path
+    out = output_txt_path or str(Path(midi_file_path).with_suffix('')) + '_chords.txt'
+    with open(out, 'w', encoding='utf-8') as f:
+        # First line: key and mode
+        f.write(f"Key: {key_name} {mode}\n")
+        for start_tick, end_tick, label, out_of_key in merged:
+            start_sec = _ticks_to_seconds(start_tick, tempo_map, tpq)
+            end_sec = _ticks_to_seconds(end_tick, tempo_map, tpq)
+            norm = _normalize_symbol_to_tone_mode(label)
+            suffix = " (out_of_key)" if out_of_key and norm != 'N' else ""
+            f.write(f"{start_sec:.3f} {end_sec:.3f} {norm}{suffix}\n")
+    return out
+
+
+def export_chords_txt_chorder(midi_file_path, output_txt_path=None, beats=True, beat_times=None, beat_subdivision=1):
+    """
+    Alternative exporter using chorder (by-beat chord detection).
+    
+    Args:
+        midi_file_path: Path to MIDI file
+        output_txt_path: Output txt path (optional)
+        beats: Whether to use beat-level detection
+        beat_times: Optional array of actual beat times (from SingNet) to remap chord times.
+                   If provided, chord times will be aligned to these actual beat positions
+                   instead of using the fixed MIDI tempo.
+        beat_subdivision: What subdivision the beat_times represent (default 1 = quarter notes)
+                         - 1 = quarter notes (beats)
+                         - 2 = 8th notes (each chord spans 2 beat_times)
+                         - 4 = 16th notes (each chord spans 4 beat_times)
+    """
+    from miditoolkit.midi import parser
+    from chorder import Dechorder
+    midi = parser.MidiFile(midi_file_path)
+    chords = Dechorder.dechord(midi)  # list of chord symbols per beat
+    # Build tempo map using miditoolkit tempo changes (BPM) for better accuracy
+    tpq = midi.ticks_per_beat
+    tempo_changes = sorted(midi.tempo_changes, key=lambda t: t.time)
+    # Try to get more reliable qpm from symusic if available
+    try:
+        _score_tmp = Score(midi_file_path, ttype='tick')
+        qpm = float(getattr(_score_tmp, 'tempo', 0.0)) if hasattr(_score_tmp, 'tempo') else 0.0
+        if qpm and qpm > 0:
+            # Override as a single global tempo change
+            tempo_changes = [type('T', (), {'time': 0, 'tempo': qpm})()]
+    except Exception:
+        pass
+    if not tempo_changes:
+        # default 120 bpm
+        tempo_changes = [type('T', (), {'time': 0, 'tempo': 120.0})()]
+
+    def ticks_to_seconds_bpm(ticks: int) -> float:
+        seconds = 0.0
+        last_tick = 0
+        last_bpm = tempo_changes[0].tempo
+        for i in range(1, len(tempo_changes)):
+            t = tempo_changes[i]
+            if ticks <= t.time:
+                seg_ticks = ticks - last_tick
+                seconds += (seg_ticks / tpq) * (60.0 / last_bpm)
+                return seconds
+            seg_ticks = t.time - last_tick
+            seconds += (seg_ticks / tpq) * (60.0 / last_bpm)
+            last_tick = t.time
+            last_bpm = t.tempo
+        seg_ticks = ticks - last_tick
+        seconds += (seg_ticks / tpq) * (60.0 / last_bpm)
+        return seconds
+    
+    # If beat_times provided, create a mapping from beat index to actual time
+    def get_beat_time(beat_idx):
+        """Get actual beat time from beat_times array, or extrapolate if out of range.
+        
+        When beat_subdivision > 1, each chord beat (quarter note) spans multiple beat_times entries.
+        E.g., if beat_subdivision=2 (8th notes), chord at beat i starts at beat_times[i*2].
+        """
+        if beat_times is None:
+            # Fall back to MIDI tempo calculation
+            return ticks_to_seconds_bpm(beat_idx * tpq)
+        
+        # Adjust index based on subdivision
+        # Chord beat index i corresponds to beat_times[i * beat_subdivision]
+        actual_idx = beat_idx * beat_subdivision
+        
+        if actual_idx < len(beat_times):
+            return beat_times[actual_idx]
+        else:
+            # Extrapolate beyond available beat times
+            if len(beat_times) >= 2:
+                # Use average interval from last few beats
+                last_intervals = []
+                for i in range(max(0, len(beat_times)-5), len(beat_times)-1):
+                    last_intervals.append(beat_times[i+1] - beat_times[i])
+                avg_interval = sum(last_intervals) / len(last_intervals) if last_intervals else 0.5
+                # Extrapolate using the actual beat_times interval
+                return beat_times[-1] + (actual_idx - len(beat_times) + 1) * avg_interval
+            else:
+                return ticks_to_seconds_bpm(beat_idx * tpq)
+    
+    # Write
+    from pathlib import Path
+    out = output_txt_path or str(Path(midi_file_path).with_suffix('')) + '_chords_chorder.txt'
+    with open(out, 'w', encoding='utf-8') as f:
+        for i, symbol in enumerate(chords):
+            start_sec = get_beat_time(i)
+            end_sec = get_beat_time(i + 1)
+            # chorder returns Chord objects or strings depending on version
+            label = 'N'
+            if symbol:
+                try:
+                    # Prefer text if available
+                    label = str(symbol)
+                except Exception:
+                    label = 'N'
+            norm = _normalize_symbol_to_tone_mode(label)
+            f.write(f"{start_sec:.3f} {end_sec:.3f} {norm}\n")
+    
+    if beat_times is not None:
+        subdivision_name = {1: "quarter notes", 2: "8th notes", 4: "16th notes"}.get(beat_subdivision, f"1/{beat_subdivision} notes")
+        print(f"Chord times remapped to {len(beat_times)} beat positions (subdivision: {subdivision_name})")
+    
+    return out
+
+
+def fill_none_chords_in_txt(input_txt_path, output_txt_path=None):
+    """
+    Fill 'None' or 'N' chords in a chord txt file by extending the previous chord.
+    
+    Args:
+        input_txt_path: Path to input chord txt file
+        output_txt_path: Path to output file (optional, defaults to same as input with _filled suffix)
+    
+    Returns:
+        str: Path to output file
+    """
+    from pathlib import Path
+    
+    lines = []
+    with open(input_txt_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                parts = line.split()
+                if len(parts) >= 3:
+                    start, end, chord = parts[0], parts[1], parts[2]
+                    lines.append([float(start), float(end), chord])
+    
+    # Fill None chords with previous chord
+    last_valid_chord = None
+    none_count = 0
+    
+    for i, (start, end, chord) in enumerate(lines):
+        if chord.lower() in ('none', 'n'):
+            if last_valid_chord is not None:
+                lines[i][2] = last_valid_chord
+                none_count += 1
+            # If no previous chord, keep as is (will be handled at output)
+        else:
+            last_valid_chord = chord
+    
+    # Handle leading None chords - look for first valid chord and backfill
+    first_valid_idx = None
+    for i, (start, end, chord) in enumerate(lines):
+        if chord.lower() not in ('none', 'n'):
+            first_valid_idx = i
+            break
+    
+    if first_valid_idx is not None and first_valid_idx > 0:
+        first_valid_chord = lines[first_valid_idx][2]
+        for i in range(first_valid_idx):
+            if lines[i][2].lower() in ('none', 'n'):
+                lines[i][2] = first_valid_chord
+                none_count += 1
+    
+    # Write output
+    if output_txt_path is None:
+        base = str(Path(input_txt_path).with_suffix(''))
+        output_txt_path = base + '_filled.txt'
+    
+    with open(output_txt_path, 'w', encoding='utf-8') as f:
+        for start, end, chord in lines:
+            f.write(f"{start:.3f} {end:.3f} {chord}\n")
+    
+    if none_count > 0:
+        print(f"Filled {none_count} None chords")
+    
+    return output_txt_path
+
+
+# --- Chord symbol normalization ---
+def _normalize_symbol_to_tone_mode(symbol: str) -> str:
+    """Normalize chord symbols to 'Tone[:quality]' style, e.g., CM->C, Am->A:min, Gm7->G:min7.
+    Keeps 'N' as is. Accepts inputs from chorder like 'CM','Am','Dm','G','Bb','Gm7'.
+    """
+    if not symbol:
+        return 'N'
+    s = symbol.strip()
+    if s.upper() == 'N':
+        return 'N'
+    import re
+    m = re.match(r'^([A-G](?:#|b)?)(.*)$', s)
+    if not m:
+        return s
+    root, qual = m.group(1), m.group(2)
+    qual = qual.strip()
+    # Common aliases
+    q = qual
+    q_low = q.lower()
+    # Exact common cases
+    if q in ('', 'M', 'maj'):
+        return root
+    if q_low in ('m', 'min'):
+        return f"{root}:min"
+    if q_low in ('m7', 'min7'):
+        return f"{root}:min7"
+    if q_low in ('maj7',):
+        return f"{root}:maj7"
+    if q_low in ('7',):
+        return f"{root}:7"
+    if q_low in ('m9', 'min9'):
+        return f"{root}:min9"
+    if q_low in ('maj9',):
+        return f"{root}:maj9"
+    if q_low in ('dim', 'o'):
+        return f"{root}:dim"
+    if q_low in ('dim7', 'o7'):
+        return f"{root}:dim7"
+    if q_low in ('aug', '+'):
+        return f"{root}:aug"
+    if q_low in ('sus2',):
+        return f"{root}:sus2"
+    if q_low in ('sus4',):
+        return f"{root}:sus4"
+    # Patterns like Gm7, Bbmaj7, Cdim, Aaug, Dsus4
+    if q_low.startswith('m7'):
+        return f"{root}:min7"
+    if q_low.startswith('m'):
+        return f"{root}:min"
+    if q_low.startswith('maj7'):
+        return f"{root}:maj7"
+    if q_low.startswith('maj9'):
+        return f"{root}:maj9"
+    if q_low.startswith('dim7'):
+        return f"{root}:dim7"
+    if q_low.startswith('dim'):
+        return f"{root}:dim"
+    if q_low.startswith('aug'):
+        return f"{root}:aug"
+    if q_low.startswith('sus2'):
+        return f"{root}:sus2"
+    if q_low.startswith('sus4'):
+        return f"{root}:sus4"
+    if q_low.startswith('7'):
+        return f"{root}:7"
+    # Fallback: return root + cleaned qual if any
+    return root if not q else f"{root}:{q}"
+
+
+# --- Tempo utilities ---
+def get_initial_bpm(midi_path: str) -> float:
+    """Read initial tempo (BPM) from a MIDI file. Fallback to 120 if missing."""
+    try:
+        # Prefer miditoolkit
+        from miditoolkit.midi import parser
+        mf = parser.MidiFile(midi_path)
+        if mf.tempo_changes:
+            return float(mf.tempo_changes[0].tempo)
+    except Exception:
+        pass
+    try:
+        # Fallback mido
+        import mido as _m
+        f = _m.MidiFile(midi_path)
+        abs_t = 0
+        for msg in _m.merge_tracks(f.tracks):
+            abs_t += msg.time
+            if msg.type == 'set_tempo':
+                return 60_000_000.0 / msg.tempo
+    except Exception:
+        pass
+    return 120.0
+
+
+def set_midi_global_bpm(target_midi_path: str, bpm: float, output_path: Optional[str] = None) -> str:
+    """Set/override global tempo at tick 0 for a MIDI file, preserving other events.
+    Writes to output_path (or in-place if None) and returns the path written."""
+    import mido as _m
+    mid = _m.MidiFile(target_midi_path)
+    tempo_us = int(round(60_000_000.0 / bpm))
+    # Ensure tempo at the very beginning of track 0
+    for ti, tr in enumerate(mid.tracks):
+        # Insert set_tempo at time 0 at the very start
+        # Keep existing delta times by pushing current first event after tempo if needed
+        if ti == 0:
+            # If there's already a tempo at start, replace it
+            if tr and getattr(tr[0], 'type', None) == 'set_tempo' and tr[0].time == 0:
+                tr[0] = _m.MetaMessage('set_tempo', tempo=tempo_us, time=0)
+            else:
+                tr.insert(0, _m.MetaMessage('set_tempo', tempo=tempo_us, time=0))
+            break
+    out = output_path or target_midi_path
+    mid.save(out)
+    return out
+
+
+def sync_output_tempo_with_input(input_midi_path: str, output_midi_paths: list[str]) -> list[str]:
+    """Make all output MIDI files use the same tempo as the input MIDI.
+    Returns the list of written paths (same as inputs)."""
+    bpm = get_initial_bpm(input_midi_path)
+    written = []
+    for p in output_midi_paths:
+        written.append(set_midi_global_bpm(p, bpm))
+    return written
+
+def fill_empty_bars_with_chords(input_melody_path, midi_file_path, empty_bars, output_path=None):
+    """
+    Fill empty bars at the beginning with chords from the chord generation using symusic.
+    
+    This function does two things:
+    1. Aligns chord timing with the original melody by converting TPQ
+    2. Copies chord pattern from the beginning of generated chords to fill empty bars
+       (i.e., if chords start at bar N, copy the first few bars of chords to bar 0)
+    
+    Args:
+        input_melody_path: Path to the original melody MIDI file
+        midi_file_path: Path to the generated chord MIDI file
+        empty_bars: Number of empty bars at the beginning (before melody starts)
+        output_path: Optional output path, defaults to input path with '_filled' suffix
+    
+    Returns:
+        str: Path to the output file
+    """
+    from symusic import Note
+    
+    # Load MIDI files
+    chord_score = Score(midi_file_path, ttype="tick")
+    original_score = Score(input_melody_path, ttype="tick")
+    
+    # Get TPQ values
+    original_tpq = original_score.ticks_per_quarter
+    chord_tpq = chord_score.ticks_per_quarter
+    tpq_ratio = original_tpq / chord_tpq
+    
+    print(f"=== Fill Empty Bars with Chords ===")
+    print(f"Original melody TPQ: {original_tpq}")
+    print(f"Chord gen TPQ: {chord_tpq}")
+    print(f"TPQ ratio: {tpq_ratio:.4f}")
+    
+    if len(chord_score.tracks) < 2:
+        print("Warning: MIDI file doesn't have both piano and chord tracks")
+        return midi_file_path
+    
+    # Track indices (assuming standard AccoMontage output)
+    piano_track_idx = 0
+    chord_track_idx = 1
+    
+    # Get chord track
+    chord_track_obj = chord_score.tracks[chord_track_idx]
+    if not chord_track_obj.notes:
+        print("Warning: No chord notes found")
+        return midi_file_path
+    
+    # Calculate timing constants
+    ticks_per_bar_chord = chord_tpq * 4  # 4 beats per bar in 4/4 time
+    ticks_per_bar_original = original_tpq * 4
+    
+    # Find where chords actually start
+    first_chord_tick = chord_track_obj.notes[0].start
+    first_chord_bar = first_chord_tick / ticks_per_bar_chord
+    
+    print(f"Chords start at tick: {first_chord_tick} (bar {first_chord_bar:.2f})")
+    print(f"Empty bars to fill: {empty_bars}")
+    
+    # Create new score with original TPQ
+    new_score = Score(ttype="tick")
+    new_score.ticks_per_quarter = original_tpq
+    new_score.tempos = original_score.tempos
+    
+    from symusic import Track
+    new_chord_track = Track(name="Chords")
+    
+    # Helper function to convert tick from chord TPQ to original TPQ
+    def convert_tick(tick_in_chord_tpq):
+        return int(tick_in_chord_tpq * tpq_ratio)
+    
+    # STEP 1: If chords don't start from bar 0, we need to fill the empty space
+    # Copy the chord pattern from the beginning to fill the gap
+    
+    fill_ticks_chord = int(first_chord_bar) * ticks_per_bar_chord  # Gap to fill in chord TPQ
+    
+    if fill_ticks_chord > 0 and first_chord_tick > 0:
+        # We have empty space at the beginning
+        # Collect chord notes from the first section to use as pattern
+        # Use chords from the first 'empty_bars' bars (or first_chord_bar bars if smaller)
+        
+        bars_to_copy = min(empty_bars, int(first_chord_bar)) if empty_bars > 0 else int(first_chord_bar)
+        if bars_to_copy <= 0:
+            bars_to_copy = min(4, int(first_chord_bar))  # Default to copying up to 4 bars
+        
+        pattern_duration_chord = bars_to_copy * ticks_per_bar_chord
+        
+        # Collect notes from the first section of chords (after they start)
+        pattern_notes = []
+        for note in chord_track_obj.notes:
+            relative_start = note.start - first_chord_tick
+            if relative_start < pattern_duration_chord:
+                pattern_notes.append(note)
+            else:
+                break
+        
+        print(f"Copying {len(pattern_notes)} chord notes to fill {bars_to_copy} bars at the beginning")
+        
+        # Add pattern notes shifted to start from tick 0
+        for note in pattern_notes:
+            new_start = convert_tick(note.start - first_chord_tick)
+            new_duration = convert_tick(note.end - note.start)
+            new_note = Note(
+                time=new_start,
+                duration=new_duration,
+                pitch=note.pitch,
+                velocity=note.velocity
+            )
+            new_chord_track.notes.append(new_note)
+    
+    # STEP 2: Add all original chord notes with converted timing
+    for note in chord_track_obj.notes:
+        new_start = convert_tick(note.start)
+        new_duration = convert_tick(note.end - note.start)
+        new_note = Note(
+            time=new_start,
+            duration=new_duration,
+            pitch=note.pitch,
+            velocity=note.velocity
+        )
+        new_chord_track.notes.append(new_note)
+    
+    # Sort and remove duplicates (notes at same position with same pitch)
+    new_chord_track.notes.sort(key=lambda n: (n.time, n.pitch))
+    
+    # Remove exact duplicates
+    unique_notes = []
+    for note in new_chord_track.notes:
+        if not unique_notes or (note.time != unique_notes[-1].time or 
+                                note.pitch != unique_notes[-1].pitch):
+            unique_notes.append(note)
+    new_chord_track.notes = unique_notes
+    
+    # STEP 3: Add melody track from chord file
+    new_melody_track = Track(name="Melody")
+    melody_track_from_chord = chord_score.tracks[piano_track_idx]
+    for note in melody_track_from_chord.notes:
+        new_start = convert_tick(note.start)
+        new_duration = convert_tick(note.end - note.start)
+        new_note = Note(
+            time=new_start,
+            duration=new_duration,
+            pitch=note.pitch,
+            velocity=note.velocity
+        )
+        new_melody_track.notes.append(new_note)
+    
+    new_melody_track.notes.sort(key=lambda n: n.time)
+    
+    # Add tracks to new score
+    new_score.tracks.append(new_melody_track)
+    new_score.tracks.append(new_chord_track)
+    
+    # Determine output path
+    if output_path is None:
+        base_path = os.path.splitext(midi_file_path)[0]
+        output_path = f"{base_path}_filled_empty_bars.mid"
+    
+    # Save the modified MIDI file
+    new_score.dump_midi(output_path)
+    
+    print(f"\n=== Output Summary ===")
+    print(f"Output TPQ: {new_score.ticks_per_quarter}")
+    print(f"Melody track notes: {len(new_melody_track.notes)}")
+    print(f"Chord track notes: {len(new_chord_track.notes)}")
+    if new_chord_track.notes:
+        print(f"First chord now at tick: {new_chord_track.notes[0].time}")
+        print(f"Last chord at tick: {new_chord_track.notes[-1].time}")
+    print(f"Output saved to: {output_path}")
+    
+    return output_path
+
+def estimate_tempo_from_notes(input_melody_path):
+    """
+    Estimate the correct tempo by analyzing note positions.
+    
+    IMPORTANT: This function assumes the MIDI file has notes positioned based on
+    actual audio timing, and we need to find the tempo that makes the notes
+    align to a musical grid.
+    
+    The approach:
+    1. Find the most common inter-onset interval (IOI)
+    2. Calculate what tempo would make this IOI a 1/16, 1/8, or 1/4 note
+    3. Pick the tempo in a reasonable range (60-200 BPM)
+    
+    Args:
+        input_melody_path: Path to the MIDI file
+    
+    Returns:
+        float: Estimated BPM
+    """
+    from collections import Counter
+    
+    score = Score(input_melody_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    
+    # Collect all note onsets
+    all_notes = []
+    for track in score.tracks:
+        all_notes.extend(track.notes)
+    
+    if not all_notes:
+        print("No notes found, using default 120 BPM")
+        return 120.0
+    
+    # Get note onset positions
+    onsets = sorted(set(n.start for n in all_notes))
+    
+    if len(onsets) < 2:
+        print("Less than 2 onsets, using default 120 BPM")
+        return 120.0
+    
+    # Calculate inter-onset intervals (IOIs)
+    iois = [onsets[i+1] - onsets[i] for i in range(len(onsets)-1)]
+    
+    # Filter out very small IOIs (likely grace notes or chords)
+    min_ioi = tpq / 8  # 1/32 note at 120 BPM
+    iois = [ioi for ioi in iois if ioi >= min_ioi]
+    
+    if not iois:
+        print("No valid IOIs found, using default 120 BPM")
+        return 120.0
+    
+    # Quantize IOIs to reduce noise (to 1/16 note resolution at 120 BPM)
+    quantize_unit = tpq / 4  # 1/16 note at 120 BPM = 120 ticks
+    quantized_iois = [round(ioi / quantize_unit) * quantize_unit for ioi in iois]
+    ioi_counts = Counter(quantized_iois)
+    
+    # Get the most common IOI
+    most_common_ioi = ioi_counts.most_common(1)[0][0]
+    print(f"Most common IOI: {most_common_ioi} ticks")
+    print(f"Top 5 IOIs: {ioi_counts.most_common(5)}")
+    
+    if most_common_ioi <= 0:
+        print("Invalid IOI, using default 120 BPM")
+        return 120.0
+    
+    # Calculate what tempo would make this IOI equal to different note values
+    # Formula: At tempo T, note duration in ticks = (60/T) * (note_fraction * 4) * tpq / 60
+    #          = note_fraction * 4 * tpq * (60/T) / 60
+    #          = note_fraction * 4 * tpq / T * (standard tempo / standard tempo)
+    # 
+    # Simplified: At 120 BPM, 1/4 note = tpq ticks, 1/8 = tpq/2, 1/16 = tpq/4
+    # If actual IOI should be X note at tempo T:
+    #   most_common_ioi / (tpq * note_fraction * 4) = 120 / T
+    #   T = 120 * (tpq * note_fraction * 4) / most_common_ioi
+    
+    candidates = []
+    
+    # If IOI is 1/16 note: T = 120 * (tpq/4) / most_common_ioi
+    tempo_if_16th = 120.0 * (tpq / 4) / most_common_ioi
+    
+    # If IOI is 1/8 note: T = 120 * (tpq/2) / most_common_ioi
+    tempo_if_8th = 120.0 * (tpq / 2) / most_common_ioi
+    
+    # If IOI is 1/4 note (beat): T = 120 * tpq / most_common_ioi
+    tempo_if_quarter = 120.0 * tpq / most_common_ioi
+    
+    print(f"Tempo candidates: 1/16={tempo_if_16th:.1f}, 1/8={tempo_if_8th:.1f}, 1/4={tempo_if_quarter:.1f} BPM")
+    
+    # Choose the tempo that gives a reasonable BPM (60-200 range is typical)
+    for tempo in [tempo_if_16th, tempo_if_8th, tempo_if_quarter]:
+        if 60 <= tempo <= 200:
+            candidates.append(tempo)
+    
+    if not candidates:
+        # Try wider range if nothing found
+        for tempo in [tempo_if_16th, tempo_if_8th, tempo_if_quarter]:
+            if 40 <= tempo <= 240:
+                candidates.append(tempo)
+    
+    if candidates:
+        # Prefer tempo closer to 120 (common default)
+        estimated_tempo = min(candidates, key=lambda t: abs(t - 120))
+        print(f"Selected tempo: {estimated_tempo:.1f} BPM (closest to 120 in valid range)")
+    else:
+        estimated_tempo = 120.0
+        print(f"No valid tempo found, using default 120 BPM")
+    
+    return estimated_tempo
+
+
+def reassign_global_tempo(input_melody_path, output_melody_path=None, target_bpm=None):
+    """
+    Reassign global tempo to a MIDI file. This is useful when the MIDI file has
+    an incorrect tempo but the note positions (in ticks) are correct.
+    
+    The function will:
+    1. If target_bpm is provided, use that tempo
+    2. Otherwise, estimate tempo by analyzing note alignment to grid
+    
+    Args:
+        input_melody_path: Path to the input MIDI file
+        output_melody_path: Optional output path, defaults to overwriting input
+        target_bpm: Target BPM to set. If None, will estimate from note analysis.
+    
+    Returns:
+        tuple: (output_path, new_bpm)
+    """
+    from symusic import Note, Track
+    import mido
+    
+    score = Score(input_melody_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    
+    print(f"=== Reassigning Global Tempo ===")
+    print(f"Input: {input_melody_path}")
+    print(f"TPQ: {tpq}")
+    
+    # Get current tempo
+    current_tempo = 120.0  # default
+    if score.tempos:
+        current_tempo = score.tempos[0].qpm
+    print(f"Current tempo in file: {current_tempo} BPM")
+    
+    if target_bpm is not None:
+        new_bpm = target_bpm
+        print(f"Using provided target BPM: {new_bpm}")
+    else:
+        # Estimate tempo from note positions
+        new_bpm = estimate_tempo_from_notes(input_melody_path)
+        print(f"Estimated tempo from note analysis: {new_bpm} BPM")
+    
+    # Update the tempo
+    if output_melody_path is None:
+        output_melody_path = input_melody_path
+    
+    # Use mido to properly set tempo at tick 0
+    midi = mido.MidiFile(input_melody_path)
+    tempo_us = int(round(60_000_000.0 / new_bpm))
+    
+    # Find or create tempo event at the beginning
+    for track in midi.tracks:
+        # Remove existing tempo events and insert new one
+        new_track = []
+        first_tempo_set = False
+        for msg in track:
+            if msg.type == 'set_tempo':
+                if not first_tempo_set:
+                    # Replace first tempo with our new tempo
+                    new_track.append(mido.MetaMessage('set_tempo', tempo=tempo_us, time=msg.time))
+                    first_tempo_set = True
+                # Skip other tempo events
+            else:
+                new_track.append(msg)
+        
+        if not first_tempo_set:
+            # Insert tempo at the very beginning
+            new_track.insert(0, mido.MetaMessage('set_tempo', tempo=tempo_us, time=0))
+        
+        track[:] = new_track
+        break  # Only modify first track
+    
+    midi.save(output_melody_path)
+    
+    print(f"New tempo set: {new_bpm} BPM")
+    print(f"Output saved to: {output_melody_path}")
+    
+    return output_melody_path, new_bpm
+
+
+def pad_melody_to_valid_length(input_path, output_path=None):
+    """
+    Pad melody to a valid length (multiple of 4 bars) by adding empty time at the end.
+    This ensures the melody can be properly segmented by chorderator.
+    
+    Args:
+        input_path: Path to the input MIDI file
+        output_path: Optional output path, defaults to overwriting input
+    
+    Returns:
+        tuple: (output_path, original_bars, padded_bars)
+    """
+    from symusic import Note, Track
+    
+    score = Score(input_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    ticks_per_bar = tpq * 4  # 4/4 time
+    
+    # Find the end of the melody
+    max_tick = 0
+    for track in score.tracks:
+        for note in track.notes:
+            if note.end > max_tick:
+                max_tick = note.end
+    
+    # Calculate current bar count
+    current_bars = max_tick / ticks_per_bar
+    original_bars = int(current_bars) + (1 if current_bars % 1 > 0 else 0)
+    
+    # Calculate target bar count (round UP to multiple of 4 for padding)
+    target_bars = get_valid_bar_count(original_bars, round_up=True)
+    
+    if target_bars == original_bars:
+        print(f"Melody already at valid length: {original_bars} bars")
+        if output_path is None:
+            return input_path, original_bars, original_bars
+        # Still save to output path
+        score.dump_midi(output_path)
+        return output_path, original_bars, original_bars
+    
+    # Extend the melody by adjusting the end time
+    # We don't need to add notes, just ensure the MIDI length covers the target
+    target_ticks = target_bars * ticks_per_bar
+    
+    # Add a silent note at the end to extend the MIDI length
+    # (This is a common trick to ensure MIDI players/parsers recognize the full length)
+    if score.tracks:
+        # Add a very quiet note at pitch 0 (or use a rest)
+        # Actually, we can just extend the last note slightly or add metadata
+        # For simplicity, we'll just save as-is and let chorderator handle it
+        pass
+    
+    if output_path is None:
+        output_path = input_path
+    
+    score.dump_midi(output_path)
+    
+    print(f"Melody padded: {original_bars} -> {target_bars} bars")
+    return output_path, original_bars, target_bars
+
+
+def preprocess_melody(input_melody_path, output_melody_path, target_bpm=None, auto_estimate_tempo=True):
+    """
+    Preprocess the melody:
+    1. Leave only one track (the one with notes)
+    2. Reassign global tempo (either to target_bpm or auto-estimated)
+    3. Pad melody to valid length if needed
+    
+    Args:
+        input_melody_path: Path to the input MIDI file
+        output_melody_path: Path to save the preprocessed MIDI
+        target_bpm: Target BPM to set. If None and auto_estimate_tempo is True, 
+                    tempo will be estimated from note positions.
+        auto_estimate_tempo: If True and target_bpm is None, estimate tempo automatically.
+    
+    Returns:
+        float: The tempo (BPM) that was set
+    """
+    print(f"Preprocessing melody: {input_melody_path}")
+    score = Score(input_melody_path, ttype="tick")
+    for i, track in enumerate(score.tracks):
+        if track.notes:
+            score.tracks = [track]
+            break
+    score.dump_midi(output_melody_path)
+    
+    # Reassign tempo
+    if target_bpm is not None:
+        # Use specified tempo
+        _, new_bpm = reassign_global_tempo(output_melody_path, output_melody_path, target_bpm)
+    elif auto_estimate_tempo:
+        # Auto-estimate tempo from note positions
+        _, new_bpm = reassign_global_tempo(output_melody_path, output_melody_path, target_bpm=None)
+    else:
+        # Keep original tempo
+        if score.tempos:
+            new_bpm = score.tempos[0].qpm
+        else:
+            new_bpm = 120.0
+    
+    # Pad melody to valid length
+    pad_melody_to_valid_length(output_melody_path, output_melody_path)
+    
+    return new_bpm
+
+
+def align_chord_gen_tpq(original_melody_path, chord_gen_path, output_path=None):
+    """
+    Convert chord_gen MIDI file to have the same TPQ as the original melody.
+    This ensures the chord_gen file can be properly aligned with the original melody.
+    
+    Args:
+        original_melody_path: Path to the original melody MIDI file
+        chord_gen_path: Path to the chord_gen MIDI file (from chorderator)
+        output_path: Optional output path, defaults to overwriting chord_gen_path
+    
+    Returns:
+        str: Path to the output file
+    """
+    from symusic import Note, Track
+    
+    original_score = Score(original_melody_path, ttype="tick")
+    chord_score = Score(chord_gen_path, ttype="tick")
+    
+    original_tpq = original_score.ticks_per_quarter
+    chord_tpq = chord_score.ticks_per_quarter
+    
+    # If TPQ is already the same, no conversion needed
+    if original_tpq == chord_tpq:
+        print(f"TPQ already aligned ({original_tpq}), no conversion needed")
+        return chord_gen_path
+    
+    tpq_ratio = original_tpq / chord_tpq
+    
+    print(f"=== Aligning chord_gen TPQ ===")
+    print(f"Original melody TPQ: {original_tpq}")
+    print(f"Chord gen TPQ: {chord_tpq}")
+    print(f"TPQ ratio: {tpq_ratio:.4f}")
+    
+    # Helper function to convert tick
+    def convert_tick(tick):
+        return int(tick * tpq_ratio)
+    
+    # Create new score with original TPQ
+    new_score = Score(ttype="tick")
+    new_score.ticks_per_quarter = original_tpq
+    new_score.tempos = original_score.tempos
+    
+    # Convert all tracks
+    for track in chord_score.tracks:
+        new_track = Track(name=track.name)
+        for note in track.notes:
+            new_start = convert_tick(note.start)
+            new_end = convert_tick(note.end)
+            new_note = Note(
+                time=new_start,
+                duration=new_end - new_start,
+                pitch=note.pitch,
+                velocity=note.velocity
+            )
+            new_track.notes.append(new_note)
+        new_track.notes.sort(key=lambda n: n.time)
+        new_score.tracks.append(new_track)
+    
+    # Determine output path
+    if output_path is None:
+        output_path = chord_gen_path
+    
+    new_score.dump_midi(output_path)
+    
+    print(f"Converted chord_gen TPQ from {chord_tpq} to {original_tpq}")
+    print(f"Output saved to: {output_path}")
+    
+    return output_path
+
+
+def quantize_melody_to_16th(input_path, output_path=None):
+    """
+    Quantize melody notes to nearest 1/16 note positions, preserving original TPQ.
+    
+    Args:
+        input_path: Path to the input MIDI file
+        output_path: Optional output path, defaults to input path with '_quantized' suffix
+    
+    Returns:
+        str: Path to the output file
+    """
+    from symusic import Note, Track
+    
+    score = Score(input_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    ticks_per_16th = tpq / 4  # 1/16 note = 1/4 quarter note
+    
+    print(f"=== Quantizing melody to 1/16 notes ===")
+    print(f"TPQ: {tpq}")
+    print(f"Ticks per 16th note: {ticks_per_16th}")
+    
+    new_score = Score(ttype="tick")
+    new_score.ticks_per_quarter = tpq
+    new_score.tempos = score.tempos
+    
+    total_notes = 0
+    for track in score.tracks:
+        new_track = Track(name=track.name)
+        for note in track.notes:
+            # Quantize start time to nearest 1/16 note
+            quantized_start = int(round(note.start / ticks_per_16th) * ticks_per_16th)
+            # Quantize duration (minimum 1/16 note)
+            quantized_duration = max(
+                int(ticks_per_16th), 
+                int(round(note.duration / ticks_per_16th) * ticks_per_16th)
+            )
+            
+            new_note = Note(
+                time=quantized_start,
+                duration=quantized_duration,
+                pitch=note.pitch,
+                velocity=note.velocity
+            )
+            new_track.notes.append(new_note)
+            total_notes += 1
+        new_track.notes.sort(key=lambda n: n.time)
+        new_score.tracks.append(new_track)
+    
+    # Determine output path
+    if output_path is None:
+        base_path = os.path.splitext(input_path)[0]
+        output_path = f"{base_path}_quantized.mid"
+    
+    new_score.dump_midi(output_path)
+    
+    print(f"Quantized {total_notes} notes to 1/16 note positions")
+    print(f"Output saved to: {output_path}")
+    
+    return output_path
+
+
+def requantize_chord_gen_melody(chord_gen_path, output_path=None, grid_resolution=16):
+    """
+    Re-quantize the melody track in chord_gen output to fix chorderator's rounding errors.
+    
+    Chorderator introduces small rounding errors (1-2 ticks) when it re-quantizes
+    the melody internally. This function fixes those errors by snapping notes
+    to the nearest grid position.
+    
+    Args:
+        chord_gen_path: Path to the chord_gen MIDI file
+        output_path: Optional output path, defaults to overwriting input
+        grid_resolution: Grid resolution in divisions per beat (default 16 = 1/16 beat)
+    
+    Returns:
+        str: Path to the output file
+    """
+    from symusic import Note, Track
+    
+    score = Score(chord_gen_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    ticks_per_grid = tpq / grid_resolution
+    
+    new_score = Score(ttype="tick")
+    new_score.ticks_per_quarter = tpq
+    new_score.tempos = score.tempos
+    new_score.time_signatures = score.time_signatures.copy() if score.time_signatures else []
+    
+    melody_notes_fixed = 0
+    
+    for i, track in enumerate(score.tracks):
+        new_track = Track(name=track.name, program=track.program, is_drum=track.is_drum)
+        
+        for note in track.notes:
+            # Only quantize the melody track (first track, typically)
+            # Chord tracks usually have notes at exact positions already
+            if i == 0:  # Melody track
+                # Snap to nearest grid position
+                quantized_start = int(round(note.time / ticks_per_grid) * ticks_per_grid)
+                quantized_end = int(round((note.time + note.duration) / ticks_per_grid) * ticks_per_grid)
+                quantized_duration = quantized_end - quantized_start
+                
+                # Ensure minimum duration
+                if quantized_duration < ticks_per_grid:
+                    quantized_duration = int(ticks_per_grid)
+                
+                if note.time != quantized_start:
+                    melody_notes_fixed += 1
+                
+                new_note = Note(
+                    time=quantized_start,
+                    duration=quantized_duration,
+                    pitch=note.pitch,
+                    velocity=note.velocity
+                )
+            else:
+                # Keep chord track notes as-is
+                new_note = Note(
+                    time=note.time,
+                    duration=note.duration,
+                    pitch=note.pitch,
+                    velocity=note.velocity
+                )
+            
+            new_track.notes.append(new_note)
+        
+        new_track.notes.sort(key=lambda n: n.time)
+        new_score.tracks.append(new_track)
+    
+    if output_path is None:
+        output_path = chord_gen_path
+    
+    new_score.dump_midi(output_path)
+    
+    if melody_notes_fixed > 0:
+        print(f"Re-quantized {melody_notes_fixed} melody notes to 1/{grid_resolution} beat grid")
+    
+    return output_path

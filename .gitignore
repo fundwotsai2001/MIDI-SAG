@@ -1,0 +1,24 @@
+# Model weights and checkpoints
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+checkpoint*/
+pretrained/
+
+# Large data files (AccoMontage2/chorderator static assets)
+*.npz
+*.pcls*
+*.pnt
+*.sf2
+*.mdch
+
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.claude
+
+# Generated outputs
+output/
