@@ -14,5 +14,6 @@ wget https://github.com/openvpi/SOME/releases/download/v1.0.0-baseline/0119_cont
 unzip /tmp/some_model.zip -d SOME/pretrained/                                                                                                    
 rm /tmp/some_model.zip 
 wget https://github.com/yxlllc/RMVPE/releases/download/230917/rmvpe.zip -O /tmp/RMVPE.zip      
-unzip /tmp/RMVPE.zip -d SOME/pretrained/rmvpe                                                                                                 
+unzip /tmp/RMVPE.zip -d SOME/pretrained/                                                                                                    
 rm /tmp/RMVPE.zip  
+gdown 1o6eUCYwUcIzZeqEycar6AHTSQ-vYcL_q --folder

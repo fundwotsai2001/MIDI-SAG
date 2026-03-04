@@ -4,7 +4,7 @@ def get_config():
 
         "output_dir": "./output/MuseControlLite_mixed",
 
-        "checkpoint_path": "./MuseControlLite/checkpoint_vocal_beat",
+        "checkpoint_path": "./MIDI-SAG_checkpoints/checkpoint_vocal_beat",
 
         "GPU_id": "0",
 

@@ -1,5 +1,5 @@
 # Paste your vocal audio path here (absolute or relative)
-VOCAL_AUDIO_PATH="/data/home/fundwotsai/MIDI-SAG/vocal_audio_test_data/MIR_1k_amy_1_vocal.wav"
+VOCAL_AUDIO_PATH="vocal_audio_test_data/chengron.wav"
 # text command for backing track generation (can be modified as needed)
 BACKING_TEXT_PROMPT="Jazzy backing music, high quality, with bass guitar, drums, piano"
 
@@ -13,7 +13,7 @@ BEAT_PATH="output/vocal_beat/$SONG_NAME/${SONG_NAME}_beat_times.txt"
 
 
 # vocal beat tracking with VAD
-python Singing-Vocal-Beat-Tracking/inference_vad.py --audio_path $VOCAL_AUDIO_PATH --model_path Singing-Vocal-Beat-Tracking/model-16.pt --use_vad --output_dir ./output/vocal_beat
+python Singing-Vocal-Beat-Tracking/inference_vad.py --audio_path $VOCAL_AUDIO_PATH --model_path MIDI-SAG_checkpoints/model-16.pt --use_vad --output_dir ./output/vocal_beat
 # SOME: vocal MIDI transcription
 python SOME/infer.py --model SOME/pretrained/0119_continuous256_5spk/model_ckpt_steps_100000_simplified.ckpt --wav $VOCAL_AUDIO_PATH --midi $VOCAL_MIDI_PATH
 # Accomotage2: melody harmonization

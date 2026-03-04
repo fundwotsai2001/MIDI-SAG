@@ -1,6 +1,6 @@
 # MuseControlLite
 git+https://github.com/fundwotsai2001/diffusers.git@v0.31.0-release
-git+https://github.com/YianLai0327/madmom.git
+git+https://github.com/fundwotsai2001/madmom.git
 soundfile
 accelerate
 transformers==4.46.1
