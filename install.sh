@@ -17,3 +17,4 @@ rm /tmp/some_model.zip
 wget https://github.com/yxlllc/RMVPE/releases/download/230917/rmvpe.zip -O /tmp/RMVPE.zip      
 unzip /tmp/RMVPE.zip -d SOME/pretrained/                                                                                                    
 rm /tmp/RMVPE.zip  
+gdown 1o6eUCYwUcIzZeqEycar6AHTSQ-vYcL_q --folder
