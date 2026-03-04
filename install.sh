@@ -1,4 +1,3 @@
-apt-get install portaudio19-dev
 pip install "pip<24.1"
 pip install torch==2.5.1 
 pip install torchaudio==2.5.1
@@ -15,5 +14,5 @@ wget https://github.com/openvpi/SOME/releases/download/v1.0.0-baseline/0119_cont
 unzip /tmp/some_model.zip -d SOME/pretrained/                                                                                                    
 rm /tmp/some_model.zip 
 wget https://github.com/yxlllc/RMVPE/releases/download/230917/rmvpe.zip -O /tmp/RMVPE.zip      
-unzip /tmp/RMVPE.zip -d SOME/pretrained/                                                                                                    
+unzip /tmp/RMVPE.zip -d SOME/pretrained/rmvpe                                                                                                 
 rm /tmp/RMVPE.zip  

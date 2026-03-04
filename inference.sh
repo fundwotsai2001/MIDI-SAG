@@ -1,7 +1,7 @@
 # Paste your vocal audio path here (absolute or relative)
-VOCAL_AUDIO_PATH="vocal_audio_test_data/chengron_15_62.wav"
+VOCAL_AUDIO_PATH="/data/home/fundwotsai/MIDI-SAG/vocal_audio_test_data/MIR_1k_amy_1_vocal.wav"
 # text command for backing track generation (can be modified as needed)
-BACKING_TEXT_PROMPT="rock backing music, high quality, with bass guitar, drums, synthesizer"
+BACKING_TEXT_PROMPT="Jazzy backing music, high quality, with bass guitar, drums, piano"
 
 # Automatically extract song name from the audio path (strips directory and extension)
 SONG_NAME="$(basename "${VOCAL_AUDIO_PATH%.*}")"
@@ -19,4 +19,4 @@ python SOME/infer.py --model SOME/pretrained/0119_continuous256_5spk/model_ckpt_
 # Accomotage2: melody harmonization
 python AccoMontage2/demo_SOME.py --midi_path $VOCAL_MIDI_PATH --beat_file $BEAT_PATH --output_dir ./output/Harmonization_results --beat_subdivision 1
 # MuseControlLite: Backing track generation 
-python MuseControlLite/MuseControlLite_inference.py --vocal_audio_file $VOCAL_AUDIO_PATH --text_prompt "$BACKING_TEXT_PROMPT" --chord_file $CHORD_PATH --vocal_beat_file $BEAT_PATH 
+python MuseControlLite/MuseControlLite_inference_47s.py --vocal_audio_file $VOCAL_AUDIO_PATH --text_prompt "$BACKING_TEXT_PROMPT" --chord_file $CHORD_PATH --vocal_beat_file $BEAT_PATH 
