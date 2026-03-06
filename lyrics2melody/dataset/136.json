@@ -1,0 +1,90 @@
+{
+    "id": 136,
+    "title_zh": "銀沙幻境",
+    "global_prompt": "An ambient electronica piece with shimmering pads, glassy synths, and female vocals. Shimmering, surreal, like wandering through a silver desert mirage.",
+    "structure_en": {
+        "Intro": "Glassy synth textures with airy pads.",
+        "Verse": "Breathy female vocals with minimal percussion.",
+        "Chorus": "Layered pads and harmonies widen the space.",
+        "Outro": "Synths dissolve into a faint shimmer."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "銀沙翻湧似水流光"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "幻境漸次覆蓋眼眸"
+            },
+            {
+                "timestamp": "00:17.60",
+                "line": "腳印消散不留痕跡"
+            },
+            {
+                "timestamp": "00:23.00",
+                "line": "空氣折射異樣色彩"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "指尖描摹浮動影像"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "遠音在沙丘間隱現"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "銀沙幻境映出虛實"
+            },
+            {
+                "timestamp": "00:44.50",
+                "line": "聲響隨著氣息浮動"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "光影織成無邊帷幕"
+            },
+            {
+                "timestamp": "00:55.20",
+                "line": "腳步漂泊無盡遼闊"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.70",
+                "line": "幻境碎裂歸於沉寂"
+            },
+            {
+                "timestamp": "01:27.00",
+                "line": "沙聲緩緩收起低吟"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 76,
+        "genres": [
+            "Ambient",
+            "Electronica"
+        ],
+        "mood": [
+            "Surreal",
+            "Shimmering",
+            "Dreamlike"
+        ],
+        "instruments": [
+            "Synth Pads",
+            "Glassy Textures"
+        ],
+        "timbre": [
+            "Airy",
+            "Glittering",
+            "Ethereal"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,90 @@
+{
+    "id": 19,
+    "title_zh": "破曉之翼",
+    "global_prompt": "An uplifting orchestral-pop hybrid with strings, driving drums, piano, and soaring female vocals. The sound is inspirational and powerful, symbolizing rising with new hope at dawn.",
+    "structure_en": {
+        "Intro": "Piano chords with soft strings, drums build in.",
+        "Verse": "Vocal storytelling with piano and light rhythm.",
+        "Chorus": "Full strings, driving drums, layered harmonies.",
+        "Outro": "Strings sustain with piano cadence, soft fade."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:08.20",
+                "line": "破曉灑落微光的溫柔"
+            },
+            {
+                "timestamp": "00:13.60",
+                "line": "黑夜退去夢想甦醒"
+            },
+            {
+                "timestamp": "00:18.90",
+                "line": "腳步邁向嶄新的起點"
+            },
+            {
+                "timestamp": "00:24.40",
+                "line": "心靈點燃希望的火焰"
+            },
+            {
+                "timestamp": "00:29.80",
+                "line": "大地回應黎明的召喚"
+            },
+            {
+                "timestamp": "00:35.10",
+                "line": "勇氣展翅擁抱未來"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:40.60",
+                "line": "破曉之翼帶我飛翔"
+            },
+            {
+                "timestamp": "00:45.80",
+                "line": "穿越雲層迎向太陽"
+            },
+            {
+                "timestamp": "00:51.30",
+                "line": "心跳隨希望不斷擴張"
+            },
+            {
+                "timestamp": "00:56.70",
+                "line": "未來就在前方閃亮"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.10",
+                "line": "光芒鋪展無盡天際"
+            },
+            {
+                "timestamp": "01:28.40",
+                "line": "心靈展翼永遠飛行"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 100,
+        "genres": [
+            "Orchestral Pop"
+        ],
+        "mood": [
+            "Inspirational",
+            "Powerful",
+            "Hopeful"
+        ],
+        "instruments": [
+            "Strings",
+            "Piano",
+            "Drums"
+        ],
+        "timbre": [
+            "Soaring",
+            "Bright",
+            "Expansive"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

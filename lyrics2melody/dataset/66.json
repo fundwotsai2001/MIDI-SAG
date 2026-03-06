@@ -1,0 +1,90 @@
+{
+    "id": 66,
+    "title_zh": "遠航之歌",
+    "global_prompt": "A folk-rock anthem with acoustic guitar, drums, accordion, and male vocals. The mood is adventurous and uplifting, like singing while sailing into the horizon.",
+    "structure_en": {
+        "Intro": "Accordion melody with guitar strumming.",
+        "Verse": "Male vocals with guitar and steady rhythm.",
+        "Chorus": "Full band with accordion and vocal harmonies.",
+        "Outro": "Accordion fades with guitar cadence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "船帆迎風遠方在呼喚"
+            },
+            {
+                "timestamp": "00:12.60",
+                "line": "浪潮翻湧心靈激昂"
+            },
+            {
+                "timestamp": "00:18.10",
+                "line": "星辰照亮未知的路"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "夢想伴隨歌聲飛揚"
+            },
+            {
+                "timestamp": "00:28.80",
+                "line": "旅程寫下勇敢的詩"
+            },
+            {
+                "timestamp": "00:34.10",
+                "line": "愛在航程中悄悄發芽"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "遠航之歌唱響天地"
+            },
+            {
+                "timestamp": "00:44.90",
+                "line": "希望綻放於無邊海域"
+            },
+            {
+                "timestamp": "00:50.30",
+                "line": "心靈堅定不再退縮"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "愛的旋律永遠長存"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "海風依舊吟唱遠航"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "夢想延續直到天際"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 100,
+        "genres": [
+            "Folk Rock"
+        ],
+        "mood": [
+            "Adventurous",
+            "Uplifting",
+            "Hopeful"
+        ],
+        "instruments": [
+            "Acoustic Guitar",
+            "Drums",
+            "Accordion"
+        ],
+        "timbre": [
+            "Bright",
+            "Earthy",
+            "Energetic"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,91 @@
+{
+    "id": 34,
+    "title_zh": "電光狂潮",
+    "global_prompt": "An EDM festival anthem with massive drops, side-chained synths, and energetic female vocals. The sound is electrifying and euphoric, like a crowd jumping under strobe lights.",
+    "structure_en": {
+        "Intro": "Synth riser with kick drum build.",
+        "Verse": "Vocal over plucked synth and side-chained chords.",
+        "Chorus": "Massive drop with heavy bass, bright synth leads, and crowd-chant feel.",
+        "Outro": "Synth echoes fade with filtered beat."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.80",
+                "line": "節奏點燃心跳的脈動"
+            },
+            {
+                "timestamp": "00:12.10",
+                "line": "燈光閃爍照亮夜空"
+            },
+            {
+                "timestamp": "00:17.50",
+                "line": "人群隨旋律一起飛翔"
+            },
+            {
+                "timestamp": "00:22.80",
+                "line": "汗水閃耀自由的光"
+            },
+            {
+                "timestamp": "00:28.10",
+                "line": "聲音穿越無邊界限"
+            },
+            {
+                "timestamp": "00:33.50",
+                "line": "靈魂燃燒直到最後"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.00",
+                "line": "電光狂潮衝破夜晚"
+            },
+            {
+                "timestamp": "00:44.20",
+                "line": "能量湧動無法阻擋"
+            },
+            {
+                "timestamp": "00:49.70",
+                "line": "心靈隨音浪自由跳躍"
+            },
+            {
+                "timestamp": "00:54.90",
+                "line": "熱情燃燒直到天亮"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.20",
+                "line": "狂潮消散仍留回音"
+            },
+            {
+                "timestamp": "01:27.60",
+                "line": "心跳延續無盡力量"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 128,
+        "genres": [
+            "EDM",
+            "Electronic"
+        ],
+        "mood": [
+            "Euphoric",
+            "Energetic",
+            "Electrifying"
+        ],
+        "instruments": [
+            "Synths",
+            "Bass",
+            "Drums"
+        ],
+        "timbre": [
+            "Bright",
+            "Punchy",
+            "Explosive"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

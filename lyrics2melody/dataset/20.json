@@ -1,0 +1,91 @@
+{
+    "id": 20,
+    "title_zh": "流光幻影",
+    "global_prompt": "A fast-paced drum & bass track with rolling breakbeats, atmospheric pads, and airy female vocals. The sound is energetic and futuristic, like chasing neon lights through a city at night.",
+    "structure_en": {
+        "Intro": "Filtered pads with hi-hat rolls, beat gradually builds.",
+        "Verse": "Vocals float over quick percussion and light bass.",
+        "Chorus": "Full drop with rolling breakbeats, bright synth leads.",
+        "Outro": "Pads and beat fade with reverb tails."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.30",
+                "line": "霓虹閃爍映照著街角"
+            },
+            {
+                "timestamp": "00:11.50",
+                "line": "腳步追逐時間的脈動"
+            },
+            {
+                "timestamp": "00:16.70",
+                "line": "風聲穿梭無盡的巷弄"
+            },
+            {
+                "timestamp": "00:22.10",
+                "line": "心跳加速與節拍契合"
+            },
+            {
+                "timestamp": "00:27.50",
+                "line": "光影流轉像夢境閃耀"
+            },
+            {
+                "timestamp": "00:32.80",
+                "line": "記憶隨音浪翻湧不休"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:38.20",
+                "line": "流光幻影閃爍不停"
+            },
+            {
+                "timestamp": "00:43.70",
+                "line": "帶我穿越無限風景"
+            },
+            {
+                "timestamp": "00:49.00",
+                "line": "心靈追隨電光之翼"
+            },
+            {
+                "timestamp": "00:54.40",
+                "line": "夢在未來不斷呼應"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "光影逐漸消散夜空"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "心跳仍在節奏回應"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 172,
+        "genres": [
+            "Drum & Bass",
+            "Electronic"
+        ],
+        "mood": [
+            "Energetic",
+            "Futuristic",
+            "Rushing"
+        ],
+        "instruments": [
+            "Breakbeats",
+            "Synth Pads",
+            "Bass"
+        ],
+        "timbre": [
+            "Bright",
+            "Fast",
+            "Airy"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

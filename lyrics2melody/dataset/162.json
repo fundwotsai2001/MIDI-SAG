@@ -1,0 +1,90 @@
+{
+    "id": 162,
+    "title_zh": "晨霧林徑",
+    "global_prompt": "A folk-inspired acoustic piece with guitar, flute, and female vocals. Fresh and quiet, like walking through a misty morning forest path.",
+    "structure_en": {
+        "Intro": "Flute motif over guitar picking.",
+        "Verse": "Female vocals with soft guitar arpeggios.",
+        "Chorus": "Flute harmonies expand the melody.",
+        "Outro": "Birdsong samples with guitar fade."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "霧氣纏繞林間小徑"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "露珠閃爍初醒光亮"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "枝葉輕晃隨風擺動"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "呼吸交融清新氣息"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "腳步隨著旋律流淌"
+            },
+            {
+                "timestamp": "00:34.10",
+                "line": "遠方傳來低低鳥鳴"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "晨霧林徑靜靜延展"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "歌聲穿過翠綠枝梢"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "旋律沐浴微涼露水"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "此刻平和灑滿時光"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "林影淡入薄霧深處"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "歌聲停在靜謐片刻"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 80,
+        "genres": [
+            "Folk",
+            "Acoustic"
+        ],
+        "mood": [
+            "Fresh",
+            "Quiet",
+            "Peaceful"
+        ],
+        "instruments": [
+            "Acoustic Guitar",
+            "Flute"
+        ],
+        "timbre": [
+            "Light",
+            "Organic",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

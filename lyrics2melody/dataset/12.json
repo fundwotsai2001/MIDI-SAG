@@ -1,0 +1,91 @@
+{
+    "id": 12,
+    "title_zh": "遠方的信",
+    "global_prompt": "A soft piano ballad with strings, light acoustic guitar, and tender male vocals. The atmosphere is sentimental and heartfelt, like reading a letter from afar.",
+    "structure_en": {
+        "Intro": "Solo piano motif with soft reverb.",
+        "Verse": "Male vocal with piano chords and subtle strings.",
+        "Chorus": "Fuller string section with layered harmonies.",
+        "Outro": "Piano arpeggio fades with single violin line."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "字跡承載遠方的思念"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "每一行都是溫柔呼喚"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "翻閱時心海慢慢蕩漾"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "紙張飄散淡淡的香氣"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "時間停留在字裡行間"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "眼淚悄然在眼角閃爍"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "遠方的信傳遞溫暖"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "隔著距離依然心安"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "歲月將記憶緊緊擁抱"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "愛的聲音從未走散"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.00",
+                "line": "信紙靜靜躺在掌心"
+            },
+            {
+                "timestamp": "01:28.00",
+                "line": "心意跨越無邊距離"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 72,
+        "genres": [
+            "Ballad",
+            "Acoustic"
+        ],
+        "mood": [
+            "Sentimental",
+            "Tender",
+            "Heartfelt"
+        ],
+        "instruments": [
+            "Piano",
+            "Strings",
+            "Acoustic Guitar"
+        ],
+        "timbre": [
+            "Warm",
+            "Soft",
+            "Emotional"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,91 @@
+{
+    "id": 134,
+    "title_zh": "晨曦石徑",
+    "global_prompt": "A soft acoustic folk track with nylon guitar, flute, and female vocals. Peaceful and fresh, like walking on a stone path under morning light.",
+    "structure_en": {
+        "Intro": "Nylon guitar arpeggio with flute harmony.",
+        "Verse": "Female vocals with guitar picking.",
+        "Chorus": "Flute melody doubles the vocals, soft percussion enters.",
+        "Outro": "Guitar fades with bird chirps."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "石徑鋪滿露水微光"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "樹影搖曳清風裡舞"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "腳步輕響與鳥鳴合"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "清晨氣息溫柔灑落"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "眼神停留翠綠閃爍"
+            },
+            {
+                "timestamp": "00:33.90",
+                "line": "空氣載著初醒旋律"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "晨曦石徑迎來新聲"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "樹梢輕唱隨風漂流"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "旋律蜿蜒灑滿青苔"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "石路延展無邊清晨"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "露珠滴下晶亮聲音"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "陽光鋪成明亮長路"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 78,
+        "genres": [
+            "Folk",
+            "Acoustic"
+        ],
+        "mood": [
+            "Peaceful",
+            "Fresh",
+            "Gentle"
+        ],
+        "instruments": [
+            "Nylon Guitar",
+            "Flute",
+            "Percussion"
+        ],
+        "timbre": [
+            "Soft",
+            "Organic",
+            "Bright"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

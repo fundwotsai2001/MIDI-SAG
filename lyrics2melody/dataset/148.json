@@ -1,0 +1,91 @@
+{
+    "id": 148,
+    "title_zh": "荒野鼓聲",
+    "global_prompt": "A tribal percussion track with hand drums, shakers, and chants. Primal, driving, like rhythms echoing across vast wilderness.",
+    "structure_en": {
+        "Intro": "Hand drum pulse with shakers.",
+        "Verse": "Male chants over deep toms and rhythmic claps.",
+        "Chorus": "Layered drums, call-and-response vocals.",
+        "Outro": "Drums fade with shaker echoes."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "荒野回盪低沉鼓聲"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "沙塵拍擊拓印節奏"
+            },
+            {
+                "timestamp": "00:17.60",
+                "line": "腳步緊隨大地心跳"
+            },
+            {
+                "timestamp": "00:23.00",
+                "line": "聲響湧動跨越遠方"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "呼喊點燃夜色奔流"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "回聲落在蒼穹裂縫"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.10",
+                "line": "荒野鼓聲敲擊長空"
+            },
+            {
+                "timestamp": "00:44.50",
+                "line": "呼喊蔓延越過山嶺"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "節奏湧動驅散沉寂"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "奔跑聲音連接天地"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.70",
+                "line": "鼓點延續穿透遠方"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "荒原靜聽深沉回響"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 100,
+        "genres": [
+            "Tribal",
+            "Percussion"
+        ],
+        "mood": [
+            "Primal",
+            "Driving",
+            "Raw"
+        ],
+        "instruments": [
+            "Hand Drums",
+            "Shakers",
+            "Claps"
+        ],
+        "timbre": [
+            "Earthy",
+            "Deep",
+            "Resonant"
+        ],
+        "vocal_gender": "Male (Chants)",
+        "duration_target_sec": 95
+    }
+}

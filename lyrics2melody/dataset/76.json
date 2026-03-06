@@ -1,0 +1,91 @@
+{
+    "id": 76,
+    "title_zh": "冰川之聲",
+    "global_prompt": "An ambient electronic piece with glacial synths, drones, and airy male vocals. The mood is vast and haunting, like the echo of a glacier breaking.",
+    "structure_en": {
+        "Intro": "Low drones with shimmering synths.",
+        "Verse": "Male vocals with icy synth textures.",
+        "Chorus": "Layered harmonies with deep bass and echoing pads.",
+        "Outro": "Synth drones fade with frozen chime echoes."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.30",
+                "line": "冰川深處沉默的聲音"
+            },
+            {
+                "timestamp": "00:12.70",
+                "line": "時光凝結冰冷的夢"
+            },
+            {
+                "timestamp": "00:18.10",
+                "line": "心靈漂泊無邊的境地"
+            },
+            {
+                "timestamp": "00:23.60",
+                "line": "雪聲低語古老的歌"
+            },
+            {
+                "timestamp": "00:29.00",
+                "line": "裂痕綻放回聲迴盪"
+            },
+            {
+                "timestamp": "00:34.40",
+                "line": "靈魂安眠於白色世界"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.80",
+                "line": "冰川之聲呼喚心靈"
+            },
+            {
+                "timestamp": "00:45.20",
+                "line": "夢想在寒夜依然綻放"
+            },
+            {
+                "timestamp": "00:50.60",
+                "line": "愛的迴響穿越蒼穹"
+            },
+            {
+                "timestamp": "00:56.00",
+                "line": "希望永遠不會熄滅"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.10",
+                "line": "冰雪依舊低語蒼茫"
+            },
+            {
+                "timestamp": "01:28.40",
+                "line": "心靈延續無盡夢境"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 68,
+        "genres": [
+            "Ambient",
+            "Electronic"
+        ],
+        "mood": [
+            "Haunting",
+            "Vast",
+            "Ethereal"
+        ],
+        "instruments": [
+            "Synths",
+            "Drones",
+            "Chimes"
+        ],
+        "timbre": [
+            "Icy",
+            "Resonant",
+            "Expansive"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

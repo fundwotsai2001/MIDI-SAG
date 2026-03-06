@@ -1,0 +1,91 @@
+{
+    "id": 145,
+    "title_zh": "暗潮低鳴",
+    "global_prompt": "A dark electronic ambient track with sub-bass, drones, and processed male vocals. Murky and tense, like underwater currents rumbling unseen.",
+    "structure_en": {
+        "Intro": "Sub-bass rumble with filtered noise.",
+        "Verse": "Processed vocals over drones and sparse clicks.",
+        "Chorus": "Deeper bass swells, layered synths expand texture.",
+        "Outro": "Low-frequency fade into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "暗潮翻湧無人察覺"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "深處潛藏未知呼吸"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "低鳴穿過幽暗海脈"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "黑色漩渦緩慢蔓延"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "波紋散開割裂寂靜"
+            },
+            {
+                "timestamp": "00:33.90",
+                "line": "耳邊殘響似有似無"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.30",
+                "line": "暗潮低鳴潛伏深夜"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "聲浪緩緩推動黑幕"
+            },
+            {
+                "timestamp": "00:50.10",
+                "line": "心跳貼近水的脈絡"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "無形之力牽引前行"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.90",
+                "line": "低鳴延續隱沒無聲"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "海影封存最後一息"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 64,
+        "genres": [
+            "Dark Ambient",
+            "Electronic"
+        ],
+        "mood": [
+            "Murky",
+            "Tense",
+            "Submerged"
+        ],
+        "instruments": [
+            "Sub-bass",
+            "Drones",
+            "Synths"
+        ],
+        "timbre": [
+            "Low",
+            "Dense",
+            "Dark"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

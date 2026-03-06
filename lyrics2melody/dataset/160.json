@@ -1,0 +1,91 @@
+{
+    "id": 160,
+    "title_zh": "沙丘低語",
+    "global_prompt": "A desert-inspired ambient piece with oud, frame drum, and female vocals. Whispering and vast, like secrets carried by dunes.",
+    "structure_en": {
+        "Intro": "Oud plucking with faint wind-like drones.",
+        "Verse": "Female vocals over sparse drum and oud motif.",
+        "Chorus": "Broader layers of strings and reverb vocals expand.",
+        "Outro": "Wind sounds blend with fading oud notes."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "沙丘起伏無盡延展"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "風聲攜來隱秘低語"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "腳印逐漸消失無蹤"
+            },
+            {
+                "timestamp": "00:23.30",
+                "line": "影子落在金色波紋"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "聲響繞過漫長孤寂"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "遠處浮現模糊幻象"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "沙丘低語覆蓋夜色"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "旋律散落無邊荒原"
+            },
+            {
+                "timestamp": "00:50.30",
+                "line": "呼吸融入乾涸空氣"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "聲音托起蒼茫世界"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "低語隱入風中飄散"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "沙影停在遼闊邊境"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 72,
+        "genres": [
+            "Ambient",
+            "World"
+        ],
+        "mood": [
+            "Whispering",
+            "Vast",
+            "Mysterious"
+        ],
+        "instruments": [
+            "Oud",
+            "Frame Drum",
+            "Strings"
+        ],
+        "timbre": [
+            "Dry",
+            "Airy",
+            "Expansive"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

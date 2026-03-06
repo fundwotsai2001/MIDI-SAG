@@ -1,0 +1,89 @@
+{
+    "id": 27,
+    "title_zh": "草原牧歌",
+    "global_prompt": "A traditional folk piece with acoustic instruments such as morin khuur, hand drums, and deep male chanting vocals. The atmosphere is vast and natural, evoking open grasslands.",
+    "structure_en": {
+        "Intro": "Morin khuur solo with steady drum beat.",
+        "Verse": "Deep chanting vocal with hand drum pulse.",
+        "Chorus": "Full ensemble with layered chants and expanded instrumentation.",
+        "Outro": "Morin khuur solo fades into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "草原延伸無邊的遠方"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "馬蹄聲迴盪在大地"
+            },
+            {
+                "timestamp": "00:18.10",
+                "line": "天空低唱古老的歌謠"
+            },
+            {
+                "timestamp": "00:23.70",
+                "line": "風聲訴說祖靈的記憶"
+            },
+            {
+                "timestamp": "00:29.00",
+                "line": "心與自然緊緊相依"
+            },
+            {
+                "timestamp": "00:34.30",
+                "line": "靈魂回響無窮無盡"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "草原牧歌隨風迴盪"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "自由靈魂無所拘束"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "天地共鳴無盡之聲"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "永恆旋律在心中延續"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.10",
+                "line": "遠方仍在歌唱"
+            },
+            {
+                "timestamp": "01:28.40",
+                "line": "草原呼吸與我同在"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 86,
+        "genres": [
+            "Traditional Folk"
+        ],
+        "mood": [
+            "Vast",
+            "Natural",
+            "Spiritual"
+        ],
+        "instruments": [
+            "Morin Khuur",
+            "Hand Drums"
+        ],
+        "timbre": [
+            "Earthy",
+            "Deep",
+            "Resonant"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

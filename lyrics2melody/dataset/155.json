@@ -1,0 +1,90 @@
+{
+    "id": 155,
+    "title_zh": "深海藍脈",
+    "global_prompt": "An ambient electronic piece with deep pads, slow pulses, and female vocals. Submerged and expansive, like the hidden rhythm of the deep sea.",
+    "structure_en": {
+        "Intro": "Low synth swells with filtered noise.",
+        "Verse": "Breathy female vocals over pads and pulses.",
+        "Chorus": "Broader textures expand like waves.",
+        "Outro": "Deep pads fade into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "深藍覆蓋無聲脈動"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "波浪輕觸未知邊界"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "耳畔響起低沉訊號"
+            },
+            {
+                "timestamp": "00:23.30",
+                "line": "身影漂浮藏進流光"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "心弦繫在深海軌跡"
+            },
+            {
+                "timestamp": "00:34.10",
+                "line": "呼吸延展漫長無際"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.50",
+                "line": "深海藍脈流動歌聲"
+            },
+            {
+                "timestamp": "00:44.90",
+                "line": "聲響迴盪覆蓋四方"
+            },
+            {
+                "timestamp": "00:50.30",
+                "line": "旋律翻湧如潮來去"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "靜謐托住無窮夜幕"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "波影收起最後一息"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "深海留下遼闊回音"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 72,
+        "genres": [
+            "Ambient",
+            "Electronic"
+        ],
+        "mood": [
+            "Submerged",
+            "Expansive",
+            "Calm"
+        ],
+        "instruments": [
+            "Synth Pads",
+            "Electronic Pulses"
+        ],
+        "timbre": [
+            "Low",
+            "Ethereal",
+            "Wide"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

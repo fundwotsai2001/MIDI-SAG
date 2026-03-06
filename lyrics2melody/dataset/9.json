@@ -1,0 +1,91 @@
+{
+    "id": 9,
+    "title_zh": "風中旅人",
+    "global_prompt": "A folk-inspired acoustic song with strummed guitars, fiddle, light percussion, and male vocals. The sound is earthy and wandering, telling the story of a traveler carried by the wind.",
+    "structure_en": {
+        "Intro": "Acoustic guitar strums with fiddle ornament.",
+        "Verse": "Male vocal storytelling with light percussion.",
+        "Chorus": "Fuller instrumentation with harmonies and fiddle counter-melody.",
+        "Outro": "Fiddle solo fades with guitar strumming."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:08.00",
+                "line": "風帶我越過起伏的山丘"
+            },
+            {
+                "timestamp": "00:13.40",
+                "line": "小路延伸無盡的方向"
+            },
+            {
+                "timestamp": "00:18.70",
+                "line": "行囊裡只有堅定的夢"
+            },
+            {
+                "timestamp": "00:24.10",
+                "line": "腳步伴隨節奏前行"
+            },
+            {
+                "timestamp": "00:29.30",
+                "line": "陌生風景卻如此熟悉"
+            },
+            {
+                "timestamp": "00:34.80",
+                "line": "心裡響起自由的歌"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:40.00",
+                "line": "風中旅人唱著信念"
+            },
+            {
+                "timestamp": "00:45.20",
+                "line": "帶著勇氣不怕遙遠"
+            },
+            {
+                "timestamp": "00:50.60",
+                "line": "歲月刻劃最真的笑容"
+            },
+            {
+                "timestamp": "00:55.90",
+                "line": "讓歌聲陪伴向前"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.40",
+                "line": "旅途仍在風裡延續"
+            },
+            {
+                "timestamp": "01:28.00",
+                "line": "心聲化作自由之歌"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 90,
+        "genres": [
+            "Folk",
+            "Acoustic"
+        ],
+        "mood": [
+            "Earthy",
+            "Free-spirited",
+            "Hopeful"
+        ],
+        "instruments": [
+            "Acoustic Guitar",
+            "Fiddle",
+            "Percussion"
+        ],
+        "timbre": [
+            "Natural",
+            "Rustic",
+            "Warm"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

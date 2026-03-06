@@ -1,0 +1,90 @@
+{
+    "id": 116,
+    "title_zh": "靜夜湖畔",
+    "global_prompt": "A tranquil acoustic ballad with guitar, piano, and female vocals. The mood is peaceful and reflective, like sitting beside a quiet lake at night.",
+    "structure_en": {
+        "Intro": "Guitar picking with soft piano chords.",
+        "Verse": "Female vocals with gentle guitar.",
+        "Chorus": "Piano and harmonies enrich the melody.",
+        "Outro": "Guitar fades with a ripple-like echo."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "湖面映照滿天星辰"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "夜色溫柔撫過指尖"
+            },
+            {
+                "timestamp": "00:17.60",
+                "line": "低語隨風輕輕散去"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "夢想漂流在水的懷抱"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "愛意靜靜在此停留"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "希望如波光閃爍遠方"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "靜夜湖畔守候片刻"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想流轉無盡輕盈"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的歌聲悠悠迴盪"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "希望綻放直到天明"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "湖水依舊低語悠揚"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "夜色延續新的夢境"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 82,
+        "genres": [
+            "Acoustic",
+            "Ballad"
+        ],
+        "mood": [
+            "Peaceful",
+            "Reflective",
+            "Gentle"
+        ],
+        "instruments": [
+            "Guitar",
+            "Piano"
+        ],
+        "timbre": [
+            "Soft",
+            "Warm",
+            "Calm"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

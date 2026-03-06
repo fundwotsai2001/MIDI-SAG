@@ -1,0 +1,90 @@
+{
+    "id": 75,
+    "title_zh": "黃昏港灣",
+    "global_prompt": "A jazz-inspired ballad with upright bass, piano, saxophone, and female vocals. The mood is nostalgic and romantic, like watching the sunset over a quiet harbor.",
+    "structure_en": {
+        "Intro": "Saxophone melody with soft piano chords.",
+        "Verse": "Female vocals with upright bass and piano backing.",
+        "Chorus": "Fuller ensemble with saxophone harmonies.",
+        "Outro": "Saxophone solo fades into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "黃昏靜靜灑落港灣"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "潮聲低語夢境悠然"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "微光映照回憶片段"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "愛意停留在浪花間"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "心靈沉醉暖色的夜"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "歲月歌聲依舊悠揚"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "黃昏港灣呢喃心底"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "愛的旋律不曾停息"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "夢想隨潮遠遠漂去"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "希望綻放在此一刻"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.20",
+                "line": "港灣依舊靜靜守候"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "愛的歌聲綿延不息"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 78,
+        "genres": [
+            "Jazz Ballad"
+        ],
+        "mood": [
+            "Nostalgic",
+            "Romantic",
+            "Calm"
+        ],
+        "instruments": [
+            "Piano",
+            "Upright Bass",
+            "Saxophone"
+        ],
+        "timbre": [
+            "Warm",
+            "Smooth",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

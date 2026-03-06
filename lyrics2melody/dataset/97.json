@@ -1,0 +1,90 @@
+{
+    "id": 97,
+    "title_zh": "荒原旅歌",
+    "global_prompt": "A folk-rock anthem with harmonica, acoustic guitar, drums, and male vocals. The mood is rugged and adventurous, like singing on a long road across the wilderness.",
+    "structure_en": {
+        "Intro": "Harmonica melody with steady guitar strumming.",
+        "Verse": "Male vocals with guitar and harmonica fills.",
+        "Chorus": "Full band with stomping rhythm and harmonies.",
+        "Outro": "Harmonica echoes fade with guitar cadence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "荒原延伸無邊的路"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "腳步堅定唱出勇氣"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "風聲伴隨旅程旋律"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "夢想高歌自由不息"
+            },
+            {
+                "timestamp": "00:28.80",
+                "line": "塵土揚起希望的光"
+            },
+            {
+                "timestamp": "00:34.10",
+                "line": "愛在途中悄然閃耀"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "荒原旅歌嘹亮無限"
+            },
+            {
+                "timestamp": "00:44.90",
+                "line": "夢想飛翔跨越蒼穹"
+            },
+            {
+                "timestamp": "00:50.30",
+                "line": "愛的力量永不消散"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "希望綻放於荒原之心"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "旅歌依舊飄揚遠方"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "心靈奔馳直到永恆"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 104,
+        "genres": [
+            "Folk Rock"
+        ],
+        "mood": [
+            "Rugged",
+            "Adventurous",
+            "Hopeful"
+        ],
+        "instruments": [
+            "Harmonica",
+            "Acoustic Guitar",
+            "Drums"
+        ],
+        "timbre": [
+            "Earthy",
+            "Bright",
+            "Energetic"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

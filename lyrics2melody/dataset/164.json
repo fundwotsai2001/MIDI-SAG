@@ -1,0 +1,91 @@
+{
+    "id": 164,
+    "title_zh": "燈火巷口",
+    "global_prompt": "A city-pop style track with electric piano, bass, drums, and female vocals. Warm and lively, like meeting friends under neon streetlights.",
+    "structure_en": {
+        "Intro": "Electric piano chords with slap bass riff.",
+        "Verse": "Female vocals over syncopated guitar and drums.",
+        "Chorus": "Horn stabs and harmonies brighten the sound.",
+        "Outro": "Bass riff repeats as vocals fade."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "燈火閃爍映照街角"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "笑語散落夜色之中"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "節拍隨著腳步輕敲"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "巷口留下熟悉音符"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "眼神交會溫度升起"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "旋律流轉緊貼街聲"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.10",
+                "line": "燈火巷口歌聲明亮"
+            },
+            {
+                "timestamp": "00:44.50",
+                "line": "舞步踏過閃爍人群"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "旋律喚醒城市律動"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "此刻交織閃耀光影"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.70",
+                "line": "街聲仍在緩緩流動"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "巷口留住溫暖節拍"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 106,
+        "genres": [
+            "City Pop"
+        ],
+        "mood": [
+            "Warm",
+            "Lively",
+            "Bright"
+        ],
+        "instruments": [
+            "Electric Piano",
+            "Bass",
+            "Drums",
+            "Guitar"
+        ],
+        "timbre": [
+            "Glossy",
+            "Smooth",
+            "Upbeat"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

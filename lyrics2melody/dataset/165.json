@@ -1,0 +1,91 @@
+{
+    "id": 165,
+    "title_zh": "孤燈塔影",
+    "global_prompt": "A slow orchestral piece with strings, French horn, and male vocals. Solemn and steady, like a lighthouse standing alone in stormy seas.",
+    "structure_en": {
+        "Intro": "Low strings swell, horn plays distant motif.",
+        "Verse": "Male vocals over strings with sparse timpani.",
+        "Chorus": "Full strings and horns rise with layered choir.",
+        "Outro": "Horn solo fades with soft strings."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "孤燈高懸海霧之上"
+            },
+            {
+                "timestamp": "00:12.60",
+                "line": "浪聲拍擊沉重心弦"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "風聲撕裂無邊黑夜"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "光影守護漂泊之舟"
+            },
+            {
+                "timestamp": "00:28.90",
+                "line": "號角吹響堅定迴響"
+            },
+            {
+                "timestamp": "00:34.30",
+                "line": "孤影長伴蒼茫潮汐"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.70",
+                "line": "孤燈塔影守望遠方"
+            },
+            {
+                "timestamp": "00:45.10",
+                "line": "聲聲迴盪穿透長夜"
+            },
+            {
+                "timestamp": "00:50.50",
+                "line": "風雨依舊掩不住光"
+            },
+            {
+                "timestamp": "00:55.90",
+                "line": "堅守直到黎明降臨"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.20",
+                "line": "塔影漸隱浪聲深處"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "光芒停在海平線間"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 72,
+        "genres": [
+            "Orchestral"
+        ],
+        "mood": [
+            "Solemn",
+            "Steady",
+            "Majestic"
+        ],
+        "instruments": [
+            "Strings",
+            "French Horn",
+            "Timpani",
+            "Choir"
+        ],
+        "timbre": [
+            "Deep",
+            "Expansive",
+            "Resonant"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

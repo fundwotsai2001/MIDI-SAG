@@ -1,0 +1,89 @@
+{
+    "id": 159,
+    "title_zh": "石橋古韻",
+    "global_prompt": "A traditional Chinese instrumental with guqin, erhu, and male vocals. Ancient and steady, like the resonance of an old stone bridge.",
+    "structure_en": {
+        "Intro": "Guqin plucking with erhu drone.",
+        "Verse": "Male vocals with guqin melody.",
+        "Chorus": "Erhu takes lead, layered with vocal chant.",
+        "Outro": "Guqin cadence closes softly."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "石橋靜立歲月無聲"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "流水攜來古老旋律"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "人影穿過時光長河"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "橋身記錄萬千腳步"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "琴音追隨清澈回響"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "聲聲扣在石縫深處"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.30",
+                "line": "石橋古韻悠遠迴盪"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "歌聲浮動隨水而行"
+            },
+            {
+                "timestamp": "00:50.10",
+                "line": "旋律編織千載傳說"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "回聲停駐河畔石影"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "古韻延展無聲長夜"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "橋影靜候晨曦再臨"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 70,
+        "genres": [
+            "Chinese Traditional"
+        ],
+        "mood": [
+            "Ancient",
+            "Steady",
+            "Resonant"
+        ],
+        "instruments": [
+            "Guqin",
+            "Erhu"
+        ],
+        "timbre": [
+            "Organic",
+            "Deep",
+            "Earthy"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

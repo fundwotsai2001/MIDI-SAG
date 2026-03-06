@@ -1,0 +1,27 @@
+{
+  "processed_files": [
+    {
+      "filename": "sample01.mid",
+      "demo_name": "sample01",
+      "key": "C",
+      "mode": "major",
+      "confidence": 1.0,
+      "total_bars": 17,
+      "empty_bars": 5,
+      "content_bars": 12,
+      "note_shift": 80,
+      "segmentation": "A8B4",
+      "chord_gen_midi": "/volume/fundwo-test/lyrics2melody/generated_midi/lyrics_113/chord/chord_gen/sample01_chord_gen.mid",
+      "chord_gen_filled_midi": "/volume/fundwo-test/lyrics2melody/generated_midi/lyrics_113/chord/chord_gen_filled_empty/sample01_chord_gen_filled_empty_bars.mid",
+      "chord_txt": "/volume/fundwo-test/lyrics2melody/generated_midi/lyrics_113/chord/chord_txt/sample01_chord_gen_filled_empty_bars.txt",
+      "status": "success"
+    }
+  ],
+  "failed_files": [],
+  "summary": {
+    "total_files": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "processing_time": "2025-09-22T10:36:53.537492"
+}

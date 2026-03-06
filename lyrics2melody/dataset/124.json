@@ -1,0 +1,90 @@
+{
+    "id": 124,
+    "title_zh": "夏日遠航",
+    "global_prompt": "A breezy pop song with electric guitar, synths, and female vocals. The mood is light and adventurous, like sailing away on a summer day.",
+    "structure_en": {
+        "Intro": "Electric guitar riff with airy synths.",
+        "Verse": "Female vocals with guitar and light beats.",
+        "Chorus": "Full band with bright harmonies.",
+        "Outro": "Synth and guitar fade into waves."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "夏日微風吹散雲彩"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "海浪拍擊湧起節奏"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "船帆張開奔向遠方"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "夢想揚起閃亮微笑"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "愛意在陽光下綻放"
+            },
+            {
+                "timestamp": "00:33.90",
+                "line": "希望在浪潮中飛翔"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "夏日遠航無盡方向"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想高歌隨風飄蕩"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的旋律自由閃亮"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "未來等待新的航程"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "遠航依舊映照海洋"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "光影延續無限希望"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 108,
+        "genres": [
+            "Pop",
+            "Light Rock"
+        ],
+        "mood": [
+            "Breezy",
+            "Adventurous",
+            "Bright"
+        ],
+        "instruments": [
+            "Electric Guitar",
+            "Synths"
+        ],
+        "timbre": [
+            "Fresh",
+            "Upbeat",
+            "Shimmering"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

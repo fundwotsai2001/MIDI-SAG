@@ -1,0 +1,90 @@
+{
+    "id": 117,
+    "title_zh": "流雲之舞",
+    "global_prompt": "A lively folk-pop track with fiddle, acoustic guitar, and hand percussion. The mood is joyful and flowing, like dancing clouds in the sky.",
+    "structure_en": {
+        "Intro": "Fiddle melody with rhythmic guitar strumming.",
+        "Verse": "Female vocals with guitar and light percussion.",
+        "Chorus": "Full ensemble with fiddle harmonies.",
+        "Outro": "Fiddle plays a light cadence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.90",
+                "line": "流雲漂泊穿越山谷"
+            },
+            {
+                "timestamp": "00:12.20",
+                "line": "天空展露清朗微笑"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "腳步跟隨自由節奏"
+            },
+            {
+                "timestamp": "00:23.00",
+                "line": "歌聲飛舞在風的懷裡"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "夢想在此盡情綻放"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "希望閃耀如同晨曦"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.10",
+                "line": "流雲之舞輕盈自在"
+            },
+            {
+                "timestamp": "00:44.50",
+                "line": "夢想高飛無邊無際"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "愛的旋律溫柔迴盪"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "未來光芒照亮前方"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.70",
+                "line": "雲影依舊悠然漂流"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "歌聲延續直到遠方"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 98,
+        "genres": [
+            "Folk Pop"
+        ],
+        "mood": [
+            "Joyful",
+            "Flowing",
+            "Bright"
+        ],
+        "instruments": [
+            "Fiddle",
+            "Acoustic Guitar",
+            "Percussion"
+        ],
+        "timbre": [
+            "Lively",
+            "Organic",
+            "Cheerful"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

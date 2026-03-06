@@ -1,0 +1,91 @@
+{
+    "id": 62,
+    "title_zh": "流沙記憶",
+    "global_prompt": "An indie folk ballad with acoustic guitar, mandolin, light percussion, and male vocals. The mood is nostalgic and earthy, like memories slipping away like sand.",
+    "structure_en": {
+        "Intro": "Mandolin riff with acoustic guitar backing.",
+        "Verse": "Male vocals with fingerpicked guitar.",
+        "Chorus": "Fuller ensemble with harmonies and steady rhythm.",
+        "Outro": "Mandolin and guitar fade gently."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.80",
+                "line": "流沙滑落掌心的過往"
+            },
+            {
+                "timestamp": "00:12.20",
+                "line": "歲月無聲帶走惆悵"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "風中低語遺落的夢"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "心靈記錄片刻的光"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "回憶如歌輕輕迴盪"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "愛在時光中慢慢流淌"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.30",
+                "line": "流沙記憶飄散心間"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "夢想停留無聲瞬間"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "思念如風不斷吹拂"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "愛的痕跡依舊閃亮"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "流沙依舊靜靜飄落"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "回憶延續不滅光芒"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 84,
+        "genres": [
+            "Indie Folk",
+            "Ballad"
+        ],
+        "mood": [
+            "Nostalgic",
+            "Earthy",
+            "Gentle"
+        ],
+        "instruments": [
+            "Acoustic Guitar",
+            "Mandolin",
+            "Percussion"
+        ],
+        "timbre": [
+            "Organic",
+            "Warm",
+            "Soft"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

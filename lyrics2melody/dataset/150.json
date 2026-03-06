@@ -1,0 +1,90 @@
+{
+    "id": 150,
+    "title_zh": "浮光之河",
+    "global_prompt": "A cinematic ambient track with piano, strings, and female vocals. Flowing and reflective, like a river of drifting lights.",
+    "structure_en": {
+        "Intro": "Soft piano motif with faint string pad.",
+        "Verse": "Breathy female vocals over piano and strings.",
+        "Chorus": "Strings broaden with layered harmonies.",
+        "Outro": "Piano arpeggios fade into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "浮光流淌河面閃爍"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "夜色輕擁閃亮影子"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "漣漪鋪展微微閃動"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "時間緩緩傾入水裡"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "眼神追隨漂泊之光"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "心事融入流動旋律"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "浮光之河托起思念"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "旋律徘徊繞過黑夜"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "光點相聚化作樂章"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "此刻寧靜充滿胸懷"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "河面收起最後光點"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "夜色靜候下一個晨"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 76,
+        "genres": [
+            "Ambient",
+            "Cinematic"
+        ],
+        "mood": [
+            "Flowing",
+            "Reflective",
+            "Calm"
+        ],
+        "instruments": [
+            "Piano",
+            "Strings"
+        ],
+        "timbre": [
+            "Soft",
+            "Ethereal",
+            "Warm"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

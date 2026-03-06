@@ -1,0 +1,90 @@
+{
+    "id": 110,
+    "title_zh": "雲海之上",
+    "global_prompt": "An airy orchestral-pop track with strings, harp, and female vocals. The mood is uplifting and vast, like gliding above a sea of clouds.",
+    "structure_en": {
+        "Intro": "Harp arpeggios with soft string swells.",
+        "Verse": "Female vocals with harp and gentle percussion.",
+        "Chorus": "Strings soar with layered harmonies.",
+        "Outro": "Harp echoes fade into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "雲海翻湧無邊的藍"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "風聲輕拂遙遠的夢"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "目光穿越晨曦光影"
+            },
+            {
+                "timestamp": "00:23.30",
+                "line": "未來在天際慢慢綻放"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "愛意隨雲自由漂流"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "希望閃爍在高遠蒼穹"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "雲海之上展開翅膀"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "夢想飛翔無限方向"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "愛的旋律回響天地"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "未來光芒照耀遠方"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "雲海依舊翻湧光彩"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "腳步延續無窮旅程"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 92,
+        "genres": [
+            "Orchestral Pop"
+        ],
+        "mood": [
+            "Uplifting",
+            "Vast",
+            "Hopeful"
+        ],
+        "instruments": [
+            "Strings",
+            "Harp",
+            "Percussion"
+        ],
+        "timbre": [
+            "Bright",
+            "Airy",
+            "Expansive"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

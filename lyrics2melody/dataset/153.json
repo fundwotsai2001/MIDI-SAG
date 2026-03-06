@@ -1,0 +1,90 @@
+{
+    "id": 153,
+    "title_zh": "流雲殘響",
+    "global_prompt": "A post-rock track with layered guitars, cymbal swells, and male vocals. Expansive and melancholic, like clouds drifting with faint echoes.",
+    "structure_en": {
+        "Intro": "Reverb-heavy guitar arpeggios with cymbal washes.",
+        "Verse": "Male vocals with ambient guitars and slow drums.",
+        "Chorus": "Guitars build into walls of sound, vocals soar.",
+        "Outro": "Delay trails on guitar fade gradually."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "流雲散落天際無聲"
+            },
+            {
+                "timestamp": "00:12.60",
+                "line": "灰影輕覆山巒深處"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "聲響漫延拖出長線"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "時間緩緩模糊形狀"
+            },
+            {
+                "timestamp": "00:28.80",
+                "line": "呼吸與風交織旋律"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "殘響擴散覆蓋眼眸"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "流雲殘響迴盪天穹"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "聲浪堆積築起波瀾"
+            },
+            {
+                "timestamp": "00:50.30",
+                "line": "步伐落在無形軌道"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "旋律伸展直到遠方"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "雲影散盡仍留回聲"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "音色沈入靜默夜空"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 96,
+        "genres": [
+            "Post-rock"
+        ],
+        "mood": [
+            "Expansive",
+            "Melancholic",
+            "Atmospheric"
+        ],
+        "instruments": [
+            "Electric Guitars",
+            "Drums",
+            "Cymbals"
+        ],
+        "timbre": [
+            "Reverberant",
+            "Soaring",
+            "Dreamlike"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

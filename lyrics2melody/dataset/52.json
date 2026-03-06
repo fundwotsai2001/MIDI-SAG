@@ -1,0 +1,90 @@
+{
+    "id": 52,
+    "title_zh": "破浪者",
+    "global_prompt": "An energetic electronic-rock track with distorted synths, electric guitars, heavy drums, and male vocals. The mood is adventurous and bold, like riding through crashing waves.",
+    "structure_en": {
+        "Intro": "Distorted synth riff with guitar power chords.",
+        "Verse": "Vocals with guitar and bass-driven rhythm.",
+        "Chorus": "Massive drop with layered guitars, synths, and pounding drums.",
+        "Outro": "Feedback and synth echo fade out."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "浪濤衝擊無盡的前方"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "破浪之心燃燒無畏"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "腳步踏響冒險的節奏"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "勇氣引領不退縮"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "風聲嘯響挑戰的歌"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "靈魂在狂濤中飛翔"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "破浪者無懼狂風"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想驅動不斷前行"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "心靈閃耀不滅火焰"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "勇敢之歌迴盪蒼穹"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "浪濤依舊無休無止"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "心靈延續無畏航行"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 122,
+        "genres": [
+            "Electronic Rock"
+        ],
+        "mood": [
+            "Adventurous",
+            "Bold",
+            "Energetic"
+        ],
+        "instruments": [
+            "Electric Guitars",
+            "Synths",
+            "Drums"
+        ],
+        "timbre": [
+            "Heavy",
+            "Sharp",
+            "Dynamic"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

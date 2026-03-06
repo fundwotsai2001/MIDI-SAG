@@ -1,0 +1,91 @@
+{
+    "id": 188,
+    "title_zh": "荒漠月光",
+    "global_prompt": "A desert-inspired ambient piece with oud, frame drum, and male vocals. Lonely and vast, like moonlight shining over endless dunes.",
+    "structure_en": {
+        "Intro": "Oud melody with faint drum heartbeat.",
+        "Verse": "Male vocals chant with oud motif.",
+        "Chorus": "Drums and layered strings expand.",
+        "Outro": "Oud fades into desert wind samples."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.30",
+                "line": "荒漠鋪展靜謐銀光"
+            },
+            {
+                "timestamp": "00:12.70",
+                "line": "足跡延伸無盡邊境"
+            },
+            {
+                "timestamp": "00:18.10",
+                "line": "微風吹起低沉迴響"
+            },
+            {
+                "timestamp": "00:23.50",
+                "line": "聲音流淌穿過沙丘"
+            },
+            {
+                "timestamp": "00:28.90",
+                "line": "眼神觸碰蒼白冷光"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "旋律化作靜默波紋"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "荒漠月光覆蓋夜色"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "歌聲飄散無窮蒼茫"
+            },
+            {
+                "timestamp": "00:50.40",
+                "line": "聲浪推開沉睡大地"
+            },
+            {
+                "timestamp": "00:55.80",
+                "line": "此刻安靜無限悠長"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.20",
+                "line": "月光沉入無邊荒原"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "低語留在沙丘之上"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 70,
+        "genres": [
+            "Ambient",
+            "World"
+        ],
+        "mood": [
+            "Lonely",
+            "Vast",
+            "Calm"
+        ],
+        "instruments": [
+            "Oud",
+            "Frame Drum",
+            "Strings"
+        ],
+        "timbre": [
+            "Dry",
+            "Airy",
+            "Ethereal"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

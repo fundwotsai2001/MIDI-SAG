@@ -1,0 +1,91 @@
+{
+    "id": 15,
+    "title_zh": "光影童話",
+    "global_prompt": "A whimsical orchestral waltz with strings, celesta, woodwinds, and childlike female vocals. The atmosphere is magical and playful, like a fairytale unfolding in light and shadow.",
+    "structure_en": {
+        "Intro": "Celesta melody with pizzicato strings.",
+        "Verse": "Vocal enters with light strings and woodwind ornaments.",
+        "Chorus": "Full orchestra waltz with sweeping strings and bells.",
+        "Outro": "Celesta reprise fades into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:08.00",
+                "line": "光影交織幻化成夢境"
+            },
+            {
+                "timestamp": "00:13.20",
+                "line": "童話在眼前緩緩展開"
+            },
+            {
+                "timestamp": "00:18.70",
+                "line": "笑聲伴隨音符在舞動"
+            },
+            {
+                "timestamp": "00:23.90",
+                "line": "每一步都閃爍著驚奇"
+            },
+            {
+                "timestamp": "00:29.40",
+                "line": "夜空灑滿星辰的祝福"
+            },
+            {
+                "timestamp": "00:34.60",
+                "line": "心靈輕盈隨風飛舞"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:40.00",
+                "line": "光影童話在心中綻放"
+            },
+            {
+                "timestamp": "00:45.10",
+                "line": "夢境旋轉如同星光"
+            },
+            {
+                "timestamp": "00:50.70",
+                "line": "純真笑容映照時光"
+            },
+            {
+                "timestamp": "00:56.00",
+                "line": "讓奇蹟慢慢生長"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "童話悄悄隱入夢裡"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "光影依然溫柔守護"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 84,
+        "genres": [
+            "Orchestral",
+            "Waltz"
+        ],
+        "mood": [
+            "Whimsical",
+            "Playful",
+            "Magical"
+        ],
+        "instruments": [
+            "Strings",
+            "Celesta",
+            "Woodwinds"
+        ],
+        "timbre": [
+            "Light",
+            "Shimmering",
+            "Delicate"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,91 @@
+{
+    "id": 10,
+    "title_zh": "午夜舞池",
+    "global_prompt": "A deep house track with pulsing basslines, hypnotic synth layers, and sultry female vocals. The vibe is nocturnal and groovy, suited for a midnight dance floor.",
+    "structure_en": {
+        "Intro": "Kick drum pulse with filtered bass and hi-hats.",
+        "Verse": "Vocals enter over steady beat and synth stabs.",
+        "Chorus": "Layered synths and bass drop, hypnotic rhythm intensifies.",
+        "Outro": "Beat filters down, synth echoes fade out."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "燈光閃爍映照舞池"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "心跳與低音同步共鳴"
+            },
+            {
+                "timestamp": "00:17.60",
+                "line": "旋律環繞無盡的夜"
+            },
+            {
+                "timestamp": "00:22.90",
+                "line": "腳步交織出秘密的語言"
+            },
+            {
+                "timestamp": "00:28.10",
+                "line": "迷霧中只剩下呼吸"
+            },
+            {
+                "timestamp": "00:33.50",
+                "line": "眼神閃爍如火般明亮"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.00",
+                "line": "午夜舞池燃燒心靈"
+            },
+            {
+                "timestamp": "00:44.20",
+                "line": "旋律牽引沉醉不停"
+            },
+            {
+                "timestamp": "00:49.70",
+                "line": "身體隨波浪起伏搖動"
+            },
+            {
+                "timestamp": "00:54.90",
+                "line": "夜色中無限回應"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "舞池餘韻依然流動"
+            },
+            {
+                "timestamp": "01:27.80",
+                "line": "夜的秘密深藏其中"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 122,
+        "genres": [
+            "Deep House",
+            "Electronic"
+        ],
+        "mood": [
+            "Hypnotic",
+            "Groovy",
+            "Sultry"
+        ],
+        "instruments": [
+            "Synths",
+            "Bass",
+            "Electronic Drums"
+        ],
+        "timbre": [
+            "Deep",
+            "Smooth",
+            "Nocturnal"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

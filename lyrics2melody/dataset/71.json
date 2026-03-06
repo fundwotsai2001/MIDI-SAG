@@ -1,0 +1,90 @@
+{
+    "id": 71,
+    "title_zh": "烈日戰鼓",
+    "global_prompt": "A tribal rock anthem with big drums, chanting male vocals, and electric guitar accents. The mood is powerful and primal, like warriors gathering under the blazing sun.",
+    "structure_en": {
+        "Intro": "Tribal drums with rhythmic claps.",
+        "Verse": "Chanted vocals with low guitar drones.",
+        "Chorus": "Full drums, chants, and guitar accents.",
+        "Outro": "Drums fade with last echoing chant."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "烈日照耀無畏的靈魂"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "戰鼓轟鳴燃燒心火"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "汗水揮灑無窮的力量"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "信念高歌衝破蒼穹"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "呼喊迴盪無邊原野"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "戰士堅毅迎向黎明"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.10",
+                "line": "烈日戰鼓震撼大地"
+            },
+            {
+                "timestamp": "00:44.50",
+                "line": "勇氣燃燒不滅的火"
+            },
+            {
+                "timestamp": "00:49.80",
+                "line": "戰歌響徹無盡蒼穹"
+            },
+            {
+                "timestamp": "00:55.20",
+                "line": "希望閃耀照亮前路"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "戰鼓漸息迴盪心中"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "信念永遠不會停息"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 116,
+        "genres": [
+            "Tribal Rock"
+        ],
+        "mood": [
+            "Powerful",
+            "Primal",
+            "Intense"
+        ],
+        "instruments": [
+            "Drums",
+            "Electric Guitar",
+            "Chants"
+        ],
+        "timbre": [
+            "Heavy",
+            "Rhythmic",
+            "Majestic"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

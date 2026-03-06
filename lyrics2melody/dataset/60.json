@@ -1,0 +1,91 @@
+{
+    "id": 60,
+    "title_zh": "暗夜微光",
+    "global_prompt": "A downtempo electronic ballad with deep bass, smooth synths, and female vocals. The mood is intimate and mysterious, like a faint light in the dark.",
+    "structure_en": {
+        "Intro": "Low synth pad with deep bass pulse.",
+        "Verse": "Soft female vocals with synth backing.",
+        "Chorus": "Layered harmonies with fuller synth chords and beats.",
+        "Outro": "Synth echoes fade into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "黑夜深處閃爍的光"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "心跳隱藏無聲的渴望"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "思緒流淌在暗夜之間"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "夢境呼吸低聲呢喃"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "孤單隨旋律慢慢消散"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "靈魂找到微光的方向"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "暗夜微光閃爍心底"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想在黑暗中綻放"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的低語永不熄滅"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "希望點亮無限遠方"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "夜色依舊寧靜不語"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "心靈依然擁抱微光"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 78,
+        "genres": [
+            "Downtempo",
+            "Electronic"
+        ],
+        "mood": [
+            "Intimate",
+            "Mysterious",
+            "Calm"
+        ],
+        "instruments": [
+            "Synth Pads",
+            "Bass",
+            "Beats"
+        ],
+        "timbre": [
+            "Smooth",
+            "Deep",
+            "Warm"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

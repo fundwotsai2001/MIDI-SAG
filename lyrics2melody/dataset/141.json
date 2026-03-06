@@ -1,0 +1,90 @@
+{
+    "id": 141,
+    "title_zh": "流沙密碼",
+    "global_prompt": "A trip-hop track with dusty beats, synth textures, and male vocals. Cryptic, slow-moving, and hypnotic, like a riddle buried in desert sands.",
+    "structure_en": {
+        "Intro": "Vinyl crackle with muted beat entrance.",
+        "Verse": "Male vocals half-spoken over deep bass and sparse synths.",
+        "Chorus": "Layered effects, reversed samples, thicker beat.",
+        "Outro": "Beat dissolves with static hiss."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "流沙掩藏無聲符號"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "足跡逐漸消散不見"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "夜色編織神秘訊息"
+            },
+            {
+                "timestamp": "00:23.30",
+                "line": "沉默翻譯古老旋律"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "耳邊低語像是密碼"
+            },
+            {
+                "timestamp": "00:34.10",
+                "line": "字句逐一溶入塵煙"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.50",
+                "line": "流沙密碼無人能解"
+            },
+            {
+                "timestamp": "00:44.90",
+                "line": "碎影隱藏夜的深處"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "回聲劃過空曠荒原"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "聲音留在沉睡之地"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "沙聲繼續覆蓋時間"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "密語散落無跡可循"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 74,
+        "genres": [
+            "Trip-hop"
+        ],
+        "mood": [
+            "Cryptic",
+            "Hypnotic",
+            "Slow"
+        ],
+        "instruments": [
+            "Beats",
+            "Synths",
+            "Samples"
+        ],
+        "timbre": [
+            "Dusty",
+            "Dark",
+            "Low"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

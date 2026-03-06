@@ -1,0 +1,90 @@
+{
+    "id": 25,
+    "title_zh": "夜航燈塔",
+    "global_prompt": "An emotional indie rock track with echoing guitars, steady drums, and heartfelt female vocals. The mood is reflective and guiding, like the beacon of a lighthouse during a night voyage.",
+    "structure_en": {
+        "Intro": "Clean electric guitar arpeggios with reverb.",
+        "Verse": "Female vocal with guitars and light drums.",
+        "Chorus": "Full band with soaring guitar harmonies and stronger rhythm.",
+        "Outro": "Guitars sustain while drums slowly fade."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "黑夜裡只有浪潮低語"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "遠方微光閃爍在心底"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "船身隨夢想搖晃前行"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "星辰引領未知的路徑"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "微光指引堅定的方向"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "心靈不再迷失無助"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "夜航燈塔照亮旅程"
+            },
+            {
+                "timestamp": "00:44.90",
+                "line": "黑暗中不再孤單"
+            },
+            {
+                "timestamp": "00:50.40",
+                "line": "希望在波濤中閃耀"
+            },
+            {
+                "timestamp": "00:55.80",
+                "line": "勇氣陪我直到天明"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.30",
+                "line": "燈光依舊守護夜色"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "心靈找到歸屬的岸"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 98,
+        "genres": [
+            "Indie Rock"
+        ],
+        "mood": [
+            "Reflective",
+            "Hopeful",
+            "Guiding"
+        ],
+        "instruments": [
+            "Electric Guitars",
+            "Drums",
+            "Bass"
+        ],
+        "timbre": [
+            "Echoing",
+            "Bright",
+            "Emotional"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

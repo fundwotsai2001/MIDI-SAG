@@ -1,0 +1,91 @@
+{
+    "id": 58,
+    "title_zh": "荒原回聲",
+    "global_prompt": "An experimental ambient track with drones, percussion, world instruments, and deep male vocals. The mood is vast and haunting, like echoes across a barren desert.",
+    "structure_en": {
+        "Intro": "Low drones with distant drum pulse.",
+        "Verse": "Male chanting vocals with sparse percussion.",
+        "Chorus": "Layered voices with expanded instrumentation and echoes.",
+        "Outro": "Drone fades with last vocal echo."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.40",
+                "line": "荒原無聲延展無際"
+            },
+            {
+                "timestamp": "00:12.90",
+                "line": "回聲迴盪心靈深處"
+            },
+            {
+                "timestamp": "00:18.30",
+                "line": "鼓聲敲響遠古的記憶"
+            },
+            {
+                "timestamp": "00:23.80",
+                "line": "風沙低語無盡呼喚"
+            },
+            {
+                "timestamp": "00:29.20",
+                "line": "足跡踏碎歲月的沉默"
+            },
+            {
+                "timestamp": "00:34.60",
+                "line": "靈魂流浪天地之間"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:40.00",
+                "line": "荒原回聲呼喚永恆"
+            },
+            {
+                "timestamp": "00:45.30",
+                "line": "歲月在風裡輕聲低吟"
+            },
+            {
+                "timestamp": "00:50.70",
+                "line": "靈魂徘徊蒼茫無際"
+            },
+            {
+                "timestamp": "00:56.10",
+                "line": "愛的歌聲不會消散"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.00",
+                "line": "回聲依舊綿延荒原"
+            },
+            {
+                "timestamp": "01:28.40",
+                "line": "心靈遙望無窮遠方"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 64,
+        "genres": [
+            "Ambient",
+            "World Music"
+        ],
+        "mood": [
+            "Haunting",
+            "Vast",
+            "Ethereal"
+        ],
+        "instruments": [
+            "Drones",
+            "Percussion",
+            "World Instruments"
+        ],
+        "timbre": [
+            "Dark",
+            "Resonant",
+            "Expansive"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

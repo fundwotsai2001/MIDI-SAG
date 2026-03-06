@@ -1,0 +1,92 @@
+{
+    "id": 189,
+    "title_zh": "街角晨光",
+    "global_prompt": "A city-pop style track with electric piano, bass, drums, and female vocals. Bright and refreshing, like sunlight spilling over a quiet street corner in the morning.",
+    "structure_en": {
+        "Intro": "Electric piano chords with bass groove.",
+        "Verse": "Female vocals over light guitar and drums.",
+        "Chorus": "Horn section brightens with vocal harmonies.",
+        "Outro": "Bass riff repeats as piano chords fade."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "街角映出晨曦光線"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "微風吹來清新氣息"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "足音踏出輕快節奏"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "旋律溫暖灑在街道"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "眼神追逐明亮時刻"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "歌聲融進日光氣氛"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "街角晨光照亮城市"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "旋律隨風輕輕流淌"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "歌聲鋪滿清晨街景"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "此刻閃耀無限明朗"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "晨光停在街角深處"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "音符化作悠然低吟"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 98,
+        "genres": [
+            "City Pop"
+        ],
+        "mood": [
+            "Bright",
+            "Refreshing",
+            "Cheerful"
+        ],
+        "instruments": [
+            "Electric Piano",
+            "Bass",
+            "Drums",
+            "Guitar",
+            "Horns"
+        ],
+        "timbre": [
+            "Glossy",
+            "Warm",
+            "Sunny"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}
