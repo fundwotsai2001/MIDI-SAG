@@ -29,6 +29,7 @@ def main(config):
     weight_dtype = torch.float32
     melody_emb_extractor = MelodyEncoder().to("cuda").float()
     chord_extractor = Chord_extractor().to("cuda").float()
+    
     if config["checkpoint_path"]:
         config["transformer_ckpt"] = os.path.join(config["checkpoint_path"], "attn_procs.safetensors")
         config["melody_emb_ckpt"] = os.path.join(config["checkpoint_path"], "melody_emb.safetensors")
@@ -217,6 +218,7 @@ if __name__ == "__main__":
     parser.add_argument("--text_prompt", required=True, help="Text prompt(s) for generation")
     parser.add_argument("--vocal_beat_file", required=True, help="Path(s) to input vocal beat file(s)")
     parser.add_argument("--chord_file", required=True, help="Path(s) to input chord file(s)")
+    parser.add_argument("--checkpoint_path", required=True, help="Path(s) to input checkpoint file(s)")
     args = parser.parse_args()
 
     config = get_config()
@@ -224,4 +226,5 @@ if __name__ == "__main__":
     config["text_prompt"] = args.text_prompt
     config['chord_file'] = args.chord_file
     config['vocal_beat_file'] = args.vocal_beat_file
+    config['checkpoint_path'] = args.checkpoint_path
     main(config)

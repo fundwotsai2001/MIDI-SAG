@@ -20,7 +20,7 @@ conda activate midi-sag
 
 ```
 ## huggingface-cli login
-You will need to a token generated from [huggingface](https://huggingface.co/settings/tokens).
+You will need a token generated from [huggingface](https://huggingface.co/settings/tokens).
 ```
 huggingface-cli login
 ```

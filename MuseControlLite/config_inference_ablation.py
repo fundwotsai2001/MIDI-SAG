@@ -2,7 +2,7 @@ def get_config():
     return {
         "condition_type": ["rhythm", "melody", "chord"], # options: "dynamics", "rhythm", "melody", "audio"
 
-        "output_dir": "./output/MuseControlLite_mixed",
+        "output_dir": "./output/MuseControlLite_mixed_vocal_beat", # output directory for MuseControlLite results
 
         "checkpoint_path": "./MIDI-SAG_checkpoints/checkpoint_vocal_beat",
 

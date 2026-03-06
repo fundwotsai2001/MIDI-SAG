@@ -650,6 +650,9 @@ def infer_beats_vad_stitch_fill(
 
     inferred_beats = np.array([], dtype=np.float64)
 
+    print(f"[fill_silence] VAD intervals ({len(intervals)}): {intervals[:5]}{'...' if len(intervals)>5 else ''}")
+    print(f"[fill_silence] detected_beats: {len(detected_beats)} beats, fill_silence={fill_silence}")
+
     # ---- fill silent gaps ----
     if fill_silence and len(intervals) > 0 and len(detected_beats) > 1:
         intervals_sorted = sorted(intervals, key=lambda x: x[0])
@@ -663,6 +666,8 @@ def infer_beats_vad_stitch_fill(
         if intervals_sorted[-1][1] < dur_sec:
             gaps.append((intervals_sorted[-1][1], dur_sec))
 
+        print(f"[fill_silence] gaps to fill: {gaps}")
+
         inferred = []
         edge_margin = 0.02
 
@@ -673,6 +678,7 @@ def infer_beats_vad_stitch_fill(
             pre = detected_beats[detected_beats < g0]
             post = detected_beats[detected_beats > g1]
             period = _choose_gap_period(pre, post, k=fill_k)
+            print(f"[fill_silence] gap ({g0:.2f},{g1:.2f}): pre={len(pre)} beats, post={len(post)} beats, period={period}")
             if period is None:
                 continue
 
@@ -689,6 +695,8 @@ def infer_beats_vad_stitch_fill(
                         inferred.append(t)
                     t -= period
 
+        print(f"[fill_silence] inferred {len(inferred)} beats before dedup/collision filter")
+
         if len(inferred) > 0:
             inferred = np.array(sorted(set(inferred)), dtype=np.float64)
             # remove inferred too close to detected
@@ -697,6 +705,7 @@ def infer_beats_vad_stitch_fill(
                 if np.min(np.abs(detected_beats - t)) > 0.02:
                     keep.append(t)
             inferred_beats = np.array(keep, dtype=np.float64)
+        print(f"[fill_silence] final inferred_beats: {len(inferred_beats)}")
 
     # ---- combine beats ----
     beat_times_all = np.sort(
