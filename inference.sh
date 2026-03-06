@@ -1,5 +1,5 @@
 # Paste your vocal audio path here (absolute or relative)
-VOCAL_AUDIO_PATH="/data/home/fundwotsai/MIDI-SAG/vocal_audio_test_data/364.wav"
+VOCAL_AUDIO_PATH="./vocal_audio_test_data/361.wav"
 # text command for backing track generation (can be modified as needed)
 BACKING_TEXT_PROMPT="Jazzy backing music, high quality, with bass guitar, drums, piano"
 # For internal use, test checkpoints using ground truth beat timings or vocal beats.

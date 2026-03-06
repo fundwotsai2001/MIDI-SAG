@@ -37,6 +37,7 @@ class MIDIExtractionInference(BaseInference):
                 hop_size=self.config['hop_size'], length=length, interp_uv=True
             )
         elif f0_algo == 'rmvpe':
+            print("Using RMVPE for pitch extraction...")
             if self.rmvpe is None:
                 self.rmvpe = modules.rmvpe.RMVPE(self.config['pe_ckpt'], device=self.device)
             f0, _ = self.rmvpe.get_pitch(
