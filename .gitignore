@@ -3,6 +3,7 @@
 *.pth
 *.ckpt
 *.safetensors
+*.m4a
 checkpoint*/
 pretrained/
 

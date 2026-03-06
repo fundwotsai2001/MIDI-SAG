@@ -2,8 +2,8 @@
 VOCAL_AUDIO_PATH="/data/home/fundwotsai/MIDI-SAG/vocal_audio_test_data/364.wav"
 # text command for backing track generation (can be modified as needed)
 BACKING_TEXT_PROMPT="Jazzy backing music, high quality, with bass guitar, drums, piano"
-MIDI_SAG_ROOT="/data/home/fundwotsai/MIDI-SAG"
-MUSECONTROLLITE_CHECKPOINT="/data/home/fundwotsai/MIDI-SAG/MIDI-SAG_checkpoints/checkpoint_gt_beat"
+# For internal use, test checkpoints using ground truth beat timings or vocal beats.
+MUSECONTROLLITE_CHECKPOINT="./MIDI-SAG_checkpoints/checkpoint_gt_beat"
 # Automatically extract song name from the audio path (strips directory and extension)
 SONG_NAME="$(basename "${VOCAL_AUDIO_PATH%.*}")"
 
