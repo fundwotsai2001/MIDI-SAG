@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from safetensors.torch import load_file  # Import safetensors
 import os
 import numpy as np
-from config_inference_ablation import get_config
+from config_inference import get_config
 import argparse
 from utils.extract_conditions import compute_melody_v2, create_activations_from_timestamps
 from utils.condition_extractors import MelodyEncoder, Chord_extractor
@@ -219,6 +219,7 @@ if __name__ == "__main__":
     parser.add_argument("--vocal_beat_file", required=True, help="Path(s) to input vocal beat file(s)")
     parser.add_argument("--chord_file", required=True, help="Path(s) to input chord file(s)")
     parser.add_argument("--checkpoint_path", required=True, help="Path(s) to input checkpoint file(s)")
+    parser.add_argument("--output_dir", required=True, help="Path(s) for output directory")
     args = parser.parse_args()
 
     config = get_config()
@@ -227,4 +228,5 @@ if __name__ == "__main__":
     config['chord_file'] = args.chord_file
     config['vocal_beat_file'] = args.vocal_beat_file
     config['checkpoint_path'] = args.checkpoint_path
+    config['output_dir'] = args.output_dir
     main(config)

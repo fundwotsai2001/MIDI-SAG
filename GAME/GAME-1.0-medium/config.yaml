@@ -1,0 +1,79 @@
+model:
+  mode: d3pm
+  use_languages: true
+  num_languages: 127
+  region_cycle_len: 3
+  in_dim: 80
+  embedding_dim: 256
+  estimator_out_dim: 257
+  encoder:
+    cls: modules.backbones.EBF.EBFBackbone
+    kwargs:
+      dim: 256
+      num_layers: 4
+      num_heads: 8
+      head_dim: 64
+      c_kernel_size: 31
+      m_kernel_size: 31
+      ffn_type: glu
+      ffn_latent_drop: 0.0
+      ffn_out_drop: 0.1
+      use_ls: true
+      dropout_attn: 0.0
+      out_drop: 0.1
+      c_out_drop: 0.1
+      c_latent_drop: 0.0
+  segmenter:
+    cls: modules.backbones.EBF.EBFBackbone
+    kwargs:
+      dim: 256
+      num_layers: 8
+      latent_layer_idx: 6
+      latent_out_dim: 16
+      num_heads: 8
+      head_dim: 64
+      c_kernel_size: 31
+      m_kernel_size: 31
+      ffn_type: glu
+      ffn_latent_drop: 0.0
+      ffn_out_drop: 0.1
+      use_ls: true
+      dropout_attn: 0.0
+      out_drop: 0.1
+      c_out_drop: 0.1
+      c_latent_drop: 0.0
+  estimator:
+    cls: modules.backbones.ebf_with_joint_attention.JEBFBackbone
+    kwargs:
+      dim: 256
+      num_layers: 4
+      num_heads: 8
+      head_dim: 64
+      c_kernel_size_pool: 7
+      m_kernel_size_pool: 5
+      c_kernel_size_x: 31
+      m_kernel_size_x: 31
+      qk_norm: true
+      ffn_type: glu
+      ffn_latent_drop: 0.1
+      ffn_out_drop: 0.1
+      attn_type: joint
+      rope_mode: mixed
+      use_region_bias: false
+      region_token_num: 1
+      pool_merge_mode: mean
+inference:
+  features:
+    audio_sample_rate: 44100
+    hop_size: 441
+    fft_size: 2048
+    win_size: 2048
+    spectrogram:
+      type: mel
+      num_bins: 80
+      fmin: 0.0
+      fmax: 8000.0
+  midi_min: 0.0
+  midi_max: 128.0
+  midi_num_bins: 257
+  midi_std: 0.5

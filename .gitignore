@@ -22,4 +22,5 @@ __pycache__/
 
 # Generated outputs
 output/
+output_*
 lyrics_200/
