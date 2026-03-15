@@ -7,20 +7,21 @@ from symusic import Score
 from pretty_midi import PrettyMIDI, Instrument, Note
 config = TokenizerConfig(num_velocities=16, use_chords=False, use_programs=False)
 tokenizer = REMI(config)
-from demo_utils import (get_key, 
-                       get_chord_analysis, 
-                       get_advanced_chord_analysis, 
-                       get_detailed_key_analysis, 
-                       get_key_for_cdt, 
-                       get_mode_for_cdt, 
-                       get_auto_config, 
-                       fill_empty_bars_with_chords, 
+from demo_utils import (get_key,
+                       get_chord_analysis,
+                       get_advanced_chord_analysis,
+                       get_detailed_key_analysis,
+                       get_key_for_cdt,
+                       get_mode_for_cdt,
+                       get_auto_config,
+                       fill_empty_bars_with_chords,
                        export_chords_txt,
                        export_chords_txt_chorder,
                        sync_output_tempo_with_input,
                        preprocess_melody,
                        align_chord_gen_tpq,
-                       quantize_melody_to_16th
+                       quantize_melody_to_16th,
+                       requantize_chord_gen_melody
                        )
 
 if __name__ == '__main__':
@@ -89,7 +90,7 @@ if __name__ == '__main__':
             cdt_mode_attr = get_mode_for_cdt(tokens.tokens, key_analysis)
             
             # Auto-configure
-            auto_config = get_auto_config(tokens.tokens)
+            auto_config = get_auto_config(tokens.tokens, midi_path=processed_melody_path)
             print(f"auto_config: {auto_config}")
 
             tempo = PrettyMIDI(processed_melody_path).get_tempo_changes()[1][0]
@@ -111,7 +112,10 @@ if __name__ == '__main__':
             
             # Align chord_gen TPQ with original melody TPQ
             align_chord_gen_tpq(processed_melody_path, chord_gen_output)
-            
+
+            # Re-quantize melody track to fix chorderator's rounding errors
+            requantize_chord_gen_melody(chord_gen_output)
+
             # Fill empty bars and sync tempo - save to chord_gen_filled_empty directory
             empty_bars = auto_config['analysis']['empty_bars']
             filled_output = os.path.join(chord_gen_filled_dir, f"{demo_name}_chord_gen_filled_empty_bars.mid")

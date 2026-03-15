@@ -1302,8 +1302,8 @@ def calculate_segmentation(content_bars):
     if content_bars <= 0:
         return 'A4'  # Default fallback
     
-    # Get the valid (padded) total
-    valid_total = get_valid_bar_count(content_bars)
+    # Get the valid (padded) total — round UP to match chorderator's fix_end behaviour
+    valid_total = get_valid_bar_count(content_bars, round_up=True)
     
     if valid_total <= 4:
         print(f"Content bars: {content_bars} -> Segmentation: A4 (total: 4)")
