@@ -17,26 +17,26 @@ mkdir -p "$OUTPUT_DIR/vad_audio"
 python vad_trim.py "$VOCAL_AUDIO_PATH" "$OUTPUT_DIR/vad_audio/$SONG_NAME.wav"
 VOCAL_AUDIO_PATH="$OUTPUT_DIR/vad_audio/$SONG_NAME.wav"
 
-# # ── Pipeline ──────────────────────────────────────────────────────────────────
-# # 1. Vocal beat tracking
-# python Singing-Vocal-Beat-Tracking/inference_vad.py \
-#     --audio_path "$VOCAL_AUDIO_PATH" \
-#     --model_path MIDI-SAG_checkpoints/model-16.pt \
-#     --use_vad --fill_silence \
-#     --output_dir "$OUTPUT_DIR/vocal_beat"
+# ── Pipeline ──────────────────────────────────────────────────────────────────
+# 1. Vocal beat tracking
+python Singing-Vocal-Beat-Tracking/inference_vad.py \
+    --audio_path "$VOCAL_AUDIO_PATH" \
+    --model_path MIDI-SAG_checkpoints/model-16.pt \
+    --use_vad --fill_silence \
+    --output_dir "$OUTPUT_DIR/vocal_beat"
 
-# # 2. Vocal MIDI transcription
-# python GAME/infer.py extract "$VOCAL_AUDIO_PATH" \
-#     -m GAME/GAME-1.0-medium/model.pt \
-#     --output-dir "$OUTPUT_DIR/vocal_MIDI"
+# 2. Vocal MIDI transcription
+python GAME/infer.py extract "$VOCAL_AUDIO_PATH" \
+    -m GAME/GAME-1.0-medium/model.pt \
+    --output-dir "$OUTPUT_DIR/vocal_MIDI"
 
-# # 3. Melody harmonization
-# python AccoMontage2/demo_SOME.py \
-#     --midi_path "$VOCAL_MIDI_PATH" \
-#     --beat_file "$BEAT_PATH" \
-#     --output_dir "$OUTPUT_DIR/Harmonization_results" \
-#     --beat_subdivision 1 \
-#     --chord_style "$CHORD_STYLE"
+# 3. Melody harmonization
+python AccoMontage2/demo_SOME.py \
+    --midi_path "$VOCAL_MIDI_PATH" \
+    --beat_file "$BEAT_PATH" \
+    --output_dir "$OUTPUT_DIR/Harmonization_results" \
+    --beat_subdivision 1 \
+    --chord_style "$CHORD_STYLE"
 
 # 4. Backing track generation
 python MuseControlLite/MuseControlLite_inference_47s.py \
