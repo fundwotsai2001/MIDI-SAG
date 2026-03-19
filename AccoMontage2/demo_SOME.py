@@ -38,6 +38,9 @@ if __name__ == '__main__':
     parser.add_argument('--output_dir', type=str, default='output_SOME', help='Base output directory')
     parser.add_argument('--beat_subdivision', type=int, default=1,
                         help='Beat subdivision: 1=quarter, 2=8th, 4=16th notes (default: 1)')
+    parser.add_argument('--chord_style', type=str, default='POP_STANDARD',
+                        choices=['POP_STANDARD', 'POP_COMPLEX', 'DARK', 'RANDB', 'NOCONSTRAINT'],
+                        help='Output chord style (default: POP_STANDARD)')
     args = parser.parse_args()
 
     input_melody_path = args.midi_path
@@ -124,7 +127,7 @@ if __name__ == '__main__':
         cdt.set_meta(tonic=cdt_key_value, mode=cdt_mode_value, tempo=tempo)
         cdt.set_note_shift(auto_config['note_shift'])
         cdt.set_segmentation(auto_config['segmentation'])
-        cdt.set_output_style(cdt.Style.POP_STANDARD)
+        cdt.set_output_style(getattr(cdt.Style, args.chord_style))
 
         # Generate chord progression
         chord_gen_output = os.path.join(chord_gen_dir, f"{demo_name}_chord_gen.mid")
