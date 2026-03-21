@@ -8,6 +8,12 @@ pip install -r requirements.txt
 pip install torchcodec
 pip install chorder
 pip install miditok
+pip install -U huggingface_hub
+
+# Download the SoulX-Singer SVS model
+hf download Soul-AILab/SoulX-Singer --local-dir pretrained_models/SoulX-Singer
+# Download models required for preprocessing
+hf download Soul-AILab/SoulX-Singer-Preprocess --local-dir pretrained_models/SoulX-Singer-Preprocess
 
 # wget https://github.com/openvpi/SOME/releases/download/v1.0.0-baseline/0119_continuous128_5spk.zip -O /tmp/some_model.zip                                                         
 # unzip /tmp/some_model.zip -d SOME/pretrained/                                                                                                    

@@ -5,42 +5,40 @@ from datetime import datetime
 from miditok import REMI, TokenizerConfig
 from symusic import Score
 from pretty_midi import PrettyMIDI, Instrument, Note
+import sys
 config = TokenizerConfig(num_velocities=16, use_chords=False, use_programs=False)
 tokenizer = REMI(config)
-from demo_utils import (get_key,
-                       get_chord_analysis,
-                       get_advanced_chord_analysis,
-                       get_detailed_key_analysis,
-                       get_key_for_cdt,
-                       get_mode_for_cdt,
-                       get_auto_config,
-                       fill_empty_bars_with_chords,
+from demo_utils import (get_key, 
+                       get_chord_analysis, 
+                       get_advanced_chord_analysis, 
+                       get_detailed_key_analysis, 
+                       get_key_for_cdt, 
+                       get_mode_for_cdt, 
+                       get_auto_config, 
+                       fill_empty_bars_with_chords, 
                        export_chords_txt,
                        export_chords_txt_chorder,
                        sync_output_tempo_with_input,
-                       preprocess_melody,
-                       align_chord_gen_tpq,
-                       quantize_melody_to_16th,
-                       requantize_chord_gen_melody
+                       preprocess_melody
                        )
 
 if __name__ == '__main__':
     # Process all MIDI files in the directory
-    midi_dir = "/home/feiyueh/AccoMontage2/MIDI demos/inputs/rofo"
-    
+    # midi_dir = "/home/feiyueh/AccoMontage2/MIDI demos/inputs/midi"
+    midi_dir = sys.argv[1]
     # Create output directory structure
-    output_base_dir = "batch_processing_results_rofo"
+    # output_base_dir = "batch_processing_results"
+    output_base_dir = sys.argv[2]
+    chord_type = sys.argv[3]
     processed_melody_dir = os.path.join(output_base_dir, "processed_melody")
     chord_gen_dir = os.path.join(output_base_dir, "chord_gen")
     chord_gen_filled_dir = os.path.join(output_base_dir, "chord_gen_filled_empty")
-    chord_gen_quantized_dir = os.path.join(output_base_dir, "chord_gen_quantized")
     chord_txt_dir = os.path.join(output_base_dir, "chord_txt")
     
     # Create directories if they don't exist
     os.makedirs(processed_melody_dir, exist_ok=True)
     os.makedirs(chord_gen_dir, exist_ok=True)
     os.makedirs(chord_gen_filled_dir, exist_ok=True)
-    os.makedirs(chord_gen_quantized_dir, exist_ok=True)
     os.makedirs(chord_txt_dir, exist_ok=True)
     
     # Data structure to store results
@@ -62,9 +60,15 @@ if __name__ == '__main__':
     print(f"Output will be saved to: {output_base_dir}/")
     print(f"  - chord_gen/: Original chord generation results")
     print(f"  - chord_gen_filled_empty/: Filled empty bars results")
-    print(f"  - chord_gen_quantized/: Quantized (1/16 note) version")
     print(f"  - chord_txt/: Chord text files")
-    
+    style_map = {
+        "pop_standard": cdt.Style.POP_STANDARD,
+        "pop_complex": cdt.Style.POP_COMPLEX,
+        "r&b": cdt.Style.RANDB,
+        "dark": cdt.Style.DARK,
+        "None": cdt.Style.NOCONSTRAINT
+        # add any other styles supported by chorderator
+    }
     for midi_file in midi_files:
         try:
             print(f"\n=== Processing: {midi_file} ===")
@@ -90,7 +94,7 @@ if __name__ == '__main__':
             cdt_mode_attr = get_mode_for_cdt(tokens.tokens, key_analysis)
             
             # Auto-configure
-            auto_config = get_auto_config(tokens.tokens, midi_path=processed_melody_path)
+            auto_config = get_auto_config(tokens.tokens)
             print(f"auto_config: {auto_config}")
 
             tempo = PrettyMIDI(processed_melody_path).get_tempo_changes()[1][0]
@@ -101,7 +105,8 @@ if __name__ == '__main__':
             cdt.set_meta(tonic=cdt_key_value, mode=cdt_mode_value, tempo=tempo)
             cdt.set_note_shift(auto_config['note_shift'])
             cdt.set_segmentation(auto_config['segmentation'])
-            cdt.set_output_style(cdt.Style.POP_STANDARD)
+            cdt.set_output_style(style_map[chord_type])
+            print(f"Using:{style_map[chord_type]}")
             
             # Generate chord progression - save to chord_gen directory
             chord_gen_output = os.path.join(chord_gen_dir, f"{demo_name}_chord_gen.mid")
@@ -110,12 +115,6 @@ if __name__ == '__main__':
                                             task='chord',
                                             log=False)
             
-            # Align chord_gen TPQ with original melody TPQ
-            align_chord_gen_tpq(processed_melody_path, chord_gen_output)
-
-            # Re-quantize melody track to fix chorderator's rounding errors
-            requantize_chord_gen_melody(chord_gen_output)
-
             # Fill empty bars and sync tempo - save to chord_gen_filled_empty directory
             empty_bars = auto_config['analysis']['empty_bars']
             filled_output = os.path.join(chord_gen_filled_dir, f"{demo_name}_chord_gen_filled_empty_bars.mid")
@@ -126,10 +125,6 @@ if __name__ == '__main__':
                 filled_output
             )
             # sync_output_tempo_with_input(processed_melody_path, [filled_output])
-            
-            # Create quantized (1/16 note) version - save to chord_gen_quantized directory
-            quantized_output = os.path.join(chord_gen_quantized_dir, f"{demo_name}_chord_gen_quantized.mid")
-            quantize_melody_to_16th(filled_output, quantized_output)
             
             # Export chord text - save to chord_txt directory
             txt_file = os.path.join(chord_txt_dir, f"{demo_name}_chord_gen_filled_empty_bars.txt")
@@ -149,7 +144,6 @@ if __name__ == '__main__':
                 'segmentation': auto_config['segmentation'],
                 'chord_gen_midi': chord_gen_output,
                 'chord_gen_filled_midi': filled_output,
-                'chord_gen_quantized_midi': quantized_output,
                 'chord_txt': txt_file,
                 'status': 'success'
             }
@@ -160,7 +154,6 @@ if __name__ == '__main__':
             print(f"  Key: {key_analysis['key']} {key_analysis['mode']} (confidence: {key_analysis['confidence']:.2f})")
             print(f"  Chord Gen: {chord_gen_output}")
             print(f"  Filled Empty: {filled_output}")
-            print(f"  Quantized: {quantized_output}")
             print(f"  Chord Text: {txt_file}")
             
         except Exception as e:
@@ -187,7 +180,6 @@ if __name__ == '__main__':
         print(f"\n=== Successfully Processed Files ===")
         for file_result in results['processed_files']:
             print(f"- {file_result['filename']}: {file_result['key']} {file_result['mode']} ({file_result['confidence']:.2f})")
-    
     # Print failed files
     if results['failed_files']:
         print(f"\n=== Failed Files ===")

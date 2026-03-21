@@ -267,14 +267,10 @@ def acc2btc(acc_path, btc_path):
         f.write('\n'.join(btc_lines) + '\n')
 
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", default="/data/home/fundwotsai/MIDI-SAG/output/chord_txt")
-    parser.add_argument("--output_dir", default="/data/home/fundwotsai/MIDI-SAG/output/btc_txt")
-    args = parser.parse_args()
-
-    data_dir = args.data_dir
-    output_dir = args.output_dir
+    # input: data_dir with txt files
+    import sys
+    data_dir = sys.argv[1]
+    output_dir = sys.argv[2]
     os.makedirs(output_dir, exist_ok=True)
     for filename in os.listdir(data_dir):
         print(filename)
