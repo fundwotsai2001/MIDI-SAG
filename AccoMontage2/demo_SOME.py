@@ -9,24 +9,24 @@ from symusic import Score
 from pretty_midi import PrettyMIDI, Instrument, Note
 config = TokenizerConfig(num_velocities=16, use_chords=False, use_programs=False)
 tokenizer = REMI(config)
-from demo_utils import (get_key, 
-                       get_chord_analysis, 
-                       get_advanced_chord_analysis, 
-                       get_detailed_key_analysis, 
-                       get_key_for_cdt, 
-                       get_mode_for_cdt, 
-                       get_auto_config, 
-                       fill_empty_bars_with_chords, 
+from demo_utils import (get_key,
+                       get_chord_analysis,
+                       get_advanced_chord_analysis,
+                       get_detailed_key_analysis,
+                       get_key_for_cdt,
+                       get_mode_for_cdt,
+                       get_auto_config,
+                       fill_empty_bars_with_chords,
                        export_chords_txt,
                        export_chords_txt_chorder,
                        sync_output_tempo_with_input,
                        preprocess_melody,
                        align_chord_gen_tpq,
                        quantize_melody_to_16th,
-                       reassign_global_tempo,
                        load_beat_times,
                        estimate_tempo_from_beats,
-                       adjust_midi_to_beats,
+                       warp_midi_to_beats,
+                       detect_downbeat_phase,
                        requantize_chord_gen_melody,
                        fill_none_chords_in_txt
                        )
@@ -34,7 +34,7 @@ from demo_utils import (get_key,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate chord progression from a single vocal MIDI file.')
     parser.add_argument('--midi_path', type=str, required=True, help='Path to input vocal MIDI file')
-    parser.add_argument('--beat_file', type=str, default=None, help='Path to beat times txt file (optional)')
+    parser.add_argument('--beat_file', type=str, required=True, help='Path to beat times txt file')
     parser.add_argument('--output_dir', type=str, default='output_SOME', help='Base output directory')
     parser.add_argument('--beat_subdivision', type=int, default=1,
                         help='Beat subdivision: 1=quarter, 2=8th, 4=16th notes (default: 1)')
@@ -70,33 +70,40 @@ if __name__ == '__main__':
 
     processed_melody_path = os.path.join(processed_melody_dir, f"{demo_name}.mid")
 
-    beat_times = None
-    estimated_bpm = None
     beat_file_path = args.beat_file
-    print("beat_file_path", beat_file_path)
-    print("os.path.exists(beat_file_path)", os.path.exists(beat_file_path) if beat_file_path else False)
+    print(f"beat_file_path: {beat_file_path}")
     try:
-        if beat_file_path and os.path.exists(beat_file_path):
-            print(f"Found beat times: {beat_file_path}")
-            beat_times = load_beat_times(beat_file_path)
-            tempo_info = estimate_tempo_from_beats(beat_times)
-            estimated_bpm = tempo_info['tempo']
-            print(f"Tempo from beats: {estimated_bpm:.1f} BPM (bar duration: {tempo_info['bar_duration']:.3f}s)")
+        if not os.path.exists(beat_file_path):
+            raise FileNotFoundError(f"Beat times file not found: {beat_file_path}")
 
-            # First, do basic preprocessing (leave one track)
-            score = Score(input_melody_path, ttype="tick")
-            for i, track in enumerate(score.tracks):
-                if track.notes:
-                    score.tracks = [track]
-                    break
-            score.dump_midi(processed_melody_path)
+        beat_times = load_beat_times(beat_file_path)
+        tempo_info = estimate_tempo_from_beats(beat_times, beat_subdivision=BEAT_SUBDIVISION)
+        estimated_bpm = tempo_info['tempo']
+        print(f"Tempo from beats: {estimated_bpm:.1f} BPM (bar duration: {tempo_info['bar_duration']:.3f}s)")
 
-            # Adjust tempo while preserving absolute note timing (seconds)
-            adjust_midi_to_beats(processed_melody_path, processed_melody_path, beat_times,
-                                 beat_subdivision=BEAT_SUBDIVISION)
-        else:
-            print(f"No beat times found, using standard preprocessing")
-            estimated_bpm = preprocess_melody(input_melody_path, processed_melody_path, target_bpm=None)
+        # Step 1: strip to a single melody track
+        score = Score(input_melody_path, ttype="tick")
+        for track in score.tracks:
+            if track.notes:
+                score.tracks = [track]
+                break
+        score.dump_midi(processed_melody_path)
+
+        # Step 2: detect which beat_times entry is the first downbeat (bar 1 beat 1)
+        downbeat_phase = detect_downbeat_phase(
+            beat_times, processed_melody_path,
+            beats_per_bar=4, beat_subdivision=BEAT_SUBDIVISION
+        )
+
+        # Step 3: warp note positions onto the beat grid
+        beat_times_aligned = beat_times[downbeat_phase:]
+        warp_midi_to_beats(
+            processed_melody_path, processed_melody_path,
+            beat_times_aligned,
+            beats_per_bar=4,
+            quantize_to_grid=True,
+            grid_resolution=16
+        )
 
         # Process the MIDI file
         cdt.set_melody(processed_melody_path)
@@ -115,8 +122,8 @@ if __name__ == '__main__':
         auto_config = get_auto_config(tokens.tokens, midi_path=processed_melody_path)
         print(f"auto_config: {auto_config}")
 
-        tempo = PrettyMIDI(processed_melody_path).get_tempo_changes()[1][0]
-        print(f"tempos: {tempo}")
+        tempo = estimated_bpm
+        print(f"tempo for CDT: {tempo:.1f} BPM")
 
         # Set parameters
         cdt_key_value = getattr(cdt.Key, cdt_key_attr)
@@ -155,7 +162,7 @@ if __name__ == '__main__':
 
         # Export chord text with None values
         txt_with_none = os.path.join(chord_txt_with_none_dir, f"{demo_name}_chord_gen.txt")
-        export_chords_txt_chorder(filled_output, txt_with_none, beat_times=beat_times,
+        export_chords_txt_chorder(filled_output, txt_with_none, beat_times=beat_times_aligned,
                                   beat_subdivision=BEAT_SUBDIVISION)
 
         # Fill None chords

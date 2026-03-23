@@ -7,24 +7,24 @@ from symusic import Score
 from pretty_midi import PrettyMIDI, Instrument, Note
 config = TokenizerConfig(num_velocities=16, use_chords=False, use_programs=False)
 tokenizer = REMI(config)
-from demo_utils import (get_key, 
-                       get_chord_analysis, 
-                       get_advanced_chord_analysis, 
-                       get_detailed_key_analysis, 
-                       get_key_for_cdt, 
-                       get_mode_for_cdt, 
-                       get_auto_config, 
-                       fill_empty_bars_with_chords, 
+from demo_utils import (get_key,
+                       get_chord_analysis,
+                       get_advanced_chord_analysis,
+                       get_detailed_key_analysis,
+                       get_key_for_cdt,
+                       get_mode_for_cdt,
+                       get_auto_config,
+                       fill_empty_bars_with_chords,
                        export_chords_txt,
                        export_chords_txt_chorder,
                        sync_output_tempo_with_input,
                        preprocess_melody,
                        align_chord_gen_tpq,
                        quantize_melody_to_16th,
-                       reassign_global_tempo,
                        load_beat_times,
                        estimate_tempo_from_beats,
-                       adjust_midi_to_beats,
+                       warp_midi_to_beats,
+                       detect_downbeat_phase,
                        requantize_chord_gen_melody,
                        fill_none_chords_in_txt
                        )
@@ -36,19 +36,18 @@ if __name__ == '__main__':
     
     # Process all MIDI files in the directory
     # Each song is in a subdirectory with a vocals.mid file
-    midi_base_dir = "/home/b06611012/fundwotsai/MUSDB18_wav/conditions_SOME_predicted_vocal_midi"
+    # midi_base_dir = "/home/b06611012/fundwotsai/MUSDB18_wav/conditions_SOME_predicted_vocal_midi"
+    midi_base_dir = "../../dataset/conditions_SOME_predicted_vocal_midi"
     
     # Beat times directory (from SingNet or other beat detection)
     # Each song subdirectory should contain a beat_times.txt file
-    beat_base_dir = "/home/b06611012/fundwotsai/MUSDB18_wav/conditions_SingNet_prediced_vocal_beat_updated_v11"
-    
-    # Use beat times for tempo estimation (recommended)
-    USE_BEAT_TIMES = True
-    
+    # beat_base_dir = "/home/b06611012/fundwotsai/MUSDB18_wav/conditions_SingNet_prediced_vocal_beat_updated_v11"
+    beat_base_dir = "../../dataset/conditions_SingNet_prediced_vocal_beat_updated_v11"
+
+
     # Beat subdivision: what note value does each beat_time represent?
     # 1 = quarter notes (default), 2 = 8th notes, 4 = 16th notes
-    # Set to 2 if your beat_times are 8th notes (e.g., conditions_SingNet_prediced_vocal_beat_updated)
-    BEAT_SUBDIVISION = 1  # Updated beat_times seem to be 8th notes
+    BEAT_SUBDIVISION = 1
     
     # ============================================
     
@@ -107,34 +106,43 @@ if __name__ == '__main__':
             demo_name = song_name.replace(" ", "_").replace("/", "_")
             processed_melody_path = os.path.join(processed_melody_dir, f"{demo_name}.mid")
             
-            # Check for beat times file
+            # Beat times are required — skip songs that don't have them
             beat_file_path = os.path.join(beat_base_dir, song_name, "vocals_beat_times.txt")
-            beat_times = None
-            estimated_bpm = None
-            print("beat_file_path", beat_file_path)
-            print("os.path.exists(beat_file_path)", os.path.exists(beat_file_path))
-            if USE_BEAT_TIMES and os.path.exists(beat_file_path):
-                print(f"Found beat times: {beat_file_path}")
-                beat_times = load_beat_times(beat_file_path)
-                tempo_info = estimate_tempo_from_beats(beat_times)
-                estimated_bpm = tempo_info['tempo']
-                print(f"Tempo from beats: {estimated_bpm:.1f} BPM (bar duration: {tempo_info['bar_duration']:.3f}s)")
-                
-                # First, do basic preprocessing (leave one track)
-                score = Score(input_melody_path, ttype="tick")
-                for i, track in enumerate(score.tracks):
-                    if track.notes:
-                        score.tracks = [track]
-                        break
-                score.dump_midi(processed_melody_path)
-                
-                # Adjust tempo while preserving absolute note timing (seconds)
-                adjust_midi_to_beats(processed_melody_path, processed_melody_path, beat_times, 
-                                    beat_subdivision=BEAT_SUBDIVISION)
-            else:
-                print(f"No beat times found, using standard preprocessing")
-                # Preprocess the melody (leave only one track, estimate/set tempo)
-                estimated_bpm = preprocess_melody(input_melody_path, processed_melody_path, target_bpm=None)
+            print(f"beat_file_path: {beat_file_path}")
+            if not os.path.exists(beat_file_path):
+                raise FileNotFoundError(f"Beat times file not found: {beat_file_path}")
+
+            beat_times = load_beat_times(beat_file_path)
+            tempo_info = estimate_tempo_from_beats(beat_times, beat_subdivision=BEAT_SUBDIVISION)
+            estimated_bpm = tempo_info['tempo']
+            print(f"Tempo from beats: {estimated_bpm:.1f} BPM (bar duration: {tempo_info['bar_duration']:.3f}s)")
+
+            # Step 1: strip to a single melody track
+            score = Score(input_melody_path, ttype="tick")
+            for track in score.tracks:
+                if track.notes:
+                    score.tracks = [track]
+                    break
+            score.dump_midi(processed_melody_path)
+
+            # Step 2: detect which beat_times entry is the first downbeat (bar 1 beat 1)
+            #   - uses note onset density; instrumental intros don't affect the result
+            downbeat_phase = detect_downbeat_phase(
+                beat_times, processed_melody_path,
+                beats_per_bar=4, beat_subdivision=BEAT_SUBDIVISION
+            )
+
+            # Step 3: warp note positions onto the beat grid
+            #   - slice beat_times from the first downbeat so tick 0 = bar 1 beat 1
+            #   - notes before the first downbeat (pickup notes) are dropped by warp_midi_to_beats
+            beat_times_aligned = beat_times[downbeat_phase:]
+            warp_midi_to_beats(
+                processed_melody_path, processed_melody_path,
+                beat_times_aligned,
+                beats_per_bar=4,
+                quantize_to_grid=True,
+                grid_resolution=16
+            )
             
             # Process the MIDI file
             cdt.set_melody(processed_melody_path)
@@ -153,8 +161,10 @@ if __name__ == '__main__':
             auto_config = get_auto_config(tokens.tokens, midi_path=processed_melody_path)
             print(f"auto_config: {auto_config}")
 
-            tempo = PrettyMIDI(processed_melody_path).get_tempo_changes()[1][0]
-            print(f"tempos: {tempo}")
+            # Use the beat-derived average BPM for CDT (not the MIDI tempo event,
+            # which warp_midi_to_beats writes as a global average and may have rounding)
+            tempo = estimated_bpm
+            print(f"tempo for CDT: {tempo:.1f} BPM")
             # Set parameters
             cdt_key_value = getattr(cdt.Key, cdt_key_attr)
             cdt_mode_value = getattr(cdt.Mode, cdt_mode_attr)
@@ -194,7 +204,9 @@ if __name__ == '__main__':
             # Export chord text with None values - save to chord_txt_with_None directory
             # Pass beat_times to remap chord times to actual beat positions
             txt_with_none = os.path.join(chord_txt_with_none_dir, f"{demo_name}_chord_gen.txt")
-            export_chords_txt_chorder(filled_output, txt_with_none, beat_times=beat_times, 
+            # Use beat_times_aligned (starts at first downbeat) so chord beat 0
+            # maps to the correct real-world timestamp
+            export_chords_txt_chorder(filled_output, txt_with_none, beat_times=beat_times_aligned,
                                      beat_subdivision=BEAT_SUBDIVISION)
             
             # Fill None chords and save to chord_txt directory
