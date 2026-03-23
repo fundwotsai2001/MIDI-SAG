@@ -457,6 +457,55 @@ def find_first_downbeat_for_melody(beat_times, first_note_time, beats_per_bar=4)
     return downbeat_idx, beat_times[downbeat_idx], bar_number
 
 
+def detect_downbeat_phase(beat_times, midi_path, beats_per_bar=4, beat_subdivision=1):
+    """
+    Detect which index in beat_times corresponds to the first downbeat (bar 1 beat 1).
+
+    Strategy: vocal note onsets tend to cluster on beat 1 of the bar more than other
+    positions. We map every note onset to its nearest beat_times entry, tally which
+    position-in-bar (beat_idx % entries_per_bar) accumulates the most onsets, and call
+    that the downbeat. Instrumental intros are harmless because they contain no notes.
+
+    Args:
+        beat_times:      Array of beat onset times in seconds (from SingNet etc.)
+        midi_path:       Path to the (single-track) vocal MIDI file.
+        beats_per_bar:   Number of beats per bar (default 4 for 4/4).
+        beat_subdivision: 1 = beat_times are quarter notes, 2 = eighth notes, etc.
+
+    Returns:
+        int: phase offset p such that beat_times[p] is the first downbeat.
+             Slicing beat_times[p:] gives a beat sequence that starts on bar 1 beat 1.
+    """
+    import pretty_midi
+
+    entries_per_bar = beats_per_bar * beat_subdivision
+
+    if len(beat_times) < entries_per_bar:
+        print("  [phase] Too few beat times — defaulting to phase=0")
+        return 0
+
+    pm = pretty_midi.PrettyMIDI(midi_path)
+    note_onsets = [note.start for inst in pm.instruments for note in inst.notes]
+
+    if not note_onsets:
+        print("  [phase] No notes found — defaulting to phase=0")
+        return 0
+
+    # Count note onsets per bar-position across all positions 0..entries_per_bar-1
+    phase_scores = np.zeros(entries_per_bar)
+    for t in note_onsets:
+        k = int(np.argmin(np.abs(beat_times - t)))
+        phase_scores[k % entries_per_bar] += 1
+
+    best_phase = int(np.argmax(phase_scores))
+
+    print(f"  [phase] scores per bar position: {phase_scores.astype(int).tolist()}")
+    print(f"  [phase] detected downbeat phase={best_phase} "
+          f"→ beat_times[{best_phase}] = {beat_times[best_phase]:.3f}s")
+
+    return best_phase
+
+
 # pitch to key
 pitch_to_key = {
     0: 'C',
@@ -2571,23 +2620,34 @@ def quantize_melody_to_16th(input_path, output_path=None):
     total_notes = 0
     for track in score.tracks:
         new_track = Track(name=track.name)
+        quantized_notes = []
         for note in track.notes:
             # Quantize start time to nearest 1/16 note
             quantized_start = int(round(note.start / ticks_per_16th) * ticks_per_16th)
             # Quantize duration (minimum 1/16 note)
             quantized_duration = max(
-                int(ticks_per_16th), 
+                int(ticks_per_16th),
                 int(round(note.duration / ticks_per_16th) * ticks_per_16th)
             )
-            
-            new_note = Note(
-                time=quantized_start,
-                duration=quantized_duration,
-                pitch=note.pitch,
-                velocity=note.velocity
-            )
-            new_track.notes.append(new_note)
+            quantized_notes.append((quantized_start, quantized_duration, note.pitch, note.velocity))
+
+        # Deduplicate: if two notes snap to the same start tick, keep only the last one
+        # (earlier note is a shorter fragment that got snapped forward)
+        quantized_notes.sort(key=lambda x: x[0])
+        deduped = []
+        for start, dur, pitch, vel in quantized_notes:
+            if deduped and deduped[-1][0] == start:
+                deduped[-1] = [start, dur, pitch, vel]
+            else:
+                deduped.append([start, dur, pitch, vel])
+
+        # Clip each note's duration so it does not overlap the next note's start
+        for i, note in enumerate(deduped):
+            if i + 1 < len(deduped):
+                note[1] = max(1, min(note[1], deduped[i + 1][0] - note[0]))
+            new_track.notes.append(Note(time=note[0], duration=note[1], pitch=note[2], velocity=note[3]))
             total_notes += 1
+
         new_track.notes.sort(key=lambda n: n.time)
         new_score.tracks.append(new_track)
     
