@@ -1,7 +1,7 @@
 # ── User config ──────────────────────────────────────────────────────────────
-VOCAL_AUDIO_PATH="/data/home/fundwotsai/MIDI-SAG/vocal_audio_test_data/i-like-you-bpm-65-1.wav"
-OUTPUT_DIR="./output_game"
-BACKING_TEXT_PROMPT="romantic pop song with a mellow vibe, featuring soft piano chords and gentle guitar strumming, creating a warm and intimate atmosphere that complements the vocal melody."
+VOCAL_AUDIO_PATH="/data/home/fundwotsai/MIDI-SAG/vocal_audio_test_data/366.wav"
+OUTPUT_DIR="./output_game_3_23"
+BACKING_TEXT_PROMPT="piano and drums, in the style of pop music"
 MUSECONTROLLITE_CHECKPOINT="./MIDI-SAG_checkpoints/checkpoint_gt_beat"
 # Chord style for harmonization: POP_STANDARD | POP_COMPLEX | DARK | RANDB | NOCONSTRAINT
 CHORD_STYLE="POP_COMPLEX"

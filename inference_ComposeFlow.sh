@@ -6,6 +6,7 @@ SOULX_PROMPT_META="example/audio/zh_prompt.json"
 SOULX_SAVE_DIR="/data/home/fundwotsai/MIDI-SAG/output_compose/vocal_audio"
 LANGUAGE="Mandarin"
 CHORD_TYPE="pop_complex" # choices: "pop_standard", "pop_complex", "r&b", "dark", "None"
+BACKING_TEXT_PROMPT="piano and drums, in the style of pop music"
 
 
 
@@ -51,3 +52,11 @@ python -m cli.inference \
 cd AccoMontage2
 python demo.py "$MIDI_DIR" "$CHORD_DIR" "$CHORD_TYPE" 
 python acc2btc.py "$CHORD_DIR/chord_txt" "$CHORD_DIR/chord_btc_txt"
+# ── 5. MuseControlLite: Vocal audio + Chord progression + beat → Backing track ────────────────────────────────
+python MuseControlLite/MuseControlLite_inference_47s.py \
+    --vocal_audio_file "$VOCAL_AUDIO_PATH" \
+    --text_prompt "$BACKING_TEXT_PROMPT" \
+    --chord_file "$CHORD_PATH" \
+    --vocal_beat_file "$BEAT_PATH" \
+    --checkpoint_path "$MUSECONTROLLITE_CHECKPOINT" \
+    --output_dir "$OUTPUT_DIR/Backing_track"
