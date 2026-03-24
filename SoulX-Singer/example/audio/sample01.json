@@ -1,0 +1,30 @@
+[
+  {
+    "index": "sample01_0",
+    "language": "Mandarin",
+    "time": [
+      30230,
+      90230
+    ],
+    "duration": "0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.23 0.23 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.23 0.23 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.23 0.23 0.23 0.35 0.35 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.23 0.69 0.23 0.23 0.23 0.23 0.23 0.69 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.92 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.23 0.46 0.46 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.46 0.23 0.23 0.23 0.23 0.23",
+    "text": "还 记 得 那 场 音 乐 会 的 烟 火 *. <SP> 还 记 得 那 个 凉 凉 的 深 秋 *. <SP> 还 记 得 人 潮 把 你 推 向 了 我 *. <SP> 游 乐 园 拥 挤 的 正 是 时 候 *. <SP> 一 个 夜 晚 坚 持 不 睡 的 等 候 *. <SP> 一 起 泡 温 泉 奢 侈 的 享 受 *. <SP> 有 一 次 日 记 里 愚 蠢 的 困 惑 *. <SP> 因 为 你 的 微 笑 幻 化 成 风 *. <SP> 你 大 大 的 勇 敢 保 护 着 我 *. <SP> 我 小 小 的 关 怀 喋 喋 不 休 *. <SP> 感 谢 我 们 一 起 走 了 那 么 久 *. <SP> 又 再 一 次 回 到 凉 凉 深 秋 *. <SP> 给 你 我 的 手. <SP> 像 温 柔 野 兽. <SP> 把 自 由 交 给 草 原 的 辽 阔 *. <SP> 我 们 小 手 拉 大 手. <SP> 一 起 郊 游. <SP> 今 天 别 想 太 多 *. <SP> 你 是 我 的",
+    "phoneme": "zh_hai2 zh_ji4 zh_de2 zh_na4 zh_chang3 zh_yin1 zh_yue4 zh_hui4 zh_de5 zh_yan1 zh_huo3 <SP> <SP> zh_hai2 zh_ji4 zh_de2 zh_na4 zh_ge4 zh_liang2 zh_liang2 zh_de5 zh_shen1 zh_qiu1 <SP> <SP> zh_hai2 zh_ji4 zh_de2 zh_ren2 zh_chao2 zh_ba3 zh_ni3 zh_tui1 zh_xiang4 zh_le5 zh_wo3 <SP> <SP> zh_you2 zh_le4 zh_yuan2 zh_yong1 zh_ji3 zh_de5 zh_zheng4 zh_shi4 zh_shi2 zh_hou4 <SP> <SP> zh_yi1 zh_ge4 zh_ye4 zh_wan3 zh_jian1 zh_chi2 zh_bu4 zh_shui4 zh_ban3 zh_deng3 zh_hou4 <SP> <SP> zh_yi1 zh_qi3 zh_pao4 zh_wen1 zh_quan2 zh_she1 zh_chi3 zh_de5 zh_xiang3 zh_shou4 <SP> <SP> zh_you3 zh_yi1 zh_ci4 zh_ri4 zh_ji4 zh_li3 zh_yu2 zh_chun3 zh_de5 zh_kun4 zh_huo4 <SP> <SP> zh_yin1 zh_wei2 zh_ni3 zh_de5 zh_wei1 zh_xiao4 zh_huan4 zh_hua4 zh_cheng2 zh_feng1 <SP> <SP> zh_ni3 zh_da4 zh_da4 zh_de5 zh_yong3 zh_gan3 zh_bao3 zh_hu4 zh_zhe5 zh_wo3 <SP> <SP> zh_wo3 zh_xiao3 zh_xiao3 zh_de5 zh_guan1 zh_huai2 zh_die2 zh_die2 zh_bu4 zh_xiu1 <SP> <SP> zh_gan3 zh_xie4 zh_wo3 zh_men5 zh_yi1 zh_qi3 zh_zou3 zh_le5 zh_na4 zh_me5 zh_jiu3 <SP> <SP> zh_you4 zh_zai4 zh_yi1 zh_ci4 zh_hui2 zh_dao4 zh_liang2 zh_liang2 zh_shen1 zh_qiu1 <SP> <SP> zh_gei3 zh_ni3 zh_wo3 zh_de5 zh_shou3 <SP> zh_xiang4 zh_wen1 zh_rou2 zh_ye3 zh_shou4 <SP> zh_ba3 zh_zi4 zh_you2 zh_jiao1 zh_gei3 zh_cao3 zh_yuan2 zh_de5 zh_liao2 zh_kuo4 <SP> <SP> zh_wo3 zh_men5 zh_xiao3 zh_shou3 zh_la1 zh_da4 zh_shou3 <SP> zh_yi1 zh_qi3 zh_jiao1 zh_you2 <SP> zh_jin1 zh_tian1 zh_bie2 zh_xiang3 zh_tai4 zh_duo1 <SP> <SP> zh_ni3 zh_shi4 zh_wo3 zh_de5",
+    "note_pitch": "55 55 57 60 62 64 69 67 64 62 62 60 0 60 62 60 59 60 65 57 60 64 64 62 0 62 64 62 61 62 67 59 62 64 62 62 60 0 60 62 60 59 60 65 57 60 57 57 55 0 55 55 57 60 62 64 69 67 64 62 62 60 0 60 62 60 59 60 65 57 60 64 64 62 0 62 64 62 61 62 67 59 62 64 62 62 60 0 60 62 60 59 60 65 57 60 62 62 60 0 64 65 64 62 64 65 64 62 64 64 65 0 65 67 65 67 65 64 62 60 62 62 64 0 64 64 62 60 64 64 62 62 62 61 61 62 0 62 62 64 66 62 69 67 67 66 66 67 0 64 65 64 65 67 0 64 65 64 65 67 0 67 69 67 69 71 72 64 64 69 69 67 0 60 62 60 65 64 62 60 0 65 64 62 60 0 60 62 57 60 64 65 67 0 64 65 64 65",
+    "note_type": "2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 1 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 1 2 2 2 2 1 2 2 2 2 2 2 2 1 2 2 2 2",
+    "f0": ""
+  },
+  {
+    "index": "sample01_1",
+    "language": "Mandarin",
+    "time": [
+      90230,
+      105230
+    ],
+    "duration": "0.69 0.23 0.23 0.23 0.23 0.23 0.69 0.23 0.23 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.92 0.23 0.23 0.23 0.23 0.46 0.23 0.46 0.46 0.23 0.23 0.46 0.23 0.23 0.46 0.23 0.46 0.23 0.46 0.46 0.23 1.85",
+    "text": "梦. <SP> 像 北 方 的 风. <SP> 吹 着 南 方 暖 洋 洋 的 哀 愁 *. <SP> 我 们 小 手 拉 大 手. <SP> 今 天 加 * 油 向 昨 天 挥 挥 手 *.",
+    "phoneme": "zh_meng4 <SP> zh_xiang4 zh_bei3 zh_fang1 zh_de5 zh_feng1 <SP> zh_chui1 zh_zhe5 zh_nan2 zh_fang1 zh_nuan3 zh_yang2 zh_yang2 zh_de5 zh_ai1 zh_chou2 <SP> <SP> zh_wo3 zh_men5 zh_xiao3 zh_shou3 zh_la1 zh_da4 zh_shou3 <SP> zh_jin1 zh_tian1 zh_jia1 <SP> zh_you2 zh_xiang4 zh_zuo2 zh_tian1 zh_hui1 zh_hui1 zh_shou3 <SP>",
+    "note_pitch": "67 0 64 65 64 65 67 0 67 69 67 69 71 72 64 64 69 69 67 0 60 62 60 65 64 62 60 0 65 64 62 60 60 60 62 57 60 62 62 60",
+    "note_type": "2 1 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 2 2",
+    "f0": ""
+  }
+]

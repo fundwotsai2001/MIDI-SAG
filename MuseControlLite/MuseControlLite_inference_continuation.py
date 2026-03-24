@@ -415,15 +415,6 @@ def main(config):
                     else: 
                         extracted_audio_condition = torch.zeros((1, 128, 1024), device="cuda")
                         masked_extracted_audio_condition = extracted_audio_condition
-                    if "key" in config['condition_type']:
-                        key_start = int(config['structure_start_seconds'][segments] / (2097152/44100) * 1024)
-                        key_segment = key_ids[key_start: key_start + 1024]
-                        extracted_key_condition = key_emb_extractor(key_segment.cuda().unsqueeze(0)).transpose(1,2)
-                        # print("key_condition", extracted_key_condition.shape)
-                        masked_extracted_key_condition = torch.zeros_like(extracted_key_condition)
-                    else: 
-                        extracted_key_condition = torch.zeros((1, 128, 1024), device="cuda")
-                        masked_extracted_key_condition = extracted_key_condition
                     if "strucure" in config['condition_type']:
                         structures_ids_start = int(config['structure_start_seconds'][segments] / (2097152/44100) * 1024)
                         print("structures_ids_start", structures_ids_start)
