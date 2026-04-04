@@ -6,7 +6,7 @@
 *.m4a
 checkpoint*/
 pretrained/
-
+*.wav
 # # Large data files (AccoMontage2/chorderator static assets)
 # *.npz
 # *.pcls*
