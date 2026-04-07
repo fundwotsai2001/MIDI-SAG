@@ -4,6 +4,8 @@
 *.ckpt
 *.safetensors
 *.m4a
+*.wav
+
 checkpoint*/
 pretrained/
 
