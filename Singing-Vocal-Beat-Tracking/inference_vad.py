@@ -1,9 +1,21 @@
 import argparse
 import os
+import builtins
 import numpy as np
 import torch
 import soundfile as sf
 import librosa
+
+# Work around a broken local madmom install where DBNBeatTrackingProcessor
+# defaults reference undefined min_bpm/max_bpm names during import.
+if not hasattr(builtins, 'min_bpm'):
+    builtins.min_bpm = 60.0
+if not hasattr(builtins, 'max_bpm'):
+    builtins.max_bpm = 160.0
+if not hasattr(builtins, 'MIN_BPM'):
+    builtins.MIN_BPM = 60.0
+if not hasattr(builtins, 'MAX_BPM'):
+    builtins.MAX_BPM = 160.0
 
 from madmom.features import DBNBeatTrackingProcessor
 
@@ -40,7 +52,15 @@ def load_model(model_path, device='cuda'):
 # ----------------------------
 # Beat conversion (your logic)
 # ----------------------------
-def predictions_to_beat_times(preds, method='DBN', threshold=0.5, sample_rate=16000, hop_length=320):
+def predictions_to_beat_times(
+    preds,
+    method='DBN',
+    threshold=0.5,
+    sample_rate=16000,
+    hop_length=320,
+    dbn_min_bpm=None,
+    dbn_max_bpm=None
+):
     if isinstance(preds, torch.Tensor):
         preds = preds.detach().cpu().numpy()
 
@@ -50,7 +70,12 @@ def predictions_to_beat_times(preds, method='DBN', threshold=0.5, sample_rate=16
     preds = preds.flatten()
 
     if method == 'DBN':
-        dbn_processor = DBNBeatTrackingProcessor(fps=50)
+        dbn_kwargs = {'fps': 50}
+        if dbn_min_bpm is not None:
+            dbn_kwargs['min_bpm'] = dbn_min_bpm
+        if dbn_max_bpm is not None:
+            dbn_kwargs['max_bpm'] = dbn_max_bpm
+        dbn_processor = DBNBeatTrackingProcessor(**dbn_kwargs)
         beat_times = dbn_processor.process_offline(preds)
     elif method == 'threshold':
         beat_frames = np.argwhere(preds >= threshold).flatten()
@@ -221,6 +246,49 @@ def choose_gap_period(pre_beats, post_beats, k=8):
         return 0.5 * (pre_p + post_p)
     # otherwise prefer pre (continuity) — you can flip this if you want
     return pre_p
+
+
+def fill_beat_sequence_gaps(
+    beats: np.ndarray,
+    k: int = 8,
+    gap_threshold: float = 1.5,
+    edge_margin: float = 0.02
+) -> tuple:
+    """
+    Fill unusually large inter-beat gaps within the detected beat sequence itself
+    (not VAD gaps). Any consecutive pair whose interval > gap_threshold * local_period
+    gets interpolated beats inserted.
+    Returns (filled_beats, extra_inferred_beats).
+    """
+    if beats is None or len(beats) < 2:
+        return (beats if beats is not None else np.array([], dtype=np.float64),
+                np.array([], dtype=np.float64))
+
+    extra = []
+    for i in range(len(beats) - 1):
+        gap = beats[i + 1] - beats[i]
+        pre  = beats[max(0, i - k): i + 1]
+        post = beats[i + 1: min(len(beats), i + 1 + k + 1)]
+        period = _choose_gap_period(pre, post, k=k)
+        if period is None:
+            continue
+        if gap > gap_threshold * period:
+            t = beats[i] + period
+            while t < beats[i + 1] - edge_margin:
+                if t > beats[i] + edge_margin:
+                    extra.append(t)
+                t += period
+
+    if len(extra) == 0:
+        return beats, np.array([], dtype=np.float64)
+
+    extra_arr = np.array(sorted(set(extra)), dtype=np.float64)
+    # remove extras that collide with existing beats (within 20 ms)
+    keep = [t for t in extra_arr if np.min(np.abs(beats - t)) > 0.02]
+    extra_arr = np.array(keep, dtype=np.float64)
+
+    filled = np.sort(np.unique(np.concatenate([beats, extra_arr]))).astype(np.float64)
+    return filled, extra_arr
 
 
 def fill_silence_with_beats(
@@ -543,6 +611,8 @@ def infer_beats_vad_stitch_fill(
     model_type,
     method='DBN',
     threshold=0.5,
+    lock_first_bpm=True,
+    first_bpm_margin=10.0,
     use_vad=True,
     vad_threshold=0.5,
     vad_merge_gap=3.0,
@@ -551,6 +621,7 @@ def infer_beats_vad_stitch_fill(
     vad_min_silence_ms=100,
     vad_device="cpu",
     interval_pad=0.25,
+    vad_beat_buffer=0.1,
     fill_silence=True,
     fill_k=8,
     fps=50
@@ -559,7 +630,10 @@ def infer_beats_vad_stitch_fill(
     Returns:
       beat_times_all (np.ndarray): detected + inferred beats in global seconds
       global_preds (np.ndarray): full-length prediction curve at fps (50), zeros in silence
-      original_audio (np.ndarray), original_sr (int) for save_results
+
+    vad_beat_buffer: extend each VAD interval by this many seconds on each side
+        before slicing audio and filtering beats. Prevents edge beats from being
+        clipped by tight VAD boundaries. Default 0.1s.
     """
     # ---- load original (for save_results) ----
     audio, sr = sf.read(audio_path)
@@ -593,6 +667,11 @@ def infer_beats_vad_stitch_fill(
     else:
         intervals = [(0.0, dur_sec)]
 
+    # ---- extend VAD intervals by vad_beat_buffer on each side ----
+    if vad_beat_buffer > 0 and use_vad:
+        intervals = [(max(0.0, s - vad_beat_buffer), min(dur_sec, e + vad_beat_buffer))
+                     for s, e in intervals]
+
     # ---- processor once ----
     device = next(model.parameters()).device
     processor = build_processor(model_type, device=device)
@@ -603,8 +682,12 @@ def infer_beats_vad_stitch_fill(
 
     detected_beats = []
 
+    # ---- Pass 1: detect beats for every segment (unconstrained) ----
+    # Store per-segment preds + beats so we can selectively re-detect in pass 2
+    # without re-running the neural network.
+    seg_results = []  # list of dicts: {s, e, ps, pe, preds_beat, bt_global, bpm}
+
     for (s, e) in intervals:
-        # pad for boundary stability
         ps = max(0.0, s - interval_pad)
         pe = min(dur_sec, e + interval_pad)
 
@@ -613,28 +696,87 @@ def infer_beats_vad_stitch_fill(
         seg = audio_16k[i0:i1]
 
         if len(seg) < int(0.5 * 16000):
+            seg_results.append({'s': s, 'e': e, 'ps': ps, 'pe': pe,
+                                'preds_beat': None, 'bt_global': np.array([], dtype=np.float64),
+                                'bpm': None})
             continue
 
         preds_beat, _ = infer_segment_preds(model, processor, seg)
 
-        # ---- beat times for this interval ----
+        # unconstrained beat detection
         bt = predictions_to_beat_times(preds_beat, method=method, threshold=threshold)
         bt_global = bt + ps
         bt_global = bt_global[(bt_global >= s) & (bt_global <= e)]
-        if len(bt_global) > 0:
-            detected_beats.append(bt_global)
+        bt_global = np.array(sorted(bt_global), dtype=np.float64)
+
+        # estimate per-segment BPM
+        seg_bpm = None
+        if len(bt_global) >= 2:
+            period = _median_period(bt_global, k=fill_k)
+            if period is not None:
+                seg_bpm = 60.0 / period
+
+        seg_results.append({'s': s, 'e': e, 'ps': ps, 'pe': pe,
+                            'preds_beat': preds_beat, 'bt_global': bt_global,
+                            'bpm': seg_bpm})
+
+    # ---- Determine reference BPM from the smallest per-segment BPM ----
+    valid_bpms = [r['bpm'] for r in seg_results if r['bpm'] is not None]
+
+    if valid_bpms:
+        min_bpm = min(valid_bpms)
+        print(f"[bpm_lock] per-segment BPMs: {[f'{b:.1f}' for b in valid_bpms]}")
+        print(f"[bpm_lock] smallest BPM = {min_bpm:.2f}")
+    else:
+        min_bpm = None
+
+    # ---- Pass 2: re-detect segments whose BPM >= 1.2 * min_bpm ----
+    for r in seg_results:
+        if r['preds_beat'] is None:
+            continue
+
+        needs_redetect = (
+            method == 'DBN'
+            and lock_first_bpm
+            and min_bpm is not None
+            and r['bpm'] is not None
+            and r['bpm'] >= 1.2 * min_bpm
+        )
+
+        if needs_redetect:
+            dbn_min = max(1.0, min_bpm - first_bpm_margin)
+            dbn_max = min_bpm + first_bpm_margin
+            print(f"[bpm_lock] re-detecting segment [{r['s']:.2f}-{r['e']:.2f}]: "
+                  f"original {r['bpm']:.1f} BPM >= 1.2*{min_bpm:.1f}={1.2*min_bpm:.1f}, "
+                  f"constraining to [{dbn_min:.1f}, {dbn_max:.1f}]")
+
+            bt = predictions_to_beat_times(
+                r['preds_beat'], method=method, threshold=threshold,
+                dbn_min_bpm=dbn_min, dbn_max_bpm=dbn_max
+            )
+            bt_global = bt + r['ps']
+            bt_global = bt_global[(bt_global >= r['s']) & (bt_global <= r['e'])]
+            r['bt_global'] = np.array(sorted(bt_global), dtype=np.float64)
+
+            # update BPM
+            if len(r['bt_global']) >= 2:
+                period = _median_period(r['bt_global'], k=fill_k)
+                if period is not None:
+                    r['bpm'] = 60.0 / period
+                    print(f"[bpm_lock]   -> re-detected BPM: {r['bpm']:.1f}")
+
+        if len(r['bt_global']) > 0:
+            detected_beats.append(r['bt_global'])
 
         # ---- paste predictions into global_preds (keep only frames inside [s,e]) ----
-        preds_np = preds_beat.detach().cpu().numpy().reshape(-1)
-        # time for each frame in padded segment
-        frame_times = ps + (np.arange(len(preds_np)) / fps)
+        preds_np = r['preds_beat'].detach().cpu().numpy().reshape(-1)
+        frame_times = r['ps'] + (np.arange(len(preds_np)) / fps)
 
-        inside = (frame_times >= s) & (frame_times <= e)
+        inside = (frame_times >= r['s']) & (frame_times <= r['e'])
         if np.any(inside):
             ft = frame_times[inside]
             pv = preds_np[inside]
             idx = np.clip(np.round(ft * fps).astype(int), 0, total_frames - 1)
-            # use max to avoid overwriting with smaller values on overlaps
             np.maximum.at(global_preds, idx, pv.astype(np.float32))
 
     if len(detected_beats) > 0:
@@ -648,12 +790,21 @@ def infer_beats_vad_stitch_fill(
     else:
         detected_beats = np.array([], dtype=np.float64)
 
+    # ---- snapshot: beats before any gap-filling (vocal segments only) ----
+    detected_beats_raw = detected_beats.copy()
+
     inferred_beats = np.array([], dtype=np.float64)
+
+    # ---- fill intra-sequence gaps (missed beats within vocal segments) ----
+    if len(detected_beats) > 1:
+        detected_beats, seq_inferred = fill_beat_sequence_gaps(detected_beats, k=fill_k)
+        inferred_beats = np.concatenate([inferred_beats, seq_inferred])
+        print(f"[fill_seq_gaps] filled {len(seq_inferred)} intra-sequence beats")
 
     print(f"[fill_silence] VAD intervals ({len(intervals)}): {intervals[:5]}{'...' if len(intervals)>5 else ''}")
     print(f"[fill_silence] detected_beats: {len(detected_beats)} beats, fill_silence={fill_silence}")
 
-    # ---- fill silent gaps ----
+    # ---- fill silent gaps (non-vocal regions) ----
     if fill_silence and len(intervals) > 0 and len(detected_beats) > 1:
         intervals_sorted = sorted(intervals, key=lambda x: x[0])
 
@@ -712,11 +863,34 @@ def infer_beats_vad_stitch_fill(
         np.unique(np.concatenate([detected_beats, inferred_beats]) if (len(detected_beats) + len(inferred_beats)) > 0 else np.array([]))
     ).astype(np.float64)
 
+    # De-dup near-duplicates: fill_beat_sequence_gaps and fill_silence can both
+    # fill the same gap with slightly different periods, creating interleaved
+    # beats only 0.02-0.09s apart. Merge any pair closer than 30% of the median
+    # IBI, keeping the one that was detected (or the first if both inferred).
+    if len(beat_times_all) > 1:
+        med_ibi = float(np.median(np.diff(beat_times_all)))
+        min_gap = 0.3 * med_ibi
+        cleaned = [beat_times_all[0]]
+        for t in beat_times_all[1:]:
+            if t - cleaned[-1] < min_gap:
+                # keep whichever is a detected beat; if both or neither, keep first
+                prev_is_det = len(detected_beats_raw) > 0 and np.min(np.abs(detected_beats_raw - cleaned[-1])) < 0.025
+                curr_is_det = len(detected_beats_raw) > 0 and np.min(np.abs(detected_beats_raw - t)) < 0.025
+                if curr_is_det and not prev_is_det:
+                    cleaned[-1] = t  # replace inferred with detected
+                # else keep the one already in cleaned
+            else:
+                cleaned.append(t)
+        n_deduped = len(beat_times_all) - len(cleaned)
+        if n_deduped > 0:
+            print(f"[dedup] removed {n_deduped} near-duplicate beats (min_gap={min_gap:.3f}s)")
+        beat_times_all = np.array(cleaned, dtype=np.float64)
+
     # clip to ORIGINAL duration for safety
     orig_dur = (len(audio_mono) / float(original_sr)) if original_sr > 0 else dur_sec
     beat_times_all = beat_times_all[(beat_times_all >= 0.0) & (beat_times_all <= orig_dur + 1e-3)]
 
-    return beat_times_all, global_preds, original_audio, original_sr
+    return beat_times_all, global_preds, original_audio, original_sr, detected_beats_raw
 def plot_predictions(preds, output_path, sample_rate=16000, hop_length=320, fps=50):
     """
     Plot raw model predictions (probabilities) over time.
@@ -1011,6 +1185,13 @@ def main():
                         help='Method to extract beats: DBN or threshold')
     parser.add_argument('--threshold', type=float, default=0.5,
                         help='Threshold for beat detection when method=threshold')
+    parser.add_argument('--lock_first_bpm', dest='lock_first_bpm', action='store_true',
+                        help='When using DBN, constrain later segments to the first valid segment BPM +/- margin')
+    parser.add_argument('--no_lock_first_bpm', dest='lock_first_bpm', action='store_false',
+                        help='Disable BPM locking across VAD segments')
+    parser.set_defaults(lock_first_bpm=True)
+    parser.add_argument('--first_bpm_margin', type=float, default=10.0,
+                        help='Allowed BPM deviation around the first valid segment when BPM locking is enabled')
 
     # output
     parser.add_argument('--output_dir', type=str, default='predictions',
@@ -1025,13 +1206,15 @@ def main():
     parser.add_argument('--use_vad', action='store_true', help='Enable silero VAD to remove silence')
     parser.add_argument('--vad_device', type=str, default='cpu')
     parser.add_argument('--vad_threshold', type=float, default=0.5)
-    parser.add_argument('--vad_merge_gap', type=float, default=3.0)
+    parser.add_argument('--vad_merge_gap', type=float, default=0.5)
     parser.add_argument('--vad_min_len', type=float, default=0.25)
     parser.add_argument('--vad_min_speech_ms', type=int, default=250)
     parser.add_argument('--vad_min_silence_ms', type=int, default=100)
 
     # interval padding
     parser.add_argument('--interval_pad', type=float, default=0.25)
+    parser.add_argument('--vad_beat_buffer', type=float, default=0.1,
+                        help='Extend each VAD interval by this many seconds on each side so edge beats are not clipped (default: 0.1)')
 
     # fill silence
     parser.add_argument('--fill_silence', action='store_true', help='Infer beats during silent gaps using nearby tempo')
@@ -1041,12 +1224,14 @@ def main():
 
     model = load_model(args.model_path, args.device)
 
-    beat_times_all, global_preds, original_audio, original_sr = infer_beats_vad_stitch_fill(
+    beat_times_all, global_preds, original_audio, original_sr, detected_beats_raw = infer_beats_vad_stitch_fill(
         model=model,
         audio_path=args.audio_path,
         model_type=args.model_type,
         method=args.method,
         threshold=args.threshold,
+        lock_first_bpm=args.lock_first_bpm,
+        first_bpm_margin=args.first_bpm_margin,
         use_vad=args.use_vad,
         vad_threshold=args.vad_threshold,
         vad_merge_gap=args.vad_merge_gap,
@@ -1055,6 +1240,7 @@ def main():
         vad_min_silence_ms=args.vad_min_silence_ms,
         vad_device=args.vad_device,
         interval_pad=args.interval_pad,
+        vad_beat_buffer=args.vad_beat_buffer,
         fill_silence=args.fill_silence,
         fill_k=args.fill_k,
         fps=50
@@ -1066,6 +1252,15 @@ def main():
     # same output structure as your original script
     audio_basename = os.path.splitext(os.path.basename(args.audio_path))[0]
     output_dir = os.path.join(args.output_dir, audio_basename)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Save detected-only beats (vocal segments, before any gap-filling)
+    detected_raw_path = os.path.join(output_dir, f"{audio_basename}_beat_times_detected_only.txt")
+    with open(detected_raw_path, 'w') as f:
+        f.write("# Beat times in seconds (vocal segments only, before gap-filling)\n")
+        for t in detected_beats_raw:
+            f.write(f"{t:.6f}\n")
+    print(f"Detected-only beat times saved to: {detected_raw_path}")
 
     # ✅ use your original save_results exactly
     save_results(

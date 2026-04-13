@@ -24,3 +24,5 @@ __pycache__/
 output/
 output_*
 lyrics_200/GAME/GAME-1.0-medium.zip
+test_audio
+generated_midi_right_key

@@ -181,7 +181,18 @@ class Chords:
                 bass_str = label[s_idx + 1:]
 
         root = self.pitch(root_str)
-        bass = self.interval(bass_str) if bass_str else 0
+        # Bass can be either an interval string ('3', 'b5', '#11') or a
+        # pitch-name ('G#', 'F'). interval() only handles the digit-based form
+        # and silently returns None for note names, which then breaks
+        # `ivs[bass] = 1` (numpy treats None as np.newaxis and sets the whole
+        # vector to 1, destroying the chord identity).
+        if not bass_str:
+            bass = 0
+        elif bass_str[0] in 'ABCDEFG':
+            # Pitch-name bass — convert to semitones above the root
+            bass = (self.pitch(bass_str) - root) % 12
+        else:
+            bass = self.interval(bass_str)
         ivs = self.chord_intervals(quality_str)
         ivs[bass] = 1
 

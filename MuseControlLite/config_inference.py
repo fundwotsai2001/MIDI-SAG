@@ -16,9 +16,9 @@ def get_config():
 
         "guidance_scale_text": 7.0,
 
-        "guidance_scale_con": 2.0, # The separated guidance for both Musical attribute and audio conditions. Note that if guidance scale is too large, the audio quality will be bad. Values between 0.5~2.0 is recommended.
+        "guidance_scale_con": 1.5, # The separated guidance for both Musical attribute and audio conditions. Note that if guidance scale is too large, the audio quality will be bad. Values between 0.5~2.0 is recommended.
                 
-        "denoise_step": 50,
+        "denoise_step": 100,
 
         "sigma_min": 0.3, # sigma_min and sigma_max are for the scheduler.
 

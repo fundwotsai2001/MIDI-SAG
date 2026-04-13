@@ -142,7 +142,7 @@ def extract_chords_lab(chord_path, segment_starts=0):
     CHORDS = Chords()
     with open(chord_path, 'r') as f:
         chord_infos = f.read().splitlines()
-
+    print("chord_infos", chord_infos)
     chroma = np.zeros((12, 2097152))
     segment_ends = segment_starts + 2097152 / 44100
     for info in chord_infos:
@@ -165,6 +165,57 @@ def extract_chords_lab(chord_path, segment_starts=0):
     chroma = torch.from_numpy(chroma).unsqueeze(0).float().cuda()  # shape (1, 12, 2097152)
     chroma = F.interpolate(chroma, size=1024, mode='linear', align_corners=False)  # shape (1, 12, 4756)
     return chroma, end_time
+def extract_chords_lab_full(chord_path, segment_starts=0, sr=44100, frames_per_sec=None):
+    """
+    Like extract_chords_lab but processes the full-length chord file without
+    the 2097152-sample cap. The output length is determined by the last chord's
+    end time.
+
+    Args:
+        chord_path:      path to chord txt (format: "start end chord" per line)
+        segment_starts:  global offset to subtract from all timestamps (seconds)
+        sr:              sample rate used to convert seconds -> samples (default 44100)
+        frames_per_sec:  if set, interpolate output to int(duration * frames_per_sec)
+                         frames; if None, keep one frame per sample (full resolution)
+
+    Returns:
+        chroma:    torch.Tensor on cuda, shape (1, 12, T)
+        end_time:  str, end time of last chord entry
+    """
+    CHORDS = Chords()
+    with open(chord_path, 'r') as f:
+        chord_infos = [l for l in f.read().splitlines() if l.strip()]
+
+    # determine full duration from last entry
+    _, end_time, _ = chord_infos[-1].split(' ')
+    duration_sec = float(end_time) - segment_starts
+    total_samples = int(duration_sec * sr) + 1  # +1 to avoid off-by-one
+
+    chroma = np.zeros((12, total_samples), dtype=np.float32)
+
+    for info in chord_infos:
+        s, t, chord = info.split(' ')
+        s = float(s) - segment_starts
+        t = float(t) - segment_starts
+        if t < 0 or s < 0 and t < 0:
+            continue
+        s = max(s, 0.0)
+        t = min(t, duration_sec)
+        if s >= t:
+            continue
+        mhot = CHORDS.chord(chord)
+        final_vec = np.roll(mhot[2], mhot[0]).astype(np.float32)  # (12,)
+        chroma[:, int(s * sr): int(t * sr)] = final_vec[..., None]
+
+    chroma_t = torch.from_numpy(chroma).unsqueeze(0).float().cuda()  # (1, 12, total_samples)
+
+    if frames_per_sec is not None:
+        out_frames = max(1, int(duration_sec * frames_per_sec))
+        chroma_t = F.interpolate(chroma_t, size=out_frames, mode='linear', align_corners=False)
+
+    return chroma_t, end_time
+
+
 def sublist_between(arr, a, b, eps=1e-6):
     """Return arr elements in [a, b) using indices (fast; arr must be sorted)."""
     lo = bisect.bisect_left(arr, a - eps)
