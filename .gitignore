@@ -4,8 +4,6 @@
 *.ckpt
 *.safetensors
 *.m4a
-*.wav
-
 checkpoint*/
 pretrained/
 *.wav
@@ -28,3 +26,5 @@ output_*
 lyrics_200/GAME/GAME-1.0-medium.zip
 test_audio
 generated_midi_right_key
+demo_website
+Chord_progression_editability_demo
