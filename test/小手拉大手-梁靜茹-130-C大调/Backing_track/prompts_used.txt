@@ -1,0 +1,6 @@
+inference_script=MuseControlLite/MuseControlLite_inference_continuation.py
+
+[structure_segments]
+1	0.00	intro	Soft synthesizer pads open slowly, ethereal and tranquil, meditative and dreamy, a gentle wash of sound with no rhythm yet.
+2	30.23	verse	A subtle drum machine beat enters beneath the synth pads, bass synthesizer pulses gently, calm and chillout, soothing and relaxed with a peaceful, floating atmosphere.
+3	73.85	chorus	Synthesizer leads rise over the pads and beat, drum machine intensifies slightly, bass drives with more energy, uplifting and danceable, electronic and dreamy with an inspiring, euphoric surge.

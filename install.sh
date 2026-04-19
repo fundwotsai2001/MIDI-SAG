@@ -25,4 +25,4 @@ pip install -U huggingface_hub
 wget https://github.com/openvpi/GAME/releases/download/v1.0.0/GAME-1.0-medium.zip -O /tmp/game_model.zip                                                         
 unzip /tmp/game_model.zip -d GAME/  
 
-# gdown 1o6eUCYwUcIzZeqEycar6AHTSQ-vYcL_q --folder
+gdown 1o6eUCYwUcIzZeqEycar6AHTSQ-vYcL_q --folder

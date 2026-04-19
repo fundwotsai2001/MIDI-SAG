@@ -26,7 +26,7 @@ huggingface-cli login
 ```
 ## Inference
 ```
-./inference.sh
+./inference_detected_MIDI-SAG.sh.sh
 ```
 
 
