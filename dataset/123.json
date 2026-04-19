@@ -1,0 +1,90 @@
+{
+    "id": 123,
+    "title_zh": "蒼藍彼岸",
+    "global_prompt": "An orchestral ballad with piano, strings, and male vocals. The mood is vast and solemn, like gazing toward a distant blue horizon.",
+    "structure_en": {
+        "Intro": "Piano melody with swelling strings.",
+        "Verse": "with piano and soft string pads.",
+        "Chorus": "Full strings with performance.",
+        "Outro": "Piano closes with sustained chord."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.40",
+                "line": "蒼藍天際遙不可及"
+            },
+            {
+                "timestamp": "00:12.80",
+                "line": "波光閃爍無聲低語"
+            },
+            {
+                "timestamp": "00:18.20",
+                "line": "旅途延伸穿越時空"
+            },
+            {
+                "timestamp": "00:23.60",
+                "line": "未來隱藏在遠方之海"
+            },
+            {
+                "timestamp": "00:29.00",
+                "line": "愛如潮水湧向心田"
+            },
+            {
+                "timestamp": "00:34.40",
+                "line": "希望點亮無窮彼岸"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.80",
+                "line": "蒼藍彼岸閃耀光芒"
+            },
+            {
+                "timestamp": "00:45.20",
+                "line": "夢想呼喚無限遠方"
+            },
+            {
+                "timestamp": "00:50.60",
+                "line": "愛的旋律滲透大海"
+            },
+            {
+                "timestamp": "00:56.00",
+                "line": "未來等待新的啟航"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.20",
+                "line": "蒼藍依舊遙遠閃爍"
+            },
+            {
+                "timestamp": "01:28.60",
+                "line": "旅程繼續奔赴未來"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 82,
+        "genres": [
+            "Ballad",
+            "Orchestral"
+        ],
+        "mood": [
+            "Vast",
+            "Solemn",
+            "Reflective"
+        ],
+        "instruments": [
+            "Piano",
+            "Strings"
+        ],
+        "timbre": [
+            "Majestic",
+            "Gentle",
+            "Expansive"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

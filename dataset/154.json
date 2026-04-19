@@ -1,0 +1,91 @@
+{
+    "id": 154,
+    "title_zh": "竹影流聲",
+    "global_prompt": "A traditional-inspired ambient piece with bamboo flute, guzheng, and female vocals. Calm and meditative, like watching bamboo sway in the wind.",
+    "structure_en": {
+        "Intro": "Bamboo flute melody with guzheng plucks.",
+        "Verse": "with guzheng and soft flute.",
+        "Chorus": "Flute harmonies expand with layered strings.",
+        "Outro": "Guzheng glissando fades with wind sound."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "竹影搖曳風聲輕響"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "流水緩緩映照清澈"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "光點散落林間角落"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "足音停在靜謐時刻"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "耳邊飄過低柔旋律"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "目光浸入翠綠世界"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "竹影流聲細語悠揚"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "旋律引我入夢境深"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "歌聲隨風悠悠遠去"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "靜謐鋪展無窮夜色"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "竹林收起最後低語"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "夜風安放寂寞星光"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 68,
+        "genres": [
+            "Ambient",
+            "Traditional"
+        ],
+        "mood": [
+            "Calm",
+            "Meditative",
+            "Natural"
+        ],
+        "instruments": [
+            "Bamboo Flute",
+            "Guzheng",
+            "Strings"
+        ],
+        "timbre": [
+            "Organic",
+            "Delicate",
+            "Ethereal"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

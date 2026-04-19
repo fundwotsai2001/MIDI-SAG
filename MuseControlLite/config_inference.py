@@ -2,9 +2,18 @@ def get_config():
     return {
         "condition_type": ["melody", "chord", "rhythm"], # options: "rhythm", "melody", "chord", "audio"
 
-        "output_dir": "./output/test_midi-sag", # output directory for MuseControlLite results
+        "output_dir": "/data/home/fundwotsai/MIDI-SAG/demo_website/experiment_1/简单爱-周杰伦-97-C_TTM", # output directory for MuseControlLite results
 
-        "checkpoint_path": "/volume/nas-fundwo-storage/fundwo-test/MIDI-SAG/MuseControlLite/checkpoint_vocal_beat",
+        "checkpoint_path": "/data/home/fundwotsai/MIDI-SAG/MuseControlLite/checkpoint-50000_vocal_audio",
+
+        "vocal_audio_file": "/data/home/fundwotsai/MIDI-SAG/demo_website/experiment_1/gt_vocal_MIDI/简单爱-周杰伦-97-C.wav",
+
+        "text_prompt":[
+            "reflective instrumental pop with piano, synth pad, bass, and steady drums",
+            "groovy funk with bass guitar, electric guitar, drums, and electric piano",
+            "intense instrumental rock with electric guitar riffs, bass guitar, drums, and powerful energy",
+            "melancholic electronic backing with piano, bass, reflective synth textures, and instrumental pop style",
+        ],
 
         "GPU_id": "0",
 
@@ -24,7 +33,7 @@ def get_config():
 
         "sigma_max": 500,  # Note that if sigma_max is too large or too small, the "audio condition generation" will be bad.
 
-        "weight_dtype": "fp16", # fp16 and fp32 sounds quiet the same.
+        "weight_dtype": "fp32", # fp16 and fp32 sounds quiet the same.
 
         "negative_text_prompt": "noisy, distortion, bad quality",
 

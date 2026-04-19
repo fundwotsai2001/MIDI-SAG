@@ -1,0 +1,124 @@
+[melody2chord:lyrics_38] /data/home/fundwotsai/MIDI-SAG/AccoMontage2/chorderator/utils/utils.py:24: UserWarning: Could not import FluidSynth, audio formats writing disabled
+[melody2chord:lyrics_38]   warnings.warn('Could not import FluidSynth, audio formats writing disabled')
+[melody2chord:lyrics_38] /home/fundwotsai/miniconda3/envs/midi-sag/lib/python3.9/site-packages/miditok/tokenizations/remi.py:88: UserWarning: Attribute controls are not compatible with 'config.one_token_stream_for_programs' and multi-vocabulary tokenizers. Disabling them from the config.
+[melody2chord:lyrics_38]   super().__init__(tokenizer_config, params)
+[melody2chord:lyrics_38] /data/home/fundwotsai/MIDI-SAG/AccoMontage2/chorderator/core.py:238: UserWarning: Meter auto set to 4/4/. Please set meter if this is not your expectation
+[melody2chord:lyrics_38]   warnings.warn('Meter auto set to 4/4/. Please set meter if this is not your expectation')
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:13,881 - INFO - [1;30m start read progressions from dict [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:20,480 - INFO - [1;30m read progressions done [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:20,480 - INFO - [1;30m start read progression library from source_base.pnt [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:26,930 - INFO - [1;30m read library done [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:26,930 - WARNING - [1;33m Pre-processing... [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:26,942 - WARNING - [1;33m Pre-process done! [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:26,942 - WARNING - [1;33m Solving... [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:26,942 - INFO - [1;30m start read progressions from rep [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:26,975 - INFO - [1;30m read progressions done [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:26,980 - INFO - [1;30m Melody length 3, generate progression with 63 templates [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:27,052 - WARNING - [1;33m Solved! [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:27,052 - WARNING - [1;33m Post-processing... [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:27,058 - WARNING - [1;33m Post-process done! [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:27,058 - WARNING - [1;33m Generating textures... [0m
+[melody2chord:lyrics_38] @Chorderator 2026-04-14 12:15:27,058 - WARNING - [1;33m All process finished! [0m
+[melody2chord:lyrics_38] 
+[melody2chord:lyrics_38] === Processing: sample01_shifted ===
+[melody2chord:lyrics_38] Output will be saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_38/chord/
+[melody2chord:lyrics_38] beat_file_path: None
+[melody2chord:lyrics_38] Tempo from MIDI: 78.0 BPM (no beat file — skipping warp step)
+[melody2chord:lyrics_38] processed_melody_path: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_38/chord/processed_melody/sample01_shifted.mid
+[melody2chord:lyrics_38] Detected key: Eb major (confidence: 0.51, Bellman-Budge)
+[melody2chord:lyrics_38] Content bars: 17 -> Segmentation: A8B8A4 (total: 20)
+[melody2chord:lyrics_38] Chorderator bars: 20 -> Segmentation: A8B8A4 (total: 20)
+[melody2chord:lyrics_38] auto_config: {'note_shift': 66, 'segmentation': 'A8B8A4', 'analysis': {'total_bars': 22, 'empty_bars': 4, 'content_bars': 17, 'note_shift': 66, 'segmentation': 'A8B8A4', 'first_note_bar': 4.125, 'last_note_bar': 21.8125, 'chorderator_bars': {'max_end_positions': 283, 'fixed_end_positions': 320, 'fixed_end_bars': 20, 'tempo': 77.99997660000703, 'unit': 0.19230774999999997}}}
+[melody2chord:lyrics_38] tempo for CDT: 78.0 BPM
+[melody2chord:lyrics_38] max_end: 283.0
+[melody2chord:lyrics_38] fixed_end: 320
+[melody2chord:lyrics_38] 320
+[melody2chord:lyrics_38] {'tonic': 'Eb', 'mode': 'maj', 'tempo': 77.99997660000702, 'meter': '4/4', 'pos': ['x', 'x', 'x'], 'unit': 0.19230775}
+[melody2chord:lyrics_38] Phrase length: 128 positions = 8 bars
+[melody2chord:lyrics_38] Phrase length: 128 positions = 8 bars
+[melody2chord:lyrics_38] Phrase length: 64 positions = 4 bars
+[melody2chord:lyrics_38] [128, 128, 64]
+[melody2chord:lyrics_38] Chord Progression
+[melody2chord:lyrics_38] -Source: Niko_Kotoulas_Epic_Ending_3_F#-G#m-E-B (V-vi-IV-I).mid
+[melody2chord:lyrics_38] -Source Type: None
+[melody2chord:lyrics_38] -Source Tonic: B
+[melody2chord:lyrics_38] -Source Metre: 4/4
+[melody2chord:lyrics_38] -Source Mode: M (M for Major and m for minor)
+[melody2chord:lyrics_38] -Appeared Times: 1
+[melody2chord:lyrics_38] -Appeared In Other Songs: 0
+[melody2chord:lyrics_38] -Reliability: 0.4
+[melody2chord:lyrics_38] -Progression Class: {'type': 'unknown', 'pattern': 'V-vi-IV-I', 'cycle': (0, 0), 'progression-style': 'unknown', 'chord-style': 'unknown', 'performing-style': 'unknown', 'rhythm': 'unknown', 'epic-endings': 'True', 'melodic': 'unknown', 'folder-id': 335, 'duplicate-id': 494, 'new_label': 'unknown'}
+[melody2chord:lyrics_38] Numbered: 
+[melody2chord:lyrics_38] | 5------- | 6------- | 4------- | 1------- | 1------- | 1------- | 1------- | 1------- | 
+[melody2chord:lyrics_38] Chord: 
+[melody2chord:lyrics_38] | 
+[melody2chord:lyrics_38] | F#0------- | G#1------- | E 0------- | B 0------- | B 0------- | B 0------- | B 0------- | B 0------- | 
+[melody2chord:lyrics_38] 
+[melody2chord:lyrics_38] Chord Progression
+[melody2chord:lyrics_38] -Source: Niko_Kotoulas_Emotional_Chords_2_C#m-B-F#-B-F#-G#m-E-B_.mid
+[melody2chord:lyrics_38] -Source Type: None
+[melody2chord:lyrics_38] -Source Tonic: B
+[melody2chord:lyrics_38] -Source Metre: 4/4
+[melody2chord:lyrics_38] -Source Mode: M (M for Major and m for minor)
+[melody2chord:lyrics_38] -Appeared Times: 1
+[melody2chord:lyrics_38] -Appeared In Other Songs: 0
+[melody2chord:lyrics_38] -Reliability: 1.0
+[melody2chord:lyrics_38] -Progression Class: {'type': 'unknown', 'pattern': 'unknown', 'cycle': (0.08151391459392222, 32), 'progression-style': 'emotional', 'chord-style': 'emotional', 'performing-style': 'unknown', 'rhythm': 'unknown', 'epic-endings': 'unknown', 'melodic': 'unknown', 'folder-id': 535, 'duplicate-id': 290, 'new_label': 'pop_complex'}
+[melody2chord:lyrics_38] Numbered: 
+[melody2chord:lyrics_38] | 2------- | 1------- | 5------- | 1------- | 5------- | 6------- | 4------- | 1------- | 
+[melody2chord:lyrics_38] Chord: 
+[melody2chord:lyrics_38] | 
+[melody2chord:lyrics_38] | C#1------- | B 0------- | F#0------- | B 0------- | F#0------- | G#1------- | E 0------- | B 0------- | 
+[melody2chord:lyrics_38] 
+[melody2chord:lyrics_38] Chord Progression
+[melody2chord:lyrics_38] -Source: Niko_Kotoulas_ChordProg_4_G#m-E-B-F# (vi-IV-I-V).mid
+[melody2chord:lyrics_38] -Source Type: None
+[melody2chord:lyrics_38] -Source Tonic: B
+[melody2chord:lyrics_38] -Source Metre: 4/4
+[melody2chord:lyrics_38] -Source Mode: M (M for Major and m for minor)
+[melody2chord:lyrics_38] -Appeared Times: 1
+[melody2chord:lyrics_38] -Appeared In Other Songs: 0
+[melody2chord:lyrics_38] -Reliability: 0.9
+[melody2chord:lyrics_38] -Progression Class: {'type': 'unknown', 'pattern': 'vi-IV-I-V', 'cycle': (-0.34995661963667773, 8), 'progression-style': 'unknown', 'chord-style': 'unknown', 'performing-style': 'unknown', 'rhythm': 'unknown', 'epic-endings': 'unknown', 'melodic': 'unknown', 'folder-id': 235, 'duplicate-id': 448, 'new_label': 'unknown'}
+[melody2chord:lyrics_38] Numbered: 
+[melody2chord:lyrics_38] | 6------- | 4------- | 1------- | 5------- | 
+[melody2chord:lyrics_38] Chord: 
+[melody2chord:lyrics_38] | G#1------- | E 0------- | B 0------- | F#0------- | 
+[melody2chord:lyrics_38] 
+[melody2chord:lyrics_38] Total: 3
+[melody2chord:lyrics_38] 
+[melody2chord:lyrics_38] === Aligning chord_gen TPQ ===
+[melody2chord:lyrics_38] Original melody TPQ: 480
+[melody2chord:lyrics_38] Chord gen TPQ: 220
+[melody2chord:lyrics_38] TPQ ratio: 2.1818
+[melody2chord:lyrics_38] Converted chord_gen TPQ from 220 to 480
+[melody2chord:lyrics_38] Output saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_38/chord/chord_gen/sample01_shifted_chord_gen.mid
+[melody2chord:lyrics_38] Re-quantized 56 melody notes to 1/16 beat grid
+[melody2chord:lyrics_38] === Fill Empty Bars with Chords ===
+[melody2chord:lyrics_38] Original melody TPQ: 480
+[melody2chord:lyrics_38] Chord gen TPQ: 480
+[melody2chord:lyrics_38] TPQ ratio: 1.0000
+[melody2chord:lyrics_38] Chords start at tick: 7919 (bar 4.12)
+[melody2chord:lyrics_38] Empty bars to fill: 4
+[melody2chord:lyrics_38] Prepending 0 bars and copying 38 chord notes to cover 4 leading bars
+[melody2chord:lyrics_38] 
+[melody2chord:lyrics_38] === Output Summary ===
+[melody2chord:lyrics_38] Output TPQ: 480
+[melody2chord:lyrics_38] Melody track notes: 126
+[melody2chord:lyrics_38] Chord track notes: 146
+[melody2chord:lyrics_38] First chord now at tick: 0
+[melody2chord:lyrics_38] Last chord at tick: 44400
+[melody2chord:lyrics_38] Output saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_38/chord/chord_gen_filled_empty/sample01_shifted_chord_gen_filled_empty_bars.mid
+[melody2chord:lyrics_38] === Quantizing melody to 1/16 notes ===
+[melody2chord:lyrics_38] TPQ: 480
+[melody2chord:lyrics_38] Ticks per 16th note: 120.0
+[melody2chord:lyrics_38] Quantized 158 notes to 1/16 note positions
+[melody2chord:lyrics_38] Output saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_38/chord/chord_gen_quantized/sample01_shifted_chord_gen_quantized.mid
+[melody2chord:lyrics_38] Extracted 96 beat-level chords from 'Chords' track
+[melody2chord:lyrics_38] Chord times remapped to 89 beat positions (subdivision: quarter notes)
+[melody2chord:lyrics_38] Filled 7 None chords
+[melody2chord:lyrics_38] ✓ Successfully processed: sample01_shifted
+[melody2chord:lyrics_38]   Key: Eb major (confidence: 0.51)
+[melody2chord:lyrics_38]   Tempo: 78.0 BPM (source: MIDI tempo)
+[melody2chord:lyrics_38]   Chord Text: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_38/chord/chord_txt/sample01_shifted_chord_gen.txt
+[melody2chord:lyrics_38]   BTC Text:   /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_38/chord/btc_txt/sample01_shifted_chord_gen.txt

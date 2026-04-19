@@ -1,0 +1,91 @@
+{
+    "id": 166,
+    "title_zh": "雲端小徑",
+    "global_prompt": "A light acoustic-folk track with ukulele, flute, and female vocals. Bright and playful, like walking along a path above the clouds.",
+    "structure_en": {
+        "Intro": "Ukulele strumming with flute counterpoint.",
+        "Verse": "over playful ukulele picking.",
+        "Chorus": "Flute harmonies and hand percussion add brightness.",
+        "Outro": "Ukulele fades with airy flute."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "雲端鋪展輕盈小徑"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "微風吹拂羽翼閃爍"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "笑聲散落天際藍光"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "步伐踩在柔軟空氣"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "指尖輕觸明亮陽光"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "旋律織出透明階梯"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "雲端小徑帶我飛行"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "歌聲灑落無垠天空"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "笑語飄蕩穿過日光"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "此刻心境無限明朗"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "雲影漸隱留住清風"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "小徑延伸至無盡處"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 90,
+        "genres": [
+            "Folk",
+            "Acoustic"
+        ],
+        "mood": [
+            "Bright",
+            "Playful",
+            "Light"
+        ],
+        "instruments": [
+            "Ukulele",
+            "Flute",
+            "Percussion"
+        ],
+        "timbre": [
+            "Airy",
+            "Organic",
+            "Cheerful"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

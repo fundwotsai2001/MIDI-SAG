@@ -1,0 +1,91 @@
+{
+    "id": 22,
+    "title_zh": "微風搖曳",
+    "global_prompt": "A light bossa nova track with nylon guitar, soft percussion, upright bass, and smooth female vocals. The sound is breezy and intimate, like swaying under palm trees.",
+    "structure_en": {
+        "Intro": "Nylon guitar intro with light percussion.",
+        "Verse": "with guitar chords and upright bass.",
+        "Chorus": "Full bossa groove with soft harmonies and percussion fills.",
+        "Outro": "Guitar chords fade, percussion tap lingers."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.90",
+                "line": "微風輕拂夏夜的街角"
+            },
+            {
+                "timestamp": "00:12.20",
+                "line": "燈影搖曳伴隨著心跳"
+            },
+            {
+                "timestamp": "00:17.50",
+                "line": "腳步隨旋律慢慢起舞"
+            },
+            {
+                "timestamp": "00:22.80",
+                "line": "夜色柔和如同擁抱"
+            },
+            {
+                "timestamp": "00:28.10",
+                "line": "吉他聲裡隱藏的溫度"
+            },
+            {
+                "timestamp": "00:33.50",
+                "line": "映照出安靜的微笑"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.00",
+                "line": "微風搖曳輕輕唱歌"
+            },
+            {
+                "timestamp": "00:44.20",
+                "line": "心事隨夜色慢慢散落"
+            },
+            {
+                "timestamp": "00:49.60",
+                "line": "笑容閃爍在眼眸深處"
+            },
+            {
+                "timestamp": "00:54.90",
+                "line": "旋律陪伴直到日出"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.30",
+                "line": "夜風仍舊輕輕吹拂"
+            },
+            {
+                "timestamp": "01:27.00",
+                "line": "心靈留下一片溫柔"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 92,
+        "genres": [
+            "Bossa Nova",
+            "Jazz"
+        ],
+        "mood": [
+            "Breezy",
+            "Romantic",
+            "Intimate"
+        ],
+        "instruments": [
+            "Nylon Guitar",
+            "Upright Bass",
+            "Percussion"
+        ],
+        "timbre": [
+            "Smooth",
+            "Warm",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,90 @@
+{
+    "id": 98,
+    "title_zh": "極光祈願",
+    "global_prompt": "An ethereal ambient track with synth pads, bells, and female vocals. The mood is spiritual and vast, like making a wish beneath the northern lights.",
+    "structure_en": {
+        "Intro": "Bell tones with shimmering synth pads.",
+        "Verse": "with airy pads and bells.",
+        "Chorus": "Layered harmonies with luminous synth textures.",
+        "Outro": "Bells echo with fading pads."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.40",
+                "line": "極光點亮無邊夜空"
+            },
+            {
+                "timestamp": "00:12.80",
+                "line": "祈願低語在心底流淌"
+            },
+            {
+                "timestamp": "00:18.20",
+                "line": "夢想飛翔穿越蒼穹"
+            },
+            {
+                "timestamp": "00:23.70",
+                "line": "愛的光輝閃爍無盡"
+            },
+            {
+                "timestamp": "00:29.10",
+                "line": "心靈安息於光色之間"
+            },
+            {
+                "timestamp": "00:34.50",
+                "line": "希望綻放永遠閃耀"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.80",
+                "line": "極光祈願守護夢想"
+            },
+            {
+                "timestamp": "00:45.20",
+                "line": "愛的力量永不消散"
+            },
+            {
+                "timestamp": "00:50.60",
+                "line": "希望閃耀無限蒼穹"
+            },
+            {
+                "timestamp": "00:56.00",
+                "line": "心靈飛翔直到永恆"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.20",
+                "line": "極光依舊閃爍心底"
+            },
+            {
+                "timestamp": "01:28.60",
+                "line": "夢想延續直到無限"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 74,
+        "genres": [
+            "Ambient",
+            "Ethereal"
+        ],
+        "mood": [
+            "Spiritual",
+            "Vast",
+            "Calm"
+        ],
+        "instruments": [
+            "Synth Pads",
+            "Bells"
+        ],
+        "timbre": [
+            "Luminous",
+            "Airy",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

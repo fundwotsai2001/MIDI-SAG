@@ -1,0 +1,90 @@
+{
+    "id": 130,
+    "title_zh": "黑曜裂縫",
+    "global_prompt": "An industrial rock track with distorted guitars, heavy drums, and male vocals. Dark, mechanical, and forceful, like cracks opening in obsidian stone.",
+    "structure_en": {
+        "Intro": "Distorted guitar feedback, metallic percussion hits.",
+        "Verse": "Raspy with grinding guitar riff and pounding drums.",
+        "Chorus": "Layered guitars and heavy rhythm section build intensity.",
+        "Outro": "Feedback drone fades into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "黑曜深處劃出縫隙"
+            },
+            {
+                "timestamp": "00:12.60",
+                "line": "碎裂聲響迴盪耳際"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "鐵鏈碰撞燃起火花"
+            },
+            {
+                "timestamp": "00:23.50",
+                "line": "殘影在灰燼中搖晃"
+            },
+            {
+                "timestamp": "00:28.90",
+                "line": "烈響逼近掩蓋心跳"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "影子隨震動撕裂擴散"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.70",
+                "line": "黑曜裂縫無聲怒吼"
+            },
+            {
+                "timestamp": "00:45.10",
+                "line": "灰燼翻湧吞噬長夜"
+            },
+            {
+                "timestamp": "00:50.50",
+                "line": "聲浪撕裂鋼鐵之牆"
+            },
+            {
+                "timestamp": "00:55.90",
+                "line": "暗影之中步伐堅硬"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.10",
+                "line": "裂縫仍在延伸低吟"
+            },
+            {
+                "timestamp": "01:28.40",
+                "line": "餘音散落無邊夜幕"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 122,
+        "genres": [
+            "Industrial Rock"
+        ],
+        "mood": [
+            "Dark",
+            "Mechanical",
+            "Forceful"
+        ],
+        "instruments": [
+            "Distorted Guitars",
+            "Drums",
+            "Metal Percussion"
+        ],
+        "timbre": [
+            "Harsh",
+            "Heavy",
+            "Resonant"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

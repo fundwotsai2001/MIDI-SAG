@@ -1,0 +1,90 @@
+{
+    "id": 133,
+    "title_zh": "電光疾行",
+    "global_prompt": "A fast-paced electronic dance track with heavy synths, pounding drums, and female vocals. Energetic, flashy, like racing through neon lights.",
+    "structure_en": {
+        "Intro": "Synth arpeggios with fast kick pulse.",
+        "Verse": "with heavy bass and hi-hats.",
+        "Chorus": "Explosive drop with wide synths and reverb snare.",
+        "Outro": "Synth arps fade while kick slows down."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.80",
+                "line": "電光閃爍推動夜色"
+            },
+            {
+                "timestamp": "00:12.10",
+                "line": "步伐加速越過街區"
+            },
+            {
+                "timestamp": "00:17.50",
+                "line": "霓虹切割時間流線"
+            },
+            {
+                "timestamp": "00:22.90",
+                "line": "聲浪追逐每一口氣"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "眼神聚焦方向不移"
+            },
+            {
+                "timestamp": "00:33.70",
+                "line": "速度刻劃鋒利曲線"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.10",
+                "line": "電光疾行燃燒街道"
+            },
+            {
+                "timestamp": "00:44.40",
+                "line": "節拍呼喊衝破界線"
+            },
+            {
+                "timestamp": "00:49.80",
+                "line": "聲浪推開阻擋高牆"
+            },
+            {
+                "timestamp": "00:55.20",
+                "line": "此刻只剩速度呼吸"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.60",
+                "line": "餘暉折射殘留光點"
+            },
+            {
+                "timestamp": "01:26.90",
+                "line": "節奏化作靜默回聲"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 128,
+        "genres": [
+            "EDM",
+            "Dance"
+        ],
+        "mood": [
+            "Energetic",
+            "Flashy",
+            "Fast-paced"
+        ],
+        "instruments": [
+            "Synths",
+            "Drums"
+        ],
+        "timbre": [
+            "Bright",
+            "Heavy",
+            "Punchy"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

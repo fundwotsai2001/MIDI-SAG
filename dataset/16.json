@@ -1,0 +1,90 @@
+{
+    "id": 16,
+    "title_zh": "地平線之外",
+    "global_prompt": "An anthemic alternative rock track with soaring electric guitars, driving drums, and passionate male vocals. The mood is hopeful and determined, like chasing a dream beyond the horizon.",
+    "structure_en": {
+        "Intro": "Guitar riff with steady drum beat.",
+        "Verse": "storytelling with palm-muted guitar rhythm.",
+        "Chorus": "Full band explosion with soaring guitar lead and harmonies.",
+        "Outro": "Sustained guitar chords fade with cymbal wash."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.50",
+                "line": "腳步踏上未知的路途"
+            },
+            {
+                "timestamp": "00:12.80",
+                "line": "前方呼喊指引著方向"
+            },
+            {
+                "timestamp": "00:18.30",
+                "line": "每一次跌倒重新站起"
+            },
+            {
+                "timestamp": "00:23.70",
+                "line": "信念驅動無懼的靈魂"
+            },
+            {
+                "timestamp": "00:29.00",
+                "line": "遠方閃耀如火般明亮"
+            },
+            {
+                "timestamp": "00:34.50",
+                "line": "心中渴望不斷延伸"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.80",
+                "line": "地平線之外夢在呼喊"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "希望驅動不再孤單"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "雙眼追隨無盡的光"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "心靈飛越所有阻擋"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.90",
+                "line": "遠方依舊閃耀光芒"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "夢想永遠不會停歇"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 112,
+        "genres": [
+            "Alternative Rock"
+        ],
+        "mood": [
+            "Hopeful",
+            "Determined",
+            "Anthemic"
+        ],
+        "instruments": [
+            "Electric Guitars",
+            "Drums",
+            "Bass"
+        ],
+        "timbre": [
+            "Powerful",
+            "Bright",
+            "Passionate"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,90 @@
+{
+    "id": 108,
+    "title_zh": "暮色小徑",
+    "global_prompt": "A lo-fi chillhop track with jazzy piano, soft beats, and female vocals. The mood is calm and introspective, like strolling down a path at dusk.",
+    "structure_en": {
+        "Intro": "Soft vinyl crackle with piano chords.",
+        "Verse": "with lo-fi beats and piano loops.",
+        "Chorus": "Layered harmonies with fuller beat textures.",
+        "Outro": "Beat fades with vinyl crackle."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "暮色灑落靜靜小徑"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "思緒隨風慢慢飄散"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "夢想停留黃昏光影"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "愛的聲音迴盪心底"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "時光緩緩流過掌心"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "希望在夜色裡點亮"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.30",
+                "line": "暮色小徑低語心靈"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "夢想延續無盡光芒"
+            },
+            {
+                "timestamp": "00:50.10",
+                "line": "愛的旋律緩緩流淌"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "希望永遠伴隨夜色"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "小徑依舊安靜延展"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "心靈安息於暮色中"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 78,
+        "genres": [
+            "Lo-fi",
+            "Chillhop"
+        ],
+        "mood": [
+            "Calm",
+            "Introspective",
+            "Warm"
+        ],
+        "instruments": [
+            "Piano",
+            "Beats"
+        ],
+        "timbre": [
+            "Soft",
+            "Dusty",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

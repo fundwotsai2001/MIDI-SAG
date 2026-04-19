@@ -1,0 +1,91 @@
+{
+    "id": 53,
+    "title_zh": "光影迷宮",
+    "global_prompt": "A progressive electronic track with layered synths, deep bass, glitch effects, and female vocals. The mood is mysterious and futuristic, like wandering through a maze of light and shadow.",
+    "structure_en": {
+        "Intro": "Glitchy synth textures with deep bass rumble.",
+        "Verse": "layered over evolving synth patterns.",
+        "Chorus": "Bright synth leads with heavy beats and layered harmonies.",
+        "Outro": "Filtered synth arpeggios fade into static."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.50",
+                "line": "光影交錯迷惑的道路"
+            },
+            {
+                "timestamp": "00:12.80",
+                "line": "腳步徘徊找尋出口"
+            },
+            {
+                "timestamp": "00:18.20",
+                "line": "心跳回響在黑暗深處"
+            },
+            {
+                "timestamp": "00:23.60",
+                "line": "微光引領方向不滅"
+            },
+            {
+                "timestamp": "00:28.90",
+                "line": "未知低語迴盪耳際"
+            },
+            {
+                "timestamp": "00:34.30",
+                "line": "靈魂穿越無窮幻境"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.80",
+                "line": "光影迷宮呼喚心靈"
+            },
+            {
+                "timestamp": "00:45.10",
+                "line": "夢境與現實交錯不停"
+            },
+            {
+                "timestamp": "00:50.50",
+                "line": "未來在黑暗中閃亮"
+            },
+            {
+                "timestamp": "00:55.80",
+                "line": "愛的迴響無限延伸"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.00",
+                "line": "光影依舊閃爍不停"
+            },
+            {
+                "timestamp": "01:28.40",
+                "line": "心靈找到出口方向"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 118,
+        "genres": [
+            "Progressive Electronic"
+        ],
+        "mood": [
+            "Mysterious",
+            "Futuristic",
+            "Hypnotic"
+        ],
+        "instruments": [
+            "Synths",
+            "Bass",
+            "Drums",
+            "Glitch Effects"
+        ],
+        "timbre": [
+            "Bright",
+            "Layered",
+            "Digital"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

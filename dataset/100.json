@@ -1,0 +1,90 @@
+{
+    "id": 100,
+    "title_zh": "晨曦微光",
+    "global_prompt": "A gentle pop ballad with acoustic guitar, piano, and female vocals. The mood is warm and hopeful, like the first light of dawn shining softly.",
+    "structure_en": {
+        "Intro": "Piano chords with faint acoustic guitar.",
+        "Verse": "with guitar and piano accompaniment.",
+        "Chorus": "Strings and harmonies join to lift the melody.",
+        "Outro": "Piano softly closes with fading guitar."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "晨曦微光灑落心間"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "夢想在此悄悄綻放"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "微風拂過沉睡時光"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "心靈點亮無限希望"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "愛的聲音輕輕迴盪"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "未來在光中緩緩展開"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "晨曦微光擁抱心靈"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "夢想飛翔在無限天際"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "愛的旋律永不消散"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "希望閃耀直到永恆"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "微光依舊閃爍心底"
+            },
+            {
+                "timestamp": "01:27.20",
+                "line": "愛意延續新的開始"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 88,
+        "genres": [
+            "Pop Ballad"
+        ],
+        "mood": [
+            "Warm",
+            "Hopeful",
+            "Tender"
+        ],
+        "instruments": [
+            "Acoustic Guitar",
+            "Piano",
+            "Strings"
+        ],
+        "timbre": [
+            "Soft",
+            "Bright",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

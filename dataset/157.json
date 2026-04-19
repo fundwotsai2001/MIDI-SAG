@@ -1,0 +1,91 @@
+{
+    "id": 157,
+    "title_zh": "雪嶺迴光",
+    "global_prompt": "A post-rock ballad with layered guitars, piano, and male vocals. Cold and vast, like a fleeting glimmer across snowy peaks.",
+    "structure_en": {
+        "Intro": "Echoed piano motif with soft guitar swells.",
+        "Verse": "over reverbed guitars and piano.",
+        "Chorus": "Drums and guitars expand into soaring climax.",
+        "Outro": "Guitar harmonics fade with lingering reverb."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "雪嶺覆蓋蒼白大地"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "光影折射冰冷軌跡"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "呼吸凝結散作薄霧"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "腳步沉入深深雪層"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "遠處傳來低緩鐘聲"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "旋律浮現高聳雲端"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "雪嶺迴光映照蒼穹"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "聲音劃破無邊夜色"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "樂聲拉起遼闊天幕"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "此刻凝望無限無聲"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "雪影沉入靜默深谷"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "迴響飄散無聲遠去"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 92,
+        "genres": [
+            "Post-rock",
+            "Ballad"
+        ],
+        "mood": [
+            "Cold",
+            "Vast",
+            "Melancholic"
+        ],
+        "instruments": [
+            "Electric Guitars",
+            "Piano",
+            "Drums"
+        ],
+        "timbre": [
+            "Echoed",
+            "Expansive",
+            "Icy"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

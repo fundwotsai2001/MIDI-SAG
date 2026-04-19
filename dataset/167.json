@@ -1,0 +1,90 @@
+{
+    "id": 167,
+    "title_zh": "斷崖殘響",
+    "global_prompt": "A post-metal track with heavy guitars, deep drums, and male vocals. Intense and dramatic, like echoes reverberating off cliffs.",
+    "structure_en": {
+        "Intro": "Distorted guitar riff with pounding toms.",
+        "Verse": "Growling with heavy guitar layers.",
+        "Chorus": "Full band with crashing cymbals and wall of sound.",
+        "Outro": "Guitar feedback fades into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "斷崖裂縫迴盪轟鳴"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "碎石滾落拖出長聲"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "黑雲壓下沉重氣息"
+            },
+            {
+                "timestamp": "00:23.30",
+                "line": "聲響震裂蒼白天穹"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "雙手推開荒涼峭壁"
+            },
+            {
+                "timestamp": "00:34.10",
+                "line": "音浪席捲無邊深谷"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.50",
+                "line": "斷崖殘響撕裂沉默"
+            },
+            {
+                "timestamp": "00:44.90",
+                "line": "聲浪呼嘯穿過夜空"
+            },
+            {
+                "timestamp": "00:50.30",
+                "line": "重擊點燃冰冷大地"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "回聲翻湧無窮不息"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "餘音墜入深淵之中"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "斷崖依舊靜立蒼茫"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 108,
+        "genres": [
+            "Post-metal",
+            "Rock"
+        ],
+        "mood": [
+            "Intense",
+            "Dramatic",
+            "Dark"
+        ],
+        "instruments": [
+            "Electric Guitars",
+            "Drums"
+        ],
+        "timbre": [
+            "Heavy",
+            "Raw",
+            "Resonant"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

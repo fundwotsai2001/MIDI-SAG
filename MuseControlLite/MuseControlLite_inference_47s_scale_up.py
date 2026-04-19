@@ -11,11 +11,12 @@ import os
 import numpy as np
 from config_inference import get_config
 import argparse
-from utils.extract_conditions import compute_melody_v2, create_activations_from_timestamps
+from utils.extract_conditions import calculate_beats_and_downbeats, create_activations_from_timestamps
 from utils.audio_processing import mix_audio, extract_chords_lab, sublist_between, load_audio_file
 import random
 from pathlib import Path
 import torch.nn as nn
+import re
 # ── RMVPE / F0 melody encoder ─────────────────────────────────────────
 _MUSECTRLLITE_DIR = os.path.dirname(os.path.abspath(__file__))
 from rmvpe import RMVPE  # noqa: E402
@@ -122,9 +123,23 @@ def load_attn1_qkv_into_pipeline(pipeline, qkv_path, dtype=torch.float32, strict
     # Will fill matching keys; keeps others unchanged
     incompatible = core.load_state_dict(sd, strict=strict)
     print("Unexpected:", incompatible.unexpected_keys)
+
+
+def _safe_filename_component(text: str, max_len: int = 80) -> str:
+    component = re.sub(r"[^A-Za-z0-9._-]+", "_", text).strip("._-")
+    return (component[:max_len] or "prompt")
+
+
+def _normalize_prompt_list(prompt_value):
+    if isinstance(prompt_value, str):
+        prompts = [prompt_value]
+    else:
+        prompts = list(prompt_value)
+    return prompts or [""]
+
+
 def main(config):
     os.environ['CUDA_VISIBLE_DEVICES'] = config["GPU_id"]
-    generator = torch.Generator().manual_seed(42)
     random.seed(42)
     np.random.seed(42)
     torch.cuda.manual_seed_all(42)
@@ -295,7 +310,7 @@ def main(config):
     with torch.no_grad():
        
         gt_vocal_audio_file = config['vocal_audio_file']
-        prompt_texts = config['text_prompt']
+        prompt_texts = _normalize_prompt_list(config['text_prompt'])
         
         song_name = config['vocal_audio_file'].split('/')[-1].split(".wav")[0]
         
@@ -308,7 +323,7 @@ def main(config):
         _window_start_s = 0
         
         if config["no_text"] is True:
-            prompt_texts = ""
+            prompt_texts = [""]
         # if "structure" in config['condition_type']:
         extracted_struct_condition = torch.zeros((1, 176, 1024), device="cuda")
         masked_extracted_struct_condition = extracted_struct_condition
@@ -366,12 +381,32 @@ def main(config):
             extracted_chord_condition = torch.zeros((1, 128, 1024), device="cuda")
             masked_extracted_chord_condition = extracted_chord_condition
         if "rhythm" in config["condition_type"]:
-            path = Path(config['vocal_beat_file'])
-            with path.open("r", encoding="utf-8") as f:
-                beat_times_all = [float(line.strip()) for i, line in enumerate(f) if i != 0 and line.strip()] 
+            MIDI_FILE = config['vocal_midi_file']
+            BEAT_FILE = config['vocal_beat_file']
+            DOWNBEAT_FILE = config['vocal_downbeat_file']
+            if MIDI_FILE is not None:
+                beat_times_all, downbeat_times_all = calculate_beats_and_downbeats(MIDI_FILE)
+                print(f"Loaded {len(beat_times_all)} beats and {len(downbeat_times_all)} downbeats from MIDI")
+            else:
+                # Load beat times from text file and derive downbeats heuristically
+                beat_times_all = []
+                with open(BEAT_FILE, 'r') as _bf:
+                    for _line in _bf:
+                        _line = _line.strip()
+                        if _line and not _line.startswith('#'):
+                            beat_times_all.append(float(_line))
+                downbeat_times_all = []
+                with open(DOWNBEAT_FILE, 'r') as _bf:
+                    for _line in _bf:
+                        _line = _line.strip()
+                        if _line and not _line.startswith('#'):
+                            downbeat_times_all.append(float(_line))
             beat_times = sublist_between(beat_times_all, seconds_starts, 2097152/44100 + seconds_starts)
             beat_times = [x - seconds_starts for x in beat_times]
-            downbeat_times = beat_times[::4]
+            downbeat_times = sublist_between(downbeat_times_all, seconds_starts, 2097152/44100 + seconds_starts)
+            downbeat_times = [x - seconds_starts for x in downbeat_times]
+            print(beat_times)
+            print(downbeat_times)
             print("using rhythm condition")
             rhythm_condition = create_activations_from_timestamps(beat_times, downbeat_times)
             extracted_rhythm_condition = rhythm_extractor(torch.from_numpy(rhythm_condition).cuda().unsqueeze(0).float()) 
@@ -388,46 +423,61 @@ def main(config):
         masked_extracted_condition = torch.concat((masked_extracted_rhythm_condition, masked_extracted_melody_condition, masked_extracted_struct_condition, masked_extracted_audio_condition, masked_extracted_chord_condition), dim=1)
         extracted_condition = torch.concat((masked_extracted_condition, masked_extracted_condition, extracted_condition), dim=0)
         extracted_condition = extracted_condition.transpose(1, 2)
-        waveform = pipe(
-            extracted_condition = extracted_condition, 
-            prompt=prompt_texts,
-            negative_prompt=negative_text_prompt,
-            num_inference_steps=config["denoise_step"],
-            guidance_scale_text=config["guidance_scale_text"],
-            guidance_scale_con=config["guidance_scale_con"],
-            num_waveforms_per_prompt=1,
-            audio_end_in_s=2097152 / 44100,
-            generator=generator,
-        ).audios                 
-        backing_audio = waveform[0].float().cpu()
         waveform_vocal_slice = waveform_vocal[:, int(seconds_starts*44100): int((seconds_starts + 2097152 / 44100)*44100)]
         # ---------------- Example usage ----------------
         # Assume you start with int16 PCM and want float32 in [-1, 1]:
         # wav_a_int16, wav_b_int16: torch.int16 tensors shaped [T] or [C, T]
         waveform_vocal_slice = (waveform_vocal_slice.to(torch.float32) / 32768.0).clamp(-1, 1)
-        backing_audio = (backing_audio.to(torch.float32) / 32768.0).clamp(-1, 1)
+        total_prompts = len(prompt_texts)
 
-        mix = mix_audio(waveform_vocal_slice, backing_audio, target_dbfs=-18.0, out_peak_dbfs=-1.0)
-        mixed_file_path = os.path.join(output_dir, f"mixed_{song_name}_{prompt_texts}.wav")
-        sf.write(mixed_file_path, mix.T.float().cpu().numpy(), pipe.vae.sampling_rate)
+        for prompt_index, prompt_text in enumerate(prompt_texts, start=1):
+            print(f"Generating prompt {prompt_index}/{total_prompts}: {prompt_text or '[no text]'}")
+            prompt_generator = torch.Generator().manual_seed(42)
+            waveform = pipe(
+                extracted_condition = extracted_condition,
+                prompt=prompt_text,
+                negative_prompt=negative_text_prompt,
+                num_inference_steps=config["denoise_step"],
+                guidance_scale_text=config["guidance_scale_text"],
+                guidance_scale_con=config["guidance_scale_con"],
+                num_waveforms_per_prompt=1,
+                audio_end_in_s=2097152 / 44100,
+                generator=prompt_generator,
+            ).audios
+            backing_audio = waveform[0].float().cpu()
+            backing_audio = (backing_audio.to(torch.float32) / 32768.0).clamp(-1, 1)
+
+            mix = mix_audio(waveform_vocal_slice, backing_audio, target_dbfs=-18.0, out_peak_dbfs=-1.0)
+            prompt_label = _safe_filename_component(prompt_text)
+            mixed_file_path = os.path.join(
+                output_dir,
+                f"mixed_{song_name}_prompt_{prompt_index:02d}_{prompt_label}.wav",
+            )
+            sf.write(mixed_file_path, mix.T.float().cpu().numpy(), pipe.vae.sampling_rate)
 
             
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--vocal_audio_file", required=True, help="Path(s) to input audio file(s)")
-    parser.add_argument("--text_prompt", required=True, help="Text prompt(s) for generation")
-    parser.add_argument("--vocal_beat_file", required=True, help="Path(s) to input vocal beat file(s)")
+    parser.add_argument("--text_prompt", required=True, nargs="+", help="One or more text prompts for generation")
+    parser.add_argument("--vocal_beat_file", default=None, required=False, help="Path(s) to input vocal beat file(s)")
+    parser.add_argument("--vocal_downbeat_file", default=None,
+                        help="Optional path to detected-downbeat times txt (one time/line, '#' header ok). "
+                             "If omitted, falls back to beat_times[::4].")
     parser.add_argument("--chord_file", required=True, help="Path(s) to input chord file(s)")
     parser.add_argument("--checkpoint_path", required=True, help="Path(s) to input checkpoint file(s)")
     parser.add_argument("--output_dir", required=True, help="Path(s) for output directory")
+    parser.add_argument("--vocal_midi_file", default=None, help="Path to MIDI file for beat/downbeat extraction. If not provided, beats come from --vocal_beat_file")
     args = parser.parse_args()
 
     config = get_config()
     config["vocal_audio_file"] = args.vocal_audio_file
+    config["vocal_midi_file"] = args.vocal_midi_file
     config["text_prompt"] = args.text_prompt
     config['chord_info'] = args.chord_file
     config['vocal_beat_file'] = args.vocal_beat_file
+    config['vocal_downbeat_file'] = args.vocal_downbeat_file
     config['checkpoint_path'] = args.checkpoint_path
     config['output_dir'] = args.output_dir
     main(config)

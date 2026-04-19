@@ -1,0 +1,91 @@
+{
+    "id": 86,
+    "title_zh": "城市霓虹",
+    "global_prompt": "An upbeat city-pop track with funky bass, electric piano, brass, and female vocals. The mood is vibrant and stylish, like walking under neon lights at night.",
+    "structure_en": {
+        "Intro": "Funky bass riff with electric piano chords.",
+        "Verse": "with steady groove.",
+        "Chorus": "Full brass section with harmonies.",
+        "Outro": "Bass riff and piano fade into night sounds."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.90",
+                "line": "霓虹閃爍喚醒夜色"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "城市節奏不曾停歇"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "笑語隨風漂流街頭"
+            },
+            {
+                "timestamp": "00:23.00",
+                "line": "夢想點亮眼中的光"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "人潮湧動無限能量"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "愛在夜裡悄悄盛放"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "城市霓虹照亮心靈"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想閃爍在夜空裡"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的旋律自由綻放"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "希望流動不停歇息"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "霓虹依舊閃耀不息"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "城市延續無盡節奏"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 108,
+        "genres": [
+            "City Pop",
+            "Funk"
+        ],
+        "mood": [
+            "Vibrant",
+            "Stylish",
+            "Upbeat"
+        ],
+        "instruments": [
+            "Bass",
+            "Electric Piano",
+            "Brass"
+        ],
+        "timbre": [
+            "Bright",
+            "Groovy",
+            "Energetic"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

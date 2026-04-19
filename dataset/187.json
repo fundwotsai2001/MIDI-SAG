@@ -1,0 +1,90 @@
+{
+    "id": 187,
+    "title_zh": "玻璃雨滴",
+    "global_prompt": "A minimalist piano and electronic piece with female vocals. Delicate and fragile, like raindrops falling against glass.",
+    "structure_en": {
+        "Intro": "Sparse piano motif with high synth shimmer.",
+        "Verse": "with piano arpeggios.",
+        "Chorus": "Electronic textures and layered harmonies join.",
+        "Outro": "Piano single notes echo into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "玻璃表面雨滴敲響"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "聲音散落透明夢境"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "旋律滴落無聲夜裡"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "光點折射幽暗軌跡"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "足音停在潮濕街角"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "眼神追逐消散水痕"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "玻璃雨滴化作旋律"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "聲音延展無邊透明"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "歌聲浮動水光閃爍"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "此刻停在靜謐時分"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "雨聲散落無痕之間"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "玻璃仍在輕輕共鳴"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 80,
+        "genres": [
+            "Minimal",
+            "Electronic"
+        ],
+        "mood": [
+            "Delicate",
+            "Fragile",
+            "Quiet"
+        ],
+        "instruments": [
+            "Piano",
+            "Synth Pads"
+        ],
+        "timbre": [
+            "Light",
+            "Transparent",
+            "Soft"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,89 @@
+{
+    "id": 82,
+    "title_zh": "孤燈長夜",
+    "global_prompt": "A slow ballad with piano, cello, and deep male vocals. The mood is melancholic and contemplative, like a lone lamp burning through a long night.",
+    "structure_en": {
+        "Intro": "Piano chords with cello harmony.",
+        "Verse": "with piano accompaniment.",
+        "Chorus": "Strings swell with expression.",
+        "Outro": "Piano arpeggios fade slowly."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "孤燈靜燃漫長黑夜"
+            },
+            {
+                "timestamp": "00:12.60",
+                "line": "影子搖曳思緒無聲"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "夢境停留無法消散"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "心靈低語遙遠的歌"
+            },
+            {
+                "timestamp": "00:28.90",
+                "line": "歲月沉澱不盡的愁"
+            },
+            {
+                "timestamp": "00:34.30",
+                "line": "愛的火光仍在閃耀"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.70",
+                "line": "孤燈長夜陪伴心靈"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "夢想閃爍不滅的火"
+            },
+            {
+                "timestamp": "00:50.40",
+                "line": "愛的旋律緩緩流淌"
+            },
+            {
+                "timestamp": "00:55.80",
+                "line": "希望延續穿越黑暗"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "孤燈依舊照亮夜色"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "心靈守候直到天明"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 70,
+        "genres": [
+            "Ballad"
+        ],
+        "mood": [
+            "Melancholic",
+            "Contemplative",
+            "Tender"
+        ],
+        "instruments": [
+            "Piano",
+            "Cello"
+        ],
+        "timbre": [
+            "Dark",
+            "Soft",
+            "Emotional"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

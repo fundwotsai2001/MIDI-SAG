@@ -3,6 +3,7 @@ import chorderator as cdt
 import os
 import mido
 import json
+import numpy as np
 from datetime import datetime
 from acc2btc import acc2btc
 from miditok import REMI, TokenizerConfig
@@ -29,7 +30,11 @@ from demo_utils import (get_key,
                        warp_midi_to_beats,
                        detect_downbeat_phase,
                        requantize_chord_gen_melody,
-                       fill_none_chords_in_txt
+                       fill_none_chords_in_txt,
+                       align_chord_track_to_bar,
+                       scale_midi_ticks,
+                       cover_pickup_melody_with_chord,
+                       fill_internal_empty_bars
                        )
 
 def melody_key_detect(midi_path):
@@ -99,21 +104,56 @@ def melody_key_detect(midi_path):
     return {'key': best_key, 'mode': best_mode, 'confidence': float(best_r)}
 
 
+def parse_downbeat_phase(value):
+    if value is None:
+        return None
+    normalized = str(value).strip().lower()
+    if normalized in {"none", "auto", ""}:
+        return None
+    return int(value)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate chord progression from a single vocal MIDI file.')
     parser.add_argument('--midi_path', type=str, required=True, help='Path to input vocal MIDI file')
     parser.add_argument('--beat_file', type=str, default=None,
                         help='Path to beat times txt file. If omitted, beats are derived from the MIDI tempo.')
+    parser.add_argument('--beat_file_detected', type=str, default=None,
+                        help='Optional path to the detected-only beat times txt file (before gap-filling). '
+                             'When provided together with --downbeat_phase, the phase indexes into this '
+                             'file to pick the anchor downbeat time; downbeats are then bar_duration '
+                             'multiples of that anchor.')
     parser.add_argument('--output_dir', type=str, default='output_SOME', help='Base output directory')
     parser.add_argument('--beat_subdivision', type=int, default=1,
                         help='Beat subdivision: 1=quarter, 2=8th, 4=16th notes (default: 1)')
     parser.add_argument('--chord_style', type=str, default='POP_STANDARD',
                         choices=['POP_STANDARD', 'POP_COMPLEX', 'DARK', 'RANDB', 'NOCONSTRAINT'],
                         help='Output chord style (default: POP_STANDARD)')
+    parser.add_argument('--chords_per_bar', type=int, default=1, choices=[1, 2],
+                        help='Chord events per bar. 2 splits each bar into two half-bar chord '
+                             'events; the second half uses the next bar\'s chord (anticipation). '
+                             'Default: 1')
+    parser.add_argument('--downbeat_phase', type=parse_downbeat_phase, default=None,
+                        help='Beat index to treat as bar 1 beat 1. When --beat_file_detected is given, '
+                             'this is the index into the detected-only beat file; otherwise it is a '
+                             'phase in [0, 4*beat_subdivision-1] into --beat_file. '
+                             'Use None or auto to detect automatically.')
     args = parser.parse_args()
 
     input_melody_path = args.midi_path
     BEAT_SUBDIVISION = args.beat_subdivision
+    max_downbeat_phase = 4 * BEAT_SUBDIVISION - 1
+    if (args.downbeat_phase is not None
+            and args.beat_file_detected is None
+            and not 0 <= args.downbeat_phase <= max_downbeat_phase):
+        raise ValueError(
+            f"--downbeat_phase must be between 0 and {max_downbeat_phase} "
+            f"for beat_subdivision={BEAT_SUBDIVISION}; got {args.downbeat_phase}"
+        )
+    if args.downbeat_phase is not None and args.downbeat_phase < 0:
+        raise ValueError(
+            f"--downbeat_phase must be non-negative; got {args.downbeat_phase}"
+        )
 
     # Derive song name from filename stem
     song_name = os.path.splitext(os.path.basename(input_melody_path))[0]
@@ -162,11 +202,54 @@ if __name__ == '__main__':
             estimated_bpm = tempo_info['tempo']
             print(f"Tempo from beats: {estimated_bpm:.1f} BPM (bar duration: {tempo_info['bar_duration']:.3f}s)")
 
-            # Step 2: detect which beat_times entry is the first downbeat (bar 1 beat 1)
-            downbeat_phase = detect_downbeat_phase(
-                beat_times, processed_melody_path,
-                beats_per_bar=4, beat_subdivision=BEAT_SUBDIVISION
+            # Step 2: choose which beat is bar 1 beat 1
+            downbeat_stride = 4 * BEAT_SUBDIVISION
+            if args.downbeat_phase is None:
+                downbeat_phase = detect_downbeat_phase(
+                    beat_times,
+                    processed_melody_path,
+                    beats_per_bar=4,
+                    beat_subdivision=BEAT_SUBDIVISION,
+                )
+            elif args.beat_file_detected is not None:
+                # The detected-only beat file just picks a concrete downbeat
+                # time; we convert that into a phase within a bar so the full
+                # beat grid (including pickup beats before the anchor) is
+                # still used for warping and downbeat emission.
+                if not os.path.exists(args.beat_file_detected):
+                    raise FileNotFoundError(
+                        f"Detected beat times file not found: {args.beat_file_detected}"
+                    )
+                detected_beats = load_beat_times(args.beat_file_detected)
+                if args.downbeat_phase >= len(detected_beats):
+                    raise ValueError(
+                        f"--downbeat_phase={args.downbeat_phase} is out of range for "
+                        f"detected beats of length {len(detected_beats)}"
+                    )
+                anchor_time = float(detected_beats[args.downbeat_phase])
+                anchor_idx = int(np.argmin(np.abs(np.asarray(beat_times) - anchor_time)))
+                downbeat_phase = anchor_idx % downbeat_stride
+                print(
+                    f"  [phase] anchor = detected[{args.downbeat_phase}] = {anchor_time:.3f}s "
+                    f"→ beat_times idx {anchor_idx} (t={beat_times[anchor_idx]:.3f}s), "
+                    f"phase within bar = {downbeat_phase}"
+                )
+            else:
+                downbeat_phase = args.downbeat_phase
+                print(f"  [phase] using user-provided downbeat phase={downbeat_phase}")
+
+            # Emit downbeats for the whole beat grid on the bar cycle anchored
+            # at downbeat_phase (x can be positive or negative).
+            downbeat_times = beat_times[downbeat_phase::downbeat_stride]
+            downbeat_out_path = os.path.join(
+                os.path.dirname(beat_file_path),
+                f"{os.path.splitext(os.path.basename(beat_file_path))[0].replace('_beat_times', '')}_downbeat_times.txt"
             )
+            with open(downbeat_out_path, 'w') as f:
+                f.write(f"# Downbeat times in seconds (phase={downbeat_phase}, stride={downbeat_stride})\n")
+                for t in downbeat_times:
+                    f.write(f"{t:.6f}\n")
+            print(f"  [phase] saved {len(downbeat_times)} downbeat times → {downbeat_out_path}")
 
             # Step 3: warp note positions onto the beat grid
             beat_times_aligned = beat_times[downbeat_phase:]
@@ -192,10 +275,24 @@ if __name__ == '__main__':
             beat_times_aligned = beat_times  # MIDI tick 0 = bar 1 beat 1, no phase offset
             print(f"Tempo from MIDI: {estimated_bpm:.1f} BPM (no beat file — skipping warp step)")
 
+        # For chords_per_bar == 2, feed chorderator a tick-scaled melody so each
+        # real half-bar appears as a full bar. Chorderator then picks a distinct
+        # chord per half-bar from that half-bar's melody content. The generated
+        # chord MIDI is descaled back to real time below.
+        if args.chords_per_bar == 2:
+            scaled_melody_path = os.path.join(
+                processed_melody_dir, f"{demo_name}_x{args.chords_per_bar}.mid"
+            )
+            scale_midi_ticks(processed_melody_path, scaled_melody_path,
+                             args.chords_per_bar)
+            cdt_melody_path = scaled_melody_path
+        else:
+            cdt_melody_path = processed_melody_path
+
         # Process the MIDI file
-        cdt.set_melody(processed_melody_path)
-        print(f"processed_melody_path: {processed_melody_path}")
-        midi_obj = Score(processed_melody_path)
+        cdt.set_melody(cdt_melody_path)
+        print(f"cdt_melody_path: {cdt_melody_path}")
+        midi_obj = Score(cdt_melody_path)
         tokens = tokenizer(midi_obj)
         if len(tokens) == 1:
             tokens = tokens[0]
@@ -225,12 +322,16 @@ if __name__ == '__main__':
         cdt_key_attr = get_key_for_cdt(tokens.tokens, key_analysis)
         cdt_mode_attr = get_mode_for_cdt(tokens.tokens, key_analysis)
 
-        # Auto-configure (use MIDI file for accurate bar counting)
-        auto_config = get_auto_config(tokens.tokens, midi_path=processed_melody_path)
+        # Auto-configure (use MIDI file for accurate bar counting).
+        # When chords_per_bar == 2, the scaled melody naturally yields double
+        # the bar count, and segmentation (A8 → A16, etc.) doubles accordingly.
+        auto_config = get_auto_config(tokens.tokens, midi_path=cdt_melody_path)
         print(f"auto_config: {auto_config}")
 
-        tempo = estimated_bpm
-        print(f"tempo for CDT: {tempo:.1f} BPM")
+        # Chorderator sees each real half-bar as a full bar, so its internal
+        # tempo is double the real song tempo.
+        tempo = estimated_bpm * args.chords_per_bar
+        print(f"tempo for CDT: {tempo:.1f} BPM (chords_per_bar={args.chords_per_bar})")
 
         # Set parameters
         cdt_key_value = getattr(cdt.Key, cdt_key_attr)
@@ -238,6 +339,7 @@ if __name__ == '__main__':
         cdt.set_meta(tonic=cdt_key_value, mode=cdt_mode_value, tempo=tempo)
         cdt.set_note_shift(auto_config['note_shift'])
         cdt.set_segmentation(auto_config['segmentation'])
+        print("args.chord_style", args.chord_style)
         cdt.set_output_style(getattr(cdt.Style, args.chord_style))
 
         # Generate chord progression
@@ -246,6 +348,13 @@ if __name__ == '__main__':
                                       chord_output_name=f"{demo_name}_chord_gen.mid",
                                       task='chord',
                                       log=False)
+
+        # Descale chord MIDI back to real time when we fed chorderator a scaled
+        # melody. After this, one chord-bar = one real half-bar, giving
+        # `chords_per_bar` distinct chords per real bar.
+        if args.chords_per_bar == 2:
+            scale_midi_ticks(chord_gen_output, chord_gen_output,
+                             1.0 / args.chords_per_bar)
 
         # Align chord_gen TPQ with original melody TPQ
         align_chord_gen_tpq(processed_melody_path, chord_gen_output)
@@ -267,6 +376,20 @@ if __name__ == '__main__':
         quantized_output = os.path.join(chord_gen_quantized_dir, f"{demo_name}_chord_gen_quantized.mid")
         quantize_melody_to_16th(filled_output, quantized_output)
 
+        # Forward-fill any mid-song bar where chorderator emitted no chord.
+        fill_internal_empty_bars(filled_output)
+        fill_internal_empty_bars(quantized_output)
+
+        # Snap chord-event boundaries to MIDI grid (DAW-friendly).
+        # For chords_per_bar==2, snap to half-bar so the post-fill chord
+        # sequence stays half-bar aligned rather than being forced onto bar
+        # boundaries.
+        chord_resolution_beats = 4 // args.chords_per_bar
+        align_chord_track_to_bar(filled_output,
+                                 chord_resolution_beats=chord_resolution_beats)
+        align_chord_track_to_bar(quantized_output,
+                                 chord_resolution_beats=chord_resolution_beats)
+
         # Export chord text with None values
         txt_with_none = os.path.join(chord_txt_with_none_dir, f"{demo_name}_chord_gen.txt")
         export_chords_txt_chorder(filled_output, txt_with_none, beat_times=beat_times_aligned,
@@ -280,9 +403,14 @@ if __name__ == '__main__':
         btc_file = os.path.join(btc_txt_dir, f"{demo_name}_chord_gen.txt")
         acc2btc(txt_file, btc_file)
 
+        # Extend the first chord back over the melody pickup in the MIDI too.
+        # Text/BTC leading silence is handled separately in fill_none_chords_in_txt.
+        cover_pickup_melody_with_chord(filled_output)
+        cover_pickup_melody_with_chord(quantized_output)
+
         print(f"✓ Successfully processed: {song_name}")
         print(f"  Key: {key_analysis['key']} {key_analysis['mode']} (confidence: {key_analysis['confidence']:.2f})")
-        print(f"  Tempo: {tempo:.1f} BPM (source: {'beat file' if beat_file_path else 'MIDI tempo'})")
+        print(f"  Tempo: {estimated_bpm:.1f} BPM (source: {'beat file' if beat_file_path else 'MIDI tempo'})")
         print(f"  Chord Text: {txt_file}")
         print(f"  BTC Text:   {btc_file}")
 

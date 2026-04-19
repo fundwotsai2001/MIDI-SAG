@@ -1,0 +1,91 @@
+{
+    "id": 87,
+    "title_zh": "風聲旅途",
+    "global_prompt": "A cinematic folk track with acoustic guitar, violin, and male vocals. The mood is adventurous and wistful, like traveling with the wind as a companion.",
+    "structure_en": {
+        "Intro": "Acoustic guitar arpeggio with violin melody.",
+        "Verse": "with guitar and light percussion.",
+        "Chorus": "Full ensemble with sweeping strings and harmonies.",
+        "Outro": "Guitar and violin fade together."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "風聲低語伴我前行"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "旅途寫下自由的詩"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "遠方呼喚無聲的夢"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "心靈隨風輕輕漂泊"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "山川見證不滅希望"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "愛在路上悄悄生長"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.30",
+                "line": "風聲旅途自由無限"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "夢想在天地間綻放"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的旋律迴盪遠方"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "希望永遠伴隨腳步"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "風聲依舊吟唱旅程"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "夢想延續直到永恆"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 96,
+        "genres": [
+            "Cinematic",
+            "Folk"
+        ],
+        "mood": [
+            "Adventurous",
+            "Wistful",
+            "Expansive"
+        ],
+        "instruments": [
+            "Acoustic Guitar",
+            "Violin",
+            "Percussion"
+        ],
+        "timbre": [
+            "Earthy",
+            "Bright",
+            "Organic"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

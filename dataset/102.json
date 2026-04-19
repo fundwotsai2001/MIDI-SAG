@@ -1,0 +1,90 @@
+{
+    "id": 102,
+    "title_zh": "竹林細語",
+    "global_prompt": "A traditional Chinese-inspired ballad with guzheng, dizi, and female vocals. The mood is serene and poetic, like whispers among bamboo groves.",
+    "structure_en": {
+        "Intro": "Guzheng arpeggio with soft dizi melody.",
+        "Verse": "with guzheng and subtle percussion.",
+        "Chorus": "Dizi leads with fuller guzheng accompaniment.",
+        "Outro": "Dizi solo fades like wind through bamboo."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.80",
+                "line": "竹林低語隨風搖曳"
+            },
+            {
+                "timestamp": "00:12.20",
+                "line": "光影灑落靜謐小徑"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "心靈沉醉古老樂章"
+            },
+            {
+                "timestamp": "00:23.00",
+                "line": "夢想綻放無聲的詩"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "歲月回響竹聲悠揚"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "愛在此刻悄悄生長"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "竹林細語低語心靈"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想綻放無窮天地"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的旋律迴盪山谷"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "希望守護直到永恆"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.70",
+                "line": "竹聲依舊隨風吟唱"
+            },
+            {
+                "timestamp": "01:27.00",
+                "line": "心靈安息無限平靜"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 76,
+        "genres": [
+            "Chinese Folk",
+            "Ballad"
+        ],
+        "mood": [
+            "Serene",
+            "Poetic",
+            "Tender"
+        ],
+        "instruments": [
+            "Guzheng",
+            "Dizi"
+        ],
+        "timbre": [
+            "Delicate",
+            "Organic",
+            "Airy"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

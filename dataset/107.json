@@ -1,0 +1,90 @@
+{
+    "id": 107,
+    "title_zh": "遠山回望",
+    "global_prompt": "A traditional-inspired folk ballad with erhu, pipa, and female vocals. The mood is nostalgic and tender, like looking back at distant mountains.",
+    "structure_en": {
+        "Intro": "Pipa melody with soft erhu harmonies.",
+        "Verse": "with pipa accompaniment.",
+        "Chorus": "Fuller erhu and pipa harmonies.",
+        "Outro": "Erhu solo fades into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.80",
+                "line": "遠山靜靜守護時光"
+            },
+            {
+                "timestamp": "00:12.20",
+                "line": "回首依稀夢的模樣"
+            },
+            {
+                "timestamp": "00:17.60",
+                "line": "心靈低語無聲思念"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "歲月飄散如風無痕"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "愛的旋律悠然綿延"
+            },
+            {
+                "timestamp": "00:33.90",
+                "line": "希望閃耀遙遠彼方"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.30",
+                "line": "遠山回望映照心靈"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "夢想依舊在風中飛翔"
+            },
+            {
+                "timestamp": "00:50.10",
+                "line": "愛的火光不曾消散"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "希望延續直到永恆"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.90",
+                "line": "遠山依舊靜靜守候"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "心靈安息無限夢境"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 84,
+        "genres": [
+            "Folk",
+            "Chinese Traditional"
+        ],
+        "mood": [
+            "Nostalgic",
+            "Tender",
+            "Reflective"
+        ],
+        "instruments": [
+            "Erhu",
+            "Pipa"
+        ],
+        "timbre": [
+            "Delicate",
+            "Organic",
+            "Warm"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

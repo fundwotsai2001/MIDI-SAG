@@ -16,10 +16,11 @@ import numpy as np
 import librosa
 import matplotlib.pyplot as plt
 from config_inference_full_song import get_config
+
 import argparse
 import json
 from utils.extract_conditions import compute_dynamics, extract_melody_one_hot, evaluate_f1_rhythm, calculate_beats_and_downbeats, create_activations_from_timestamps, compute_rhythm_beatnet
-
+from typing import Optional
 # ── RMVPE / F0 melody encoder ─────────────────────────────────────────
 _MUSECTRLLITE_DIR = os.path.dirname(os.path.abspath(__file__))
 from rmvpe import RMVPE  # noqa: E402
@@ -68,18 +69,38 @@ def _to_dbfs(rms: torch.Tensor, eps: float = 1e-12):
 def _from_db(db: float):
     return 10.0 ** (db / 20.0)
 
-def loudness_match(x: torch.Tensor, target_dbfs: float = -18.0):
+def _active_rms(x: torch.Tensor, gate_dbfs: float = -50.0, eps: float = 1e-12):
     """
-    RMS-loudness normalize to target dBFS per-channel.
+    Estimate loudness from active samples only so silence and long tails do not
+    dominate the normalization target.
+    """
+    gate = _from_db(gate_dbfs)
+    active = x.abs().amax(dim=0, keepdim=True) >= gate
+    if not torch.any(active):
+        return _rms(x, eps=eps)
+
+    active_f = active.to(dtype=x.dtype)
+    energy = (x**2 * active_f).sum(dim=-1, keepdim=True)
+    count = active_f.sum(dim=-1, keepdim=True).clamp_min(1.0)
+    return torch.sqrt(energy / count + eps)
+
+def loudness_match(x: torch.Tensor,
+                   target_dbfs: float = -18.0,
+                   gate_dbfs: float = -50.0,
+                   max_boost_db: float = 12.0,
+                   max_cut_db: float = 18.0):
+    """
+    Loudness normalize to target dBFS per-channel using only active material.
+    Gain is capped so very quiet stems are not over-amplified.
     x: [T] or [C, T] float32 in [-1, 1]
     """
     mono = (x.dim() == 1)
     if mono:
         x = x.unsqueeze(0)  # [1, T]
 
-    rms = _rms(x)                      # [C, 1]
+    rms = _active_rms(x, gate_dbfs=gate_dbfs)  # [C, 1]
     cur_db = _to_dbfs(rms)             # [C, 1]
-    gain_db = target_dbfs - cur_db     # [C, 1]
+    gain_db = torch.clamp(target_dbfs - cur_db, min=-max_cut_db, max=max_boost_db)
     gain = _from_db(gain_db)           # [C, 1]
     y = x * gain
 
@@ -94,6 +115,16 @@ def peak_normalize(x: torch.Tensor, peak_dbfs: float = -1.0, eps: float = 1e-12)
         return x  # silence stays silence
     target_peak = _from_db(peak_dbfs)
     return x * (target_peak / peak)
+
+def soft_limit(x: torch.Tensor, drive: float = 1.2):
+    """
+    Gentle saturation before peak normalization to keep transients from turning
+    into hard clipping after summing the stems.
+    """
+    if drive <= 1.0:
+        return x
+    norm = math.tanh(drive)
+    return torch.tanh(x * drive) / max(norm, 1e-12)
 
 def pad_or_trim(a: torch.Tensor, b: torch.Tensor):
     """
@@ -113,41 +144,75 @@ def pad_or_trim(a: torch.Tensor, b: torch.Tensor):
 def mix_audio(a: torch.Tensor,
               b: torch.Tensor,
               target_dbfs: float = -18.0,
-              out_peak_dbfs: float = -1.0):
+              out_peak_dbfs: float = -1.0,
+              vocal_target_dbfs: Optional[float] = None,
+              backing_target_dbfs: Optional[float] = None,
+              vocal_boost_db: float = 1.5,
+              soft_clip_drive: float = 1.2):
     """
-    Mix two audio tensors safely.
+    Mix vocal and backing audio with a more musical balance.
 
-    a, b: [T] mono or [C, T] multi-channel, float32 in [-1, 1]
-    target_dbfs: per-track RMS loudness target before mixing (e.g., -18 dBFS)
+    a, b: [T] mono or [C, T] multi-channel, float32 in [-1, 1].
+    `target_dbfs` is kept as a compatibility anchor; by default the backing is
+    mixed a few dB under the vocal instead of forcing both stems equally loud.
     out_peak_dbfs: peak ceiling for the final mix (e.g., -1 dBFS)
     """
-    # 1) Basic checks (dtype/range are caller’s responsibility; shown below)
+    if vocal_target_dbfs is None:
+        vocal_target_dbfs = target_dbfs
+    if backing_target_dbfs is None:
+        backing_target_dbfs = target_dbfs - 5.0
+
     assert a.dim() in (1,2) and b.dim() in (1,2), "Use [T] or [C, T]"
-    # If channel counts differ (e.g., mono vs stereo), upmix mono to stereo:
     if a.dim() == 1 and b.dim() == 2:
         a = a.unsqueeze(0).expand(b.shape[0], -1)
     if b.dim() == 1 and a.dim() == 2:
         b = b.unsqueeze(0).expand(a.shape[0], -1)
-    # Now channels must match
     if a.dim() == 2 and b.dim() == 2:
         assert a.shape[0] == b.shape[0], "Channel count mismatch"
 
-    # 2) Make same length
     a, b = pad_or_trim(a, b)
 
-    # 3) Loudness-match each stem
-    a_n = loudness_match(a, target_dbfs=target_dbfs)
-    b_n = loudness_match(b, target_dbfs=target_dbfs)
+    vocal = loudness_match(
+        a,
+        target_dbfs=vocal_target_dbfs,
+        gate_dbfs=-42.0,
+        max_boost_db=10.0,
+        max_cut_db=18.0,
+    ) * _from_db(vocal_boost_db)
+    backing = loudness_match(
+        b,
+        target_dbfs=backing_target_dbfs,
+        gate_dbfs=-50.0,
+        max_boost_db=12.0,
+        max_cut_db=12.0,
+    )
 
-    # 4) Mix (simple sum). If you want a 50/50 “equal-power” style, divide by sqrt(2).
-    mix = a_n + b_n
+    mix = vocal + backing
+    mix = soft_limit(mix, drive=soft_clip_drive)
 
-    # 5) Peak-normalize with headroom
     mix = peak_normalize(mix, peak_dbfs=out_peak_dbfs)
-
-    # 6) Safety clamp
     mix = torch.clamp(mix, -1.0, 1.0)
     return mix
+
+
+def _normalize_segment_items(name, values, target_len, default_value):
+    if values is None:
+        return [default_value] * target_len
+
+    items = list(values)
+    if len(items) < target_len:
+        print(
+            f"[structure] {name} has {len(items)} entries but {target_len} segments; "
+            f"filling the remaining {target_len - len(items)} with {default_value!r}"
+        )
+        items.extend([default_value] * (target_len - len(items)))
+    elif len(items) > target_len:
+        print(
+            f"[structure] {name} has {len(items)} entries but only {target_len} segments; "
+            f"ignoring the extra {len(items) - target_len} entries"
+        )
+        items = items[:target_len]
+    return items
 
 
 
@@ -487,7 +552,8 @@ def main(config):
         musical_attribute_mask_end = int(config["musical_attribute_mask_end_seconds"] / total_seconds * 1024)
     with torch.no_grad():
         # ── Single-song generation with pre-provided files ────────────────────
-        BEAT_FILE   = config["vocal_beat_file"]
+        BEAT_FILE   = config.get("vocal_beat_file", None)
+        DOWNBEAT_FILE   = config.get("vocal_downbeat_file", None)
         CHORD_FILE  = config["chord_info"]
         VOCAL_FILE  = config["vocal_audio_file"]
         MIDI_FILE   = config.get("vocal_midi_file", None)
@@ -503,7 +569,12 @@ def main(config):
                     _line = _line.strip()
                     if _line and not _line.startswith('#'):
                         beat_times_all.append(float(_line))
-            downbeat_times_all = beat_times_all[::4]
+            downbeat_times_all = []
+            with open(DOWNBEAT_FILE, 'r') as _bf:
+                for _line in _bf:
+                    _line = _line.strip()
+                    if _line and not _line.startswith('#'):
+                        downbeat_times_all.append(float(_line))
 
         # Resolve structure from config, or auto-derive from audio duration
         _text_prompt = config.get("text_prompt", "Instrumental music, high quality")
@@ -516,28 +587,35 @@ def main(config):
             structure_starts_seconds = _structure_starts
             _vocal_duration = _structure_duration if _structure_duration is not None \
                 else librosa.get_duration(path=VOCAL_FILE)
-            structure_tag = _structure_tags if _structure_tags is not None \
-                else ['verse'] * len(structure_starts_seconds)
-            if _structure_prompts is not None:
-                structure_prompts = {tag: prompt for tag, prompt in zip(structure_tag, _structure_prompts)}
-            else:
-                structure_prompts = {tag: _text_prompt for tag in structure_tag}
+            structure_tag = _normalize_segment_items(
+                "structure_tags",
+                _structure_tags,
+                len(structure_starts_seconds),
+                "verse",
+            )
+            structure_prompt_list = _normalize_segment_items(
+                "structure_prompts",
+                _structure_prompts,
+                len(structure_starts_seconds),
+                _text_prompt,
+            )
         else:
             # No structure provided: treat the whole song as a single segment
             _vocal_duration = librosa.get_duration(path=VOCAL_FILE)
             structure_starts_seconds = [0.0]
             structure_tag = ['verse']
-            structure_prompts = {'verse': _text_prompt}
+            structure_prompt_list = [_text_prompt]
 
         gt_chord_path = CHORD_FILE
         config['chord_info'] = CHORD_FILE
         config['vocal_audio_files'] = VOCAL_FILE
         config['structure_tag'] = structure_tag
         config['structure_start_seconds'] = structure_starts_seconds[:]
+        config['structure_prompts'] = structure_prompt_list[:]
 
         print("_vocal_duration", _vocal_duration)
         config['structure_ends_seconds'] = structure_starts_seconds[1:] + [_vocal_duration]
-        print("structure_prompts", structure_prompts)
+        print("structure_segments", list(zip(structure_starts_seconds, structure_tag, structure_prompt_list)))
         print("structure_starts_seconds", structure_starts_seconds)
         print("structure_ends_seconds", config['structure_ends_seconds'])
 
@@ -553,7 +631,7 @@ def main(config):
                 j += 1
             structures_ids_expand.append(structures_ids_list[j])
         structures_ids = torch.tensor(structures_ids_expand)
-        print("structures_ids", structures_ids)
+        print("structures_ids_list", structures_ids_list)
         config['structure_start_seconds'].append(_vocal_duration)
         id = os.path.splitext(os.path.basename(VOCAL_FILE))[0]
 
@@ -563,14 +641,25 @@ def main(config):
         segments_list = list(range(len(config['structure_tag'])))
         tensors = {str(i): torch.empty(0) for i in segments_list}
         print("segments_list", segments_list)
-        for s, segments in enumerate(segments_list):
+        print("structure_prompt_list", structure_prompt_list)
+        score_chord = []
+        score_rhythm = []
+        max_prompt_idx = len(structure_prompt_list) - 1
+        for segments in segments_list:
             seg_type = config['structure_tag'][segments]
-            prompt_1_text = structure_prompts.get(seg_type, "Instrumental music, high quality")
-            next_seg_type = config['structure_tag'][min(segments + 1, len(config['structure_tag']) - 1)]
-            prompt_2_text = structure_prompts.get(next_seg_type, "Instrumental music, high quality")
+            if segments <= 1:
+                prompt_1_idx = 0
+                prompt_2_idx = 1
+            else:
+                prompt_1_idx = segments - 1
+                prompt_2_idx = segments 
+            prompt_1_idx = min(prompt_1_idx, max_prompt_idx)
+            prompt_2_idx = min(prompt_2_idx, max_prompt_idx)
+
+            prompt_1_text = structure_prompt_list[prompt_1_idx]
+            prompt_2_text = structure_prompt_list[prompt_2_idx]
             print(f"Generating segment {segments + 1}/{len(config['structure_tag'])}")
-            print("prompt_1", prompt_1_text)
-            print("prompt_2", prompt_2_text)
+            
             print("structure_tag", config['structure_tag'][segments])
             if config["apadapter"]:
                 gt_vocal_audio_file = VOCAL_FILE
@@ -578,12 +667,12 @@ def main(config):
                     prompt_1_text = ""
                     prompt_2_text = ""
                 _window_start_s = config['structure_start_seconds'][segments]
-                _ref_end = None
-                if "audio" in config["condition_type"] and s != 0:
+                _ref_end   = int(config['structure_start_seconds'][segments]*44100)
+                _ref_start = max(0, int((config['structure_ends_seconds'][segments] - 2097152 / 44100) * 44100))
+                _window_start_s = _ref_start / 44100
+                if "audio" in config["condition_type"] and segments != 0:
                     print("config['structure_start_seconds']", config['structure_start_seconds'])
-                    _ref_end   = int(config['structure_start_seconds'][segments]*44100)
-                    _ref_start = max(0, int((config['structure_ends_seconds'][segments] - 2097152 / 44100) * 44100))
-                    _window_start_s = _ref_start / 44100
+                    
                     audio = backing_audio[:, _ref_start:_ref_end].unsqueeze(0).to(weight_dtype).cuda()
                     print(f"{_ref_start/44100} ~ {_ref_end/44100} seconds will be reference audio")
                     audio_condition = torch.zeros((1, 64, 1024), device="cuda")
@@ -646,8 +735,6 @@ def main(config):
                     downbeat_times_all += [downbeat_times_all[-1] + (downbeat_times_all[-1] - downbeat_times_all[-2]) * k for k in range(1, 40)] 
                     beat_times = sublist_between(beat_times_all, _window_start_s, _window_start_s + 2097152/44100)
                     downbeat_times = sublist_between(downbeat_times_all, _window_start_s, _window_start_s + 2097152/44100)
-                    print("beat_times: ", beat_times)
-                    print("downbeat_times: ", downbeat_times)
                     beat_times = [x - _window_start_s for x in beat_times]
                     downbeat_times = [x - _window_start_s for x in downbeat_times]
                     # print("beat_times: ", beat_times)
@@ -668,8 +755,15 @@ def main(config):
                 masked_extracted_condition = torch.concat((masked_extracted_rhythm_condition, masked_extracted_melody_condition, masked_extracted_struct_condition, masked_extracted_audio_condition, masked_extracted_chord_condition), dim=1)
                 extracted_condition = torch.concat((masked_extracted_condition, masked_extracted_condition, extracted_condition), dim=0)
                 extracted_condition = extracted_condition.transpose(1, 2)
-                audio_mid_s = (_ref_end - _ref_start) / 44100 if _ref_end is not None else structure_starts_seconds[s+1]
+                if segments == 0:
+                    audio_mid_s = structure_starts_seconds[segments+1]
+                else:
+                    audio_mid_s = (_ref_end - _ref_start) / 44100 
+                print("_ref_end", _ref_end)
+                print("_ref_start", _ref_start)
                 print("audio_mid_s, ", audio_mid_s)
+                print("prompt_1", prompt_1_text)
+                print("prompt_2", prompt_2_text)
                 waveform = pipe(
                     extracted_condition = extracted_condition, 
                     prompt_1=prompt_1_text,
@@ -688,18 +782,18 @@ def main(config):
                 # output = waveform[0]
                 tensors[str(segments)] = waveform[0]
                 segment_path = os.path.join(output_dir, f"segments_{config['structure_start_seconds'][segments]}_{config['structure_start_seconds'][segments + 1]}.wav")
-                sf.write(segment_path, waveform[0].T.float().cpu().numpy(), pipe.vae.sampling_rate)
+                # sf.write(segment_path, waveform[0].T.float().cpu().numpy(), pipe.vae.sampling_rate)
                 # print("output", output.shape)
                 # print("backing_audio", backing_audio.shape)
                 print(f"Generate {config['structure_tag'][segments]} segment")
-                if s == 0:
+                if segments == 0:
                     backing_audio = torch.cat((backing_audio, tensors[str(segments)][:, :int(44100 * (config['structure_start_seconds'][segments + 1] - config['structure_start_seconds'][segments]))].cpu()), dim=1)
-                    sf.write(segment_path, tensors[str(segments)][:, :int(44100 * (config['structure_start_seconds'][segments + 1] - config['structure_start_seconds'][segments]))].T.float().cpu().numpy(), pipe.vae.sampling_rate)
+                    # sf.write(segment_path, tensors[str(segments)][:, :int(44100 * (config['structure_start_seconds'][segments + 1] - config['structure_start_seconds'][segments]))].T.float().cpu().numpy(), pipe.vae.sampling_rate)
                     print(f"generate {config['structure_start_seconds'][segments]} ~ {config['structure_start_seconds'][segments + 1]} seconds")
                 else:
                     backing_audio = torch.cat((backing_audio, tensors[str(segments)][:, int(44100*audio_mid_s):int(44100*audio_mid_s) + int(44100 * (config['structure_start_seconds'][segments + 1] - config['structure_start_seconds'][segments]))].cpu()), dim=1)
                     print(f"generate {config['structure_start_seconds'][segments]} ~ {config['structure_start_seconds'][segments + 1]} seconds")
-                    sf.write(segment_path, tensors[str(segments)][:, int(44100*audio_mid_s):int(44100*audio_mid_s) + int(44100 * (config['structure_start_seconds'][segments + 1] - config['structure_start_seconds'][segments]))].T.float().cpu().numpy(), pipe.vae.sampling_rate)
+                    # sf.write(segment_path, tensors[str(segments)][:, int(44100*audio_mid_s):int(44100*audio_mid_s) + int(44100 * (config['structure_start_seconds'][segments + 1] - config['structure_start_seconds'][segments]))].T.float().cpu().numpy(), pipe.vae.sampling_rate)
                 # else:
                 #     backing_audio = torch.cat((backing_audio, tensors[config['structure_tag'][segments]][:, :int(config['structure_start_seconds'] - audio_mid_s)].cpu()), dim=1)
                 #     print(f"generate {_ref_start/44100} ~ {_ref_start/44100 + 2087152/44100} seconds")
@@ -708,20 +802,6 @@ def main(config):
                 
                 print(f"backing audio length {backing_audio.shape[1]/44100} seconds")
                 print("===============================")
-                
-            else:
-                audio = pipe(
-                    prompt=prompt_texts,
-                    negative_prompt=negative_text_prompt,
-                    num_inference_steps=config["denoise_step"],
-                    guidance_scale=config["guidance_scale_text"],
-                    num_waveforms_per_prompt=1,
-                    audio_end_in_s=2097152/44100,
-                    generator=generator,
-                ).audios
-                output = audio[0].T.float().cpu().numpy()
-                file_path = os.path.join(output_dir, f"{prompt_texts}.wav")
-                sf.write(file_path, output, pipe.vae.sampling_rate)    
         
         waveform_vocal = load_audio_file(gt_vocal_audio_file, segment_starts= config['structure_start_seconds'][0])
         # waveform_vocal = torch.cat([waveform_vocal_mono, waveform_vocal_mono], dim=0)
@@ -734,14 +814,132 @@ def main(config):
         backing_audio = backing_audio.to(torch.float32)
 
         mix = mix_audio(waveform_vocal, backing_audio, target_dbfs=-18.0, out_peak_dbfs=-1.0)
-        mixed_file_path = os.path.join(output_dir, f"mixed_{id}.wav")
+        mixed_file_path = os.path.join(output_dir, f"mixed_{id}_full.wav")
         sf.write(mixed_file_path, mix.T.float().cpu().numpy(), pipe.vae.sampling_rate)
 
+        prompts_log_path = os.path.join(output_dir, f"mixed_{id}_structure_prompts.json")
+        segments_log = [
+            {
+                "index": i,
+                "start_s": float(config['structure_start_seconds'][i]),
+                "end_s":   float(config['structure_ends_seconds'][i]),
+                "tag":     config['structure_tag'][i],
+                "prompt":  config['structure_prompts'][i],
+            }
+            for i in range(len(config['structure_tag']))
+        ]
+        with open(prompts_log_path, 'w', encoding='utf-8') as _f:
+            json.dump({
+                "song_id": id,
+                "vocal_audio_file": VOCAL_FILE,
+                "mixed_audio_file": mixed_file_path,
+                "segments": segments_log,
+            }, _f, ensure_ascii=False, indent=2)
+        print(f"Saved structure prompts to {prompts_log_path}")
+        if config['evaluate_chord_rhythm']:
+            from BeatNet.BeatNet import BeatNet
+            estimator = BeatNet(1, mode='offline', inference_model='DBN', plot=[], thread=False)
+            generated_timestamps = estimator.process(mixed_file_path)
+            audio_duration = backing_audio.shape[1] / 44100
+            beat_times_eval = np.array([t for t in beat_times_all if t <= audio_duration])
+            gen_timestamps_eval = generated_timestamps[generated_timestamps[:, 0] <= audio_duration]
+            print("beat_times_eval", beat_times_eval)
+            print("gen_timestamps_eval", gen_timestamps_eval)
+            precision, recall, f1 = evaluate_f1_rhythm(beat_times_eval, gen_timestamps_eval)
+            score_rhythm.append(f1)
+            print(f"rhythm {id}: {f1:.4f}")
+            if "chord" in config["condition_type"]:
+                # Use a temp dir with only the current song so BTC doesn't reprocess all songs
+                with tempfile.TemporaryDirectory() as btc_tmp_dir:
+                    shutil.copy(mixed_file_path, os.path.join(btc_tmp_dir, f"mixed_{id}.wav"))
+                    command = [
+                        "python",
+                        "test.py",
+                        "--audio_dir", btc_tmp_dir,
+                        "--save_dir", btc_tmp_dir,
+                        "--voca", "True"
+                    ]
+                    print("val_audio_dir", btc_tmp_dir)
+                    working_directory = "/data/home/fundwotsai/MIDI-SAG/BTC-ISMIR19"
+                    try:
+                        result = subprocess.run(command, check=True, text=True, capture_output=True, cwd=working_directory)
+                        print("Command executed successfully.")
+                        print("Output:\n", result.stdout)
+                        if result.stderr:
+                            print("Stderr:\n", result.stderr)
+                    except subprocess.CalledProcessError as e:
+                        print("Error occurred while running the command:")
+                        print(e.stderr)
+
+                    # Find generated chord .lab file produced by BTC
+                    gen_lab_files = [f for f in os.listdir(btc_tmp_dir) if f.endswith(f'mixed_{id}.lab')]
+                    print("gen_lab_files", gen_lab_files)
+                    if len(gen_lab_files) != 1:
+                        print(f"Warning: Expected 1 .lab for mixed_{id}, got {gen_lab_files}. Skipping chord scoring for this song.")
+                        gen_chord_path = None
+                    else:
+                        gen_chord_path = os.path.join(btc_tmp_dir, gen_lab_files[0])
+
+                    if gen_chord_path is not None:
+                        def _chord_file_to_chroma(chord_path, total_samples):
+                            _CHORDS = Chords()
+                            chroma = np.zeros((12, total_samples))
+                            with open(chord_path, 'r') as f:
+                                chord_infos = f.read().splitlines()
+                            for info in chord_infos:
+                                parts = info.split(' ')
+                                if len(parts) < 3:
+                                    continue
+                                s, t, chord = parts[0], parts[1], parts[2]
+                                s_idx = int(float(s) * 44100)
+                                t_idx = min(int(float(t) * 44100), total_samples)
+                                if s_idx >= total_samples:
+                                    continue
+                                mhot = _CHORDS.chord(chord)
+                                final_vec = np.roll(mhot[2], mhot[0])[..., None]
+                                chroma[:, s_idx:t_idx] = final_vec
+                            chroma = F.interpolate(
+                                torch.from_numpy(chroma).unsqueeze(0), size=4756, mode='nearest'
+                            )
+                            return chroma.flatten().cpu().numpy()
+
+                        total_samples = sf.info(mixed_file_path).frames
+                        c_gen = _chord_file_to_chroma(gen_chord_path, total_samples)
+                        c_gt  = _chord_file_to_chroma(gt_chord_path, total_samples)
+
+                        c_gen_bin = (c_gen > 0).astype(int)
+                        c_gt_bin  = (c_gt  > 0).astype(int)
+
+                        chord_f1 = f1_score(c_gt_bin, c_gen_bin, average='binary')
+                        score_chord.append(chord_f1)
+                        print(f"Chord F1 score for id {id}: {chord_f1:.4f}")
+            # btc_tmp_dir and its contents are automatically deleted here
+
+        # # Save per-song scores to result.json
+        # song_result = {"id": id}
+        # if "chord" in config["condition_type"] and score_chord:
+        #     song_result["chord_f1"] = score_chord[-1]
+        # if "rhythm" in config["condition_type"] and score_rhythm:
+        #     song_result["rhythm_f1"] = score_rhythm[-1]
+        # result_path = os.path.join(output_dir, f"result_chord_{id}.json")
+        # with open(result_path, 'w') as f:
+        #     json.dump(song_result, f, indent=4)
+    # print(float(np.mean(score_chord)) if score_chord else None)
+    # print(float(np.mean(score_rhythm)) if score_rhythm else None)
+    # avg_scores = {
+    #     "avg_chord_f1": float(np.mean(score_chord)) if score_chord else None,
+    #     "avg_rhythm_f1": float(np.mean(score_rhythm)) if score_rhythm else None,
+    # }
+    # avg_scores_path = os.path.join(output_dir, "avg_scores.json")
+    # with open(avg_scores_path, 'w') as f:
+    #     json.dump(avg_scores, f, indent=4)
+    # print(f"Saved average scores to {avg_scores_path}")        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AP-adapter Inference Script")
     parser.add_argument("--vocal_audio_file", required=False, help="Path to input vocal audio file")
     parser.add_argument("--text_prompt", required=False, help="Text prompt for generation")
-    parser.add_argument("--vocal_beat_file", required=False, help="Path to vocal beat times txt file")
+    parser.add_argument("--vocal_beat_file", required=False, default=None,help="Path to vocal beat times txt file")
+    parser.add_argument("--vocal_downbeat_file", required=False, default=None,help="Path to vocal beat times txt file")
     parser.add_argument("--vocal_midi_file", default=None, help="Path to MIDI file for beat/downbeat extraction. If not provided, beats come from --vocal_beat_file")
     parser.add_argument("--chord_file", required=False, help="Path to chord txt file (BTC format)")
     parser.add_argument("--checkpoint_path", required=False, help="Path to model checkpoint directory")
@@ -753,8 +951,8 @@ if __name__ == "__main__":
                         help="Structure tag per segment (e.g. intro verse chorus). "
                              "Must match the number of --structure_starts entries.")
     parser.add_argument("--structure_prompts", nargs='+', required=False,
-                        help="Text prompt per segment. Must match --structure_starts count. "
-                             "Falls back to --text_prompt for all segments if omitted.")
+                        help="Text prompt per segment; the Nth prompt matches the Nth "
+                             "start/tag entry. Missing entries fall back to --text_prompt.")
     args = parser.parse_args()
 
     config = get_config()
@@ -763,6 +961,7 @@ if __name__ == "__main__":
         "text_prompt": "text_prompt",
         "chord_file": "chord_info",
         "vocal_beat_file": "vocal_beat_file",
+        "vocal_downbeat_file": "vocal_downbeat_file",
         "vocal_midi_file": "vocal_midi_file",
         "checkpoint_path": "checkpoint_path",
         "output_dir": "output_dir",

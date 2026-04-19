@@ -1,0 +1,91 @@
+{
+    "id": 43,
+    "title_zh": "藍色海岸",
+    "global_prompt": "A tropical house track with steel drums, marimba, synths, and bright female vocals. The mood is sunny and carefree, like relaxing by a blue coastline.",
+    "structure_en": {
+        "Intro": "Marimba riff with tropical percussion.",
+        "Verse": "with soft synth chords and steel drums.",
+        "Chorus": "Full tropical house drop with layered synths and beats.",
+        "Outro": "Steel drums and synth pad fade out."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "海風吹過沙灘的笑語"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "陽光溫暖閃爍的浪花"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "腳步輕觸自由的節奏"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "心靈沉醉無憂的夏"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "椰樹搖曳伴隨著樂音"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "笑容映照清澈藍天"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "藍色海岸輕輕歌唱"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "心靈放飛自由翱翔"
+            },
+            {
+                "timestamp": "00:50.10",
+                "line": "陽光灑落無限歡笑"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "愛在浪花中閃閃發光"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "海岸依舊輕聲吟唱"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "笑語停留在心中"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 110,
+        "genres": [
+            "Tropical House",
+            "Electronic"
+        ],
+        "mood": [
+            "Sunny",
+            "Carefree",
+            "Bright"
+        ],
+        "instruments": [
+            "Steel Drums",
+            "Marimba",
+            "Synths"
+        ],
+        "timbre": [
+            "Lively",
+            "Light",
+            "Playful"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

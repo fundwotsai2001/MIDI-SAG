@@ -1,0 +1,91 @@
+{
+    "id": 31,
+    "title_zh": "孤舟遠影",
+    "global_prompt": "A slow Chinese folk-inspired ballad with guqin, erhu, and deep male vocals. The mood is nostalgic and poetic, like watching a lone boat disappear on a river.",
+    "structure_en": {
+        "Intro": "Guqin plucked notes with subtle river ambience.",
+        "Verse": "storytelling with erhu ornamentation.",
+        "Chorus": "Fuller ensemble with strings and guqin harmonies.",
+        "Outro": "Erhu solo fades with natural ambience."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.50",
+                "line": "江水悠悠托起孤舟"
+            },
+            {
+                "timestamp": "00:12.80",
+                "line": "白霧籠罩故鄉的岸"
+            },
+            {
+                "timestamp": "00:18.20",
+                "line": "遠山輪廓映照殘陽"
+            },
+            {
+                "timestamp": "00:23.70",
+                "line": "離歌迴盪隨風遠揚"
+            },
+            {
+                "timestamp": "00:29.10",
+                "line": "一聲輕嘆落入江心"
+            },
+            {
+                "timestamp": "00:34.50",
+                "line": "留下思念無人能懂"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.80",
+                "line": "孤舟遠影消失天際"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "夢回依舊在心底"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "歲月沉默不語無聲"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "思念化作河流長行"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.40",
+                "line": "江面留下一抹殘影"
+            },
+            {
+                "timestamp": "01:27.80",
+                "line": "心事隨波永遠漂流"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 66,
+        "genres": [
+            "Chinese Folk",
+            "Ballad"
+        ],
+        "mood": [
+            "Nostalgic",
+            "Poetic",
+            "Melancholic"
+        ],
+        "instruments": [
+            "Guqin",
+            "Erhu",
+            "Strings"
+        ],
+        "timbre": [
+            "Earthy",
+            "Deep",
+            "Resonant"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

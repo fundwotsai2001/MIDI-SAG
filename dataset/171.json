@@ -1,0 +1,90 @@
+{
+    "id": 171,
+    "title_zh": "晨曦薄荷",
+    "global_prompt": "A chill electronic track with soft beats, synth pads, and female vocals. Fresh and airy, like the taste of mint in the morning sunlight.",
+    "structure_en": {
+        "Intro": "Soft synth pad swells with airy textures.",
+        "Verse": "with light beats and pads.",
+        "Chorus": "Brighter synth lead and layered harmonies.",
+        "Outro": "Filtered beat fades with pad shimmer."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "晨曦輕灑薄荷氣息"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "微風吹過閃亮枝梢"
+            },
+            {
+                "timestamp": "00:17.70",
+                "line": "步伐輕快隨聲律動"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "心緒綻放晶瑩光澤"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "旋律浮起如同涼風"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "眼神追隨晨光軌跡"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.10",
+                "line": "晨曦薄荷沁入歌聲"
+            },
+            {
+                "timestamp": "00:44.50",
+                "line": "旋律散落映照清晨"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "涼意飄蕩延展時光"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "此刻明亮無限輕盈"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.60",
+                "line": "清風吹過留下清新"
+            },
+            {
+                "timestamp": "01:27.00",
+                "line": "晨光停在靜謐時刻"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 86,
+        "genres": [
+            "Chill",
+            "Electronic"
+        ],
+        "mood": [
+            "Fresh",
+            "Airy",
+            "Light"
+        ],
+        "instruments": [
+            "Synth Pads",
+            "Beats"
+        ],
+        "timbre": [
+            "Smooth",
+            "Bright",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

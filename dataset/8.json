@@ -1,0 +1,91 @@
+{
+    "id": 8,
+    "title_zh": "銀河列車",
+    "global_prompt": "An upbeat future bass track with shimmering synths, side-chained chords, and bright female vocals. The sound is cosmic and energetic, evoking a train ride through the galaxy.",
+    "structure_en": {
+        "Intro": "Rising synth swell with filtered drums, drop builds in.",
+        "Verse": "over side-chained chords, light plucked synths.",
+        "Chorus": "Big synth drop with heavy bass, layered harmonies.",
+        "Outro": "Arpeggios fade into reverb, leaving airy pads."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.30",
+                "line": "列車穿越閃耀的銀河"
+            },
+            {
+                "timestamp": "00:12.10",
+                "line": "窗外流星劃過的瞬間"
+            },
+            {
+                "timestamp": "00:17.40",
+                "line": "心隨節奏快樂地跳動"
+            },
+            {
+                "timestamp": "00:22.80",
+                "line": "每一刻都像新的冒險"
+            },
+            {
+                "timestamp": "00:28.00",
+                "line": "光影在夢中交錯流轉"
+            },
+            {
+                "timestamp": "00:33.20",
+                "line": "時空在眼前悄然打開"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:38.70",
+                "line": "銀河列車不停向前"
+            },
+            {
+                "timestamp": "00:43.60",
+                "line": "帶我飛越無限的夜"
+            },
+            {
+                "timestamp": "00:48.40",
+                "line": "心中閃耀最純粹的夢"
+            },
+            {
+                "timestamp": "00:53.90",
+                "line": "旅途永遠沒有終點"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "銀河光芒依然閃爍"
+            },
+            {
+                "timestamp": "01:27.40",
+                "line": "旅程延續在心底回響"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 150,
+        "genres": [
+            "Future Bass",
+            "Electronic"
+        ],
+        "mood": [
+            "Energetic",
+            "Cosmic",
+            "Optimistic"
+        ],
+        "instruments": [
+            "Synths",
+            "Side-chained Chords",
+            "Electronic Drums"
+        ],
+        "timbre": [
+            "Bright",
+            "Glittering",
+            "Punchy"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

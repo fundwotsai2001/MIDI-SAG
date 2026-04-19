@@ -1,0 +1,91 @@
+{
+    "id": 3,
+    "title_zh": "荒野呼喚",
+    "global_prompt": "A cinematic orchestral piece with sweeping strings, brass swells, and powerful percussion. The sound is grand and adventurous, evoking vast landscapes and the call of the wild.",
+    "structure_en": {
+        "Intro": "Low strings build tension with timpani rolls.",
+        "Verse": "enters with strings and horns, steady rhythm.",
+        "Chorus": "Full orchestra swells with-like harmonies.",
+        "Outro": "Brass fanfare fades into soft strings."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:09.00",
+                "line": "風聲越過無盡的山脊"
+            },
+            {
+                "timestamp": "00:14.20",
+                "line": "荒野中響起遠古的低語"
+            },
+            {
+                "timestamp": "00:19.80",
+                "line": "足跡在大地上留下痕跡"
+            },
+            {
+                "timestamp": "00:25.10",
+                "line": "心靈聽見命運的呼喊"
+            },
+            {
+                "timestamp": "00:30.60",
+                "line": "每一刻都像烈火燃燒"
+            },
+            {
+                "timestamp": "00:35.90",
+                "line": "帶著勇氣無懼前行"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:41.30",
+                "line": "荒野呼喚在心中迴盪"
+            },
+            {
+                "timestamp": "00:46.10",
+                "line": "力量湧動不再迷惘"
+            },
+            {
+                "timestamp": "00:51.40",
+                "line": "眼中燃起最純粹的光"
+            },
+            {
+                "timestamp": "00:56.80",
+                "line": "帶我飛向無邊遠方"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.40",
+                "line": "荒野靜默卻永不凋零"
+            },
+            {
+                "timestamp": "01:28.00",
+                "line": "呼吸隨風自由延續"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 82,
+        "genres": [
+            "Cinematic",
+            "Orchestral"
+        ],
+        "mood": [
+            "Grand",
+            "Adventurous",
+            "Powerful"
+        ],
+        "instruments": [
+            "Strings",
+            "Brass",
+            "Percussion"
+        ],
+        "timbre": [
+            "Majestic",
+            "Resonant",
+            "Expansive"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

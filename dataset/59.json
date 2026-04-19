@@ -1,0 +1,91 @@
+{
+    "id": 59,
+    "title_zh": "晨露花園",
+    "global_prompt": "A light orchestral-pop ballad with piano, strings, harp, and sweet female vocals. The mood is fresh and hopeful, like walking through a garden covered in morning dew.",
+    "structure_en": {
+        "Intro": "Harp glissando with piano chords.",
+        "Verse": "with piano and light string backing.",
+        "Chorus": "Fuller orchestration with uplifting harmonies.",
+        "Outro": "Strings sustain with piano cadence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.10",
+                "line": "晨露閃爍花瓣晶瑩"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "微風拂過芬芳的氣息"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "陽光照亮清晨的夢"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "心靈在花園自由歌唱"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "笑容隨鳥鳴一同飛舞"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "希望在此刻悄悄生長"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.40",
+                "line": "晨露花園綻放光芒"
+            },
+            {
+                "timestamp": "00:44.80",
+                "line": "心靈歌唱無盡希望"
+            },
+            {
+                "timestamp": "00:50.20",
+                "line": "夢想綻放純白之花"
+            },
+            {
+                "timestamp": "00:55.60",
+                "line": "愛在晨曦中永遠閃亮"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.20",
+                "line": "花園依舊芬芳無盡"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "心靈綻放永恆之光"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 92,
+        "genres": [
+            "Orchestral Pop",
+            "Ballad"
+        ],
+        "mood": [
+            "Fresh",
+            "Hopeful",
+            "Bright"
+        ],
+        "instruments": [
+            "Piano",
+            "Strings",
+            "Harp"
+        ],
+        "timbre": [
+            "Clear",
+            "Elegant",
+            "Uplifting"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

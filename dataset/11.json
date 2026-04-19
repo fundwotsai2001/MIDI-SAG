@@ -1,0 +1,91 @@
+{
+    "id": 11,
+    "title_zh": "秋日紙鳶",
+    "global_prompt": "A gentle indie folk-pop track with ukulele, light percussion, bells, and sweet female vocals. The atmosphere is nostalgic and playful, like flying a paper kite in autumn.",
+    "structure_en": {
+        "Intro": "Ukulele strumming with soft bells.",
+        "Verse": "with ukulele and light percussion.",
+        "Chorus": "Layered harmonies with bells and hand claps.",
+        "Outro": "Ukulele and bells fade with soft humming."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.80",
+                "line": "秋風吹動紙鳶的翅膀"
+            },
+            {
+                "timestamp": "00:11.90",
+                "line": "天空載滿童年的微笑"
+            },
+            {
+                "timestamp": "00:17.40",
+                "line": "樹影隨風輕輕搖晃"
+            },
+            {
+                "timestamp": "00:22.60",
+                "line": "時光在午後慢慢流淌"
+            },
+            {
+                "timestamp": "00:28.10",
+                "line": "掌心溫度傳遞著希望"
+            },
+            {
+                "timestamp": "00:33.50",
+                "line": "笑語像光點散落四方"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.00",
+                "line": "秋日紙鳶飛翔天空"
+            },
+            {
+                "timestamp": "00:44.20",
+                "line": "夢想隨風自由舞動"
+            },
+            {
+                "timestamp": "00:49.70",
+                "line": "純真時光永不消逝"
+            },
+            {
+                "timestamp": "00:54.90",
+                "line": "心靈記錄最美笑容"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.30",
+                "line": "紙鳶高掛秋日微風"
+            },
+            {
+                "timestamp": "01:27.00",
+                "line": "故事延續在心深處"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 96,
+        "genres": [
+            "Indie Pop",
+            "Folk"
+        ],
+        "mood": [
+            "Nostalgic",
+            "Playful",
+            "Sweet"
+        ],
+        "instruments": [
+            "Ukulele",
+            "Percussion",
+            "Bells"
+        ],
+        "timbre": [
+            "Light",
+            "Bright",
+            "Gentle"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

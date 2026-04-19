@@ -1,0 +1,92 @@
+{
+    "id": 35,
+    "title_zh": "蒼穹之眼",
+    "global_prompt": "An epic orchestral piece with soaring strings, brass, choir, and cinematic percussion. The mood is grand and awe-inspiring, like gazing into the eye of the sky.",
+    "structure_en": {
+        "Intro": "Low strings and brass swell with timpani roll.",
+        "Verse": "and strings rise with gradual build.",
+        "Chorus": "Full orchestra explode in grandeur.",
+        "Outro": "Strings and brass sustain, fading into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:08.10",
+                "line": "蒼穹映照無盡的光"
+            },
+            {
+                "timestamp": "00:13.40",
+                "line": "星辰低語永恆回響"
+            },
+            {
+                "timestamp": "00:18.70",
+                "line": "大地仰望天空的呼喚"
+            },
+            {
+                "timestamp": "00:24.20",
+                "line": "心靈點燃勇敢的力量"
+            },
+            {
+                "timestamp": "00:29.60",
+                "line": "浩瀚無邊彷彿永恆"
+            },
+            {
+                "timestamp": "00:34.90",
+                "line": "蒼穹之眼凝望人間"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:40.30",
+                "line": "蒼穹之眼照耀大地"
+            },
+            {
+                "timestamp": "00:45.70",
+                "line": "勇氣燃燒無所畏懼"
+            },
+            {
+                "timestamp": "00:51.00",
+                "line": "星辰閃爍無盡旅途"
+            },
+            {
+                "timestamp": "00:56.40",
+                "line": "希望綻放光芒不息"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.20",
+                "line": "蒼穹依舊靜靜凝視"
+            },
+            {
+                "timestamp": "01:28.00",
+                "line": "夢想在天空綿延不止"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 88,
+        "genres": [
+            "Cinematic",
+            "Orchestral"
+        ],
+        "mood": [
+            "Epic",
+            "Awe-inspiring",
+            "Grand"
+        ],
+        "instruments": [
+            "Strings",
+            "Brass",
+            "Choir",
+            "Percussion"
+        ],
+        "timbre": [
+            "Majestic",
+            "Expansive",
+            "Resonant"
+        ],
+        "vocal_gender": "Mixed Choir",
+        "duration_target_sec": 95
+    }
+}

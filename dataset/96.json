@@ -1,0 +1,91 @@
+{
+    "id": 96,
+    "title_zh": "海潮頌歌",
+    "global_prompt": "A grand orchestral piece with choir, brass, and female vocals. The mood is majestic and eternal, like an anthem to the ocean waves.",
+    "structure_en": {
+        "Intro": "Brass fanfare with hums.",
+        "Verse": "with string and brass layers.",
+        "Chorus": "and orchestra with crashing cymbals.",
+        "Outro": "Waves and fading harmonies."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.90",
+                "line": "海潮拍擊無盡岸邊"
+            },
+            {
+                "timestamp": "00:12.30",
+                "line": "低語歌唱遙遠呼喚"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "心靈沉醉於藍色深處"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "夢想隨浪自由漂流"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "愛的旋律回響大海"
+            },
+            {
+                "timestamp": "00:33.90",
+                "line": "希望永遠在浪花綻放"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "海潮頌歌迴盪蒼穹"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想綻放無邊力量"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的歌聲永不消散"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "希望在此無盡延續"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.80",
+                "line": "海潮依舊輕聲歌唱"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "心靈回響無窮藍色"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 96,
+        "genres": [
+            "Orchestral",
+            "Anthem"
+        ],
+        "mood": [
+            "Majestic",
+            "Eternal",
+            "Powerful"
+        ],
+        "instruments": [
+            "Brass",
+            "Choir",
+            "Strings"
+        ],
+        "timbre": [
+            "Expansive",
+            "Resonant",
+            "Bright"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

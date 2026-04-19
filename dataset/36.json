@@ -1,0 +1,91 @@
+{
+    "id": 36,
+    "title_zh": "夜色迷途",
+    "global_prompt": "A synthwave track with retro analog synths, electronic drums, and male vocals. The sound is nostalgic and mysterious, like getting lost in neon-lit streets at night.",
+    "structure_en": {
+        "Intro": "Analog synth pad with gated drums.",
+        "Verse": "storytelling with synth arpeggios.",
+        "Chorus": "Driving beat with bright synth leads and harmonies.",
+        "Outro": "Synth echoes fade with reverb tail."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "夜色映照無盡的街"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "霓虹閃爍掩蓋心事"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "腳步迷失在夢的邊界"
+            },
+            {
+                "timestamp": "00:23.20",
+                "line": "風聲低語引領前行"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "孤單隱沒在閃光深處"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "靈魂尋找出口的燈火"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.50",
+                "line": "夜色迷途無盡延續"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "心跳隨節奏不停追尋"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "夢境帶我穿越黑暗"
+            },
+            {
+                "timestamp": "00:55.40",
+                "line": "希望在遠方閃閃發亮"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "霓虹逐漸沉入寂靜"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "心靈找到歸屬方向"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 108,
+        "genres": [
+            "Synthwave",
+            "Electronic"
+        ],
+        "mood": [
+            "Mysterious",
+            "Nostalgic",
+            "Dreamlike"
+        ],
+        "instruments": [
+            "Analog Synths",
+            "Electronic Drums",
+            "Bass"
+        ],
+        "timbre": [
+            "Retro",
+            "Warm",
+            "Atmospheric"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

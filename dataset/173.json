@@ -1,0 +1,91 @@
+{
+    "id": 173,
+    "title_zh": "石室迴聲",
+    "global_prompt": "An experimental vocal-driven piece with throat singing, percussion, and drones. Echoing and cavernous, like voices resonating inside a stone chamber.",
+    "structure_en": {
+        "Intro": "Low drones with faint percussive hits.",
+        "Verse": "Male with sparse drum strikes.",
+        "Chorus": "Layered and echo effects expand.",
+        "Outro": "Drones fade with lingering hum."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.30",
+                "line": "石室低鳴聲聲回盪"
+            },
+            {
+                "timestamp": "00:12.60",
+                "line": "厚重氣息覆蓋空間"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "呼聲延展層層疊起"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "鼓點落下震裂寂靜"
+            },
+            {
+                "timestamp": "00:28.90",
+                "line": "聲影纏繞石壁紋路"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "回聲拉長墜入深處"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "石室迴聲層層重疊"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "聲浪推開無邊黑暗"
+            },
+            {
+                "timestamp": "00:50.40",
+                "line": "節奏沉入蒼穹深底"
+            },
+            {
+                "timestamp": "00:55.80",
+                "line": "呼喊響徹遠古時空"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "石聲仍在低沉共鳴"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "深處留下空洞回響"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 66,
+        "genres": [
+            "Experimental",
+            "Vocal"
+        ],
+        "mood": [
+            "Echoing",
+            "Cavernous",
+            "Mysterious"
+        ],
+        "instruments": [
+            "Throat Singing",
+            "Percussion",
+            "Drones"
+        ],
+        "timbre": [
+            "Low",
+            "Resonant",
+            "Raw"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

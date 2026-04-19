@@ -1,0 +1,91 @@
+{
+    "id": 17,
+    "title_zh": "深海之心",
+    "global_prompt": "An ambient downtempo track with deep synth pads, slow beats, and ethereal female vocals. The mood is mysterious and immersive, like drifting through the depths of the ocean.",
+    "structure_en": {
+        "Intro": "Deep synth pad swells with distant watery textures.",
+        "Verse": "float above slow beats and ambient layers.",
+        "Chorus": "Fuller pads and harmonies wash over the rhythm.",
+        "Outro": "Pads dissolve into reverb, heartbeat-like bass fades."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "海浪低吟隱沒的秘密"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "光線遙遠消散在深處"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "心跳隨水流緩緩漂移"
+            },
+            {
+                "timestamp": "00:23.50",
+                "line": "黑暗孕育無聲的回憶"
+            },
+            {
+                "timestamp": "00:28.80",
+                "line": "每一瞬間都無比寧靜"
+            },
+            {
+                "timestamp": "00:34.30",
+                "line": "彷彿夢境將我擁抱"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.70",
+                "line": "深海之心隱藏光芒"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "呼吸隨潮水起伏流淌"
+            },
+            {
+                "timestamp": "00:50.50",
+                "line": "靈魂徘徊無盡的藍"
+            },
+            {
+                "timestamp": "00:55.90",
+                "line": "愛在深處靜靜生長"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.40",
+                "line": "海洋懷抱無聲低語"
+            },
+            {
+                "timestamp": "01:27.60",
+                "line": "心靈隱沒無邊深藍"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 68,
+        "genres": [
+            "Ambient",
+            "Downtempo"
+        ],
+        "mood": [
+            "Mysterious",
+            "Immersive",
+            "Calm"
+        ],
+        "instruments": [
+            "Synth Pads",
+            "Electronic Beats",
+            "Ambient Textures"
+        ],
+        "timbre": [
+            "Ethereal",
+            "Deep",
+            "Soft"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

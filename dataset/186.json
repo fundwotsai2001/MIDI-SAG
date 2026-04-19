@@ -1,0 +1,92 @@
+{
+    "id": 186,
+    "title_zh": "廢墟號角",
+    "global_prompt": "An epic orchestral track with brass, timpani, and choir. Dark and grand, like a horn call rising from the ruins of an ancient city.",
+    "structure_en": {
+        "Intro": "Low brass fanfare with timpani rolls.",
+        "Verse": "with brass stabs and strings.",
+        "Chorus": "Full orchestra expand in power.",
+        "Outro": "Horn solo echoes with fading drums."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "廢墟之中號角響起"
+            },
+            {
+                "timestamp": "00:12.50",
+                "line": "石影訴說沉重過往"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "風聲推動殘垣低鳴"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "回聲傳遞久遠記憶"
+            },
+            {
+                "timestamp": "00:28.80",
+                "line": "鼓聲敲擊荒涼大地"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "旋律呼喚沉睡時光"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "廢墟號角迴盪蒼穹"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "樂聲劃開無窮黑暗"
+            },
+            {
+                "timestamp": "00:50.40",
+                "line": "聲浪堆積成為山嶺"
+            },
+            {
+                "timestamp": "00:55.80",
+                "line": "此刻回響永不停歇"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "號角隱沒廢墟深處"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "殘影靜待下一聲鳴"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 88,
+        "genres": [
+            "Orchestral",
+            "Epic"
+        ],
+        "mood": [
+            "Dark",
+            "Grand",
+            "Dramatic"
+        ],
+        "instruments": [
+            "Brass",
+            "Timpani",
+            "Choir",
+            "Strings"
+        ],
+        "timbre": [
+            "Majestic",
+            "Heavy",
+            "Resonant"
+        ],
+        "vocal_gender": "Choir",
+        "duration_target_sec": 95
+    }
+}

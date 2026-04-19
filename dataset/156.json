@@ -1,0 +1,91 @@
+{
+    "id": 156,
+    "title_zh": "紅磚小巷",
+    "global_prompt": "A lo-fi hip-hop track with vinyl crackle, electric piano, and male vocals. Cozy and nostalgic, like wandering down a red-brick alley in the evening.",
+    "structure_en": {
+        "Intro": "Vinyl crackle, soft keys, and lazy beat.",
+        "Verse": "with mellow chords and laid-back drums.",
+        "Chorus": "Added bassline and layered harmonies.",
+        "Outro": "Beat filters out leaving piano echoes."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:06.80",
+                "line": "紅磚巷裡燈影微黃"
+            },
+            {
+                "timestamp": "00:12.20",
+                "line": "腳步聲響輕敲石板"
+            },
+            {
+                "timestamp": "00:17.60",
+                "line": "記憶落在牆角裂縫"
+            },
+            {
+                "timestamp": "00:23.00",
+                "line": "風吹散了舊時低語"
+            },
+            {
+                "timestamp": "00:28.40",
+                "line": "香氣飄來熟悉味道"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "心緒靜靜跟著遊走"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.10",
+                "line": "紅磚小巷留住時光"
+            },
+            {
+                "timestamp": "00:44.50",
+                "line": "音符散落溫柔夜色"
+            },
+            {
+                "timestamp": "00:49.90",
+                "line": "旋律繞過昏黃燈火"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "步伐慢行延續寧靜"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.70",
+                "line": "巷尾只剩靜靜呼吸"
+            },
+            {
+                "timestamp": "01:27.10",
+                "line": "紅磚映著斑駁回聲"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 78,
+        "genres": [
+            "Lo-fi",
+            "Hip-hop"
+        ],
+        "mood": [
+            "Cozy",
+            "Nostalgic",
+            "Warm"
+        ],
+        "instruments": [
+            "Electric Piano",
+            "Drums",
+            "Bass"
+        ],
+        "timbre": [
+            "Dusty",
+            "Soft",
+            "Warm"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,108 @@
+[melody2chord:lyrics_90] /data/home/fundwotsai/MIDI-SAG/AccoMontage2/chorderator/utils/utils.py:24: UserWarning: Could not import FluidSynth, audio formats writing disabled
+[melody2chord:lyrics_90]   warnings.warn('Could not import FluidSynth, audio formats writing disabled')
+[melody2chord:lyrics_90] /home/fundwotsai/miniconda3/envs/midi-sag/lib/python3.9/site-packages/miditok/tokenizations/remi.py:88: UserWarning: Attribute controls are not compatible with 'config.one_token_stream_for_programs' and multi-vocabulary tokenizers. Disabling them from the config.
+[melody2chord:lyrics_90]   super().__init__(tokenizer_config, params)
+[melody2chord:lyrics_90] /data/home/fundwotsai/MIDI-SAG/AccoMontage2/chorderator/core.py:238: UserWarning: Meter auto set to 4/4/. Please set meter if this is not your expectation
+[melody2chord:lyrics_90]   warnings.warn('Meter auto set to 4/4/. Please set meter if this is not your expectation')
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:12,200 - INFO - [1;30m start read progressions from dict [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:18,659 - INFO - [1;30m read progressions done [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:18,659 - INFO - [1;30m start read progression library from source_base.pnt [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:24,920 - INFO - [1;30m read library done [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:24,920 - WARNING - [1;33m Pre-processing... [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:24,930 - WARNING - [1;33m Pre-process done! [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:24,930 - WARNING - [1;33m Solving... [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:24,930 - INFO - [1;30m start read progressions from rep [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:24,963 - INFO - [1;30m read progressions done [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:24,968 - INFO - [1;30m Melody length 2, generate progression with 63 templates [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:25,018 - WARNING - [1;33m Solved! [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:25,018 - WARNING - [1;33m Post-processing... [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:25,022 - WARNING - [1;33m Post-process done! [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:25,022 - WARNING - [1;33m Generating textures... [0m
+[melody2chord:lyrics_90] @Chorderator 2026-04-14 12:38:25,023 - WARNING - [1;33m All process finished! [0m
+[melody2chord:lyrics_90] 
+[melody2chord:lyrics_90] === Processing: sample01_shifted ===
+[melody2chord:lyrics_90] Output will be saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_90/chord/
+[melody2chord:lyrics_90] beat_file_path: None
+[melody2chord:lyrics_90] Tempo from MIDI: 78.0 BPM (no beat file — skipping warp step)
+[melody2chord:lyrics_90] processed_melody_path: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_90/chord/processed_melody/sample01_shifted.mid
+[melody2chord:lyrics_90] Detected key: Eb major (confidence: 0.66, Bellman-Budge)
+[melody2chord:lyrics_90] Content bars: 16 -> Segmentation: A8B8 (total: 16)
+[melody2chord:lyrics_90] Chorderator bars: 16 -> Segmentation: A8B8 (total: 16)
+[melody2chord:lyrics_90] auto_config: {'note_shift': 67, 'segmentation': 'A8B8', 'analysis': {'total_bars': 21, 'empty_bars': 4, 'content_bars': 16, 'note_shift': 67, 'segmentation': 'A8B8', 'first_note_bar': 4.1875, 'last_note_bar': 20.5625, 'chorderator_bars': {'max_end_positions': 262, 'fixed_end_positions': 256, 'fixed_end_bars': 16, 'tempo': 77.99997660000703, 'unit': 0.19230774999999997}}}
+[melody2chord:lyrics_90] tempo for CDT: 78.0 BPM
+[melody2chord:lyrics_90] max_end: 262.0
+[melody2chord:lyrics_90] fixed_end: 256
+[melody2chord:lyrics_90] 256
+[melody2chord:lyrics_90] {'tonic': 'Eb', 'mode': 'maj', 'tempo': 77.99997660000702, 'meter': '4/4', 'pos': ['x', 'x'], 'unit': 0.19230775}
+[melody2chord:lyrics_90] Phrase length: 128 positions = 8 bars
+[melody2chord:lyrics_90] Phrase length: 128 positions = 8 bars
+[melody2chord:lyrics_90] [128, 128]
+[melody2chord:lyrics_90] Chord Progression
+[melody2chord:lyrics_90] -Source: Niko_Kotoulas_EDM_7th_9th_Chords_16_C#m-B-G#m-F#_.mid
+[melody2chord:lyrics_90] -Source Type: None
+[melody2chord:lyrics_90] -Source Tonic: B
+[melody2chord:lyrics_90] -Source Metre: 4/4
+[melody2chord:lyrics_90] -Source Mode: M (M for Major and m for minor)
+[melody2chord:lyrics_90] -Appeared Times: 1
+[melody2chord:lyrics_90] -Appeared In Other Songs: 0
+[melody2chord:lyrics_90] -Reliability: 1.0
+[melody2chord:lyrics_90] -Progression Class: {'type': 'unknown', 'pattern': 'unknown', 'cycle': (0.9999999999999999, 32), 'progression-style': 'edm', 'chord-style': 'classy', 'performing-style': 'unknown', 'rhythm': 'unknown', 'epic-endings': 'unknown', 'melodic': 'unknown', 'folder-id': 531, 'duplicate-id': 221, 'new_label': 'pop_complex'}
+[melody2chord:lyrics_90] Numbered: 
+[melody2chord:lyrics_90] | 2------- | 1------- | 6------- | 5------- | 2------- | 1------- | 6------- | 5------- | 
+[melody2chord:lyrics_90] Chord: 
+[melody2chord:lyrics_90] | 
+[melody2chord:lyrics_90] | C#1------- | B 0------- | G#1------- | F#0------- | C#1------- | B 0------- | G#1------- | F#0------- | 
+[melody2chord:lyrics_90] 
+[melody2chord:lyrics_90] Chord Progression
+[melody2chord:lyrics_90] -Source: Niko_Kotoulas_Pop_7th_9th_Chords_7_B-G#m-B-G#m_.mid
+[melody2chord:lyrics_90] -Source Type: None
+[melody2chord:lyrics_90] -Source Tonic: B
+[melody2chord:lyrics_90] -Source Metre: 4/4
+[melody2chord:lyrics_90] -Source Mode: M (M for Major and m for minor)
+[melody2chord:lyrics_90] -Appeared Times: 1
+[melody2chord:lyrics_90] -Appeared In Other Songs: 0
+[melody2chord:lyrics_90] -Reliability: 1.0
+[melody2chord:lyrics_90] -Progression Class: {'type': 'unknown', 'pattern': 'unknown', 'cycle': (1.0, 16), 'progression-style': 'pop', 'chord-style': 'classy', 'performing-style': 'unknown', 'rhythm': 'unknown', 'epic-endings': 'unknown', 'melodic': 'unknown', 'folder-id': 528, 'duplicate-id': 174, 'new_label': 'pop_complex'}
+[melody2chord:lyrics_90] Numbered: 
+[melody2chord:lyrics_90] | 1------- | 6------- | 1------- | 6------- | 1------- | 6------- | 1------- | 6------- | 
+[melody2chord:lyrics_90] Chord: 
+[melody2chord:lyrics_90] | 
+[melody2chord:lyrics_90] | B 0------- | G#1------- | B 0------- | G#1------- | B 0------- | G#1------- | B 0------- | G#1------- | 
+[melody2chord:lyrics_90] 
+[melody2chord:lyrics_90] Total: 2
+[melody2chord:lyrics_90] 
+[melody2chord:lyrics_90] === Aligning chord_gen TPQ ===
+[melody2chord:lyrics_90] Original melody TPQ: 480
+[melody2chord:lyrics_90] Chord gen TPQ: 220
+[melody2chord:lyrics_90] TPQ ratio: 2.1818
+[melody2chord:lyrics_90] Converted chord_gen TPQ from 220 to 480
+[melody2chord:lyrics_90] Output saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_90/chord/chord_gen/sample01_shifted_chord_gen.mid
+[melody2chord:lyrics_90] Re-quantized 67 melody notes to 1/16 beat grid
+[melody2chord:lyrics_90] === Fill Empty Bars with Chords ===
+[melody2chord:lyrics_90] Original melody TPQ: 480
+[melody2chord:lyrics_90] Chord gen TPQ: 480
+[melody2chord:lyrics_90] TPQ ratio: 1.0000
+[melody2chord:lyrics_90] Chords start at tick: 8039 (bar 4.19)
+[melody2chord:lyrics_90] Empty bars to fill: 4
+[melody2chord:lyrics_90] Prepending 0 bars and copying 25 chord notes to cover 4 leading bars
+[melody2chord:lyrics_90] 
+[melody2chord:lyrics_90] === Output Summary ===
+[melody2chord:lyrics_90] Output TPQ: 480
+[melody2chord:lyrics_90] Melody track notes: 125
+[melody2chord:lyrics_90] Chord track notes: 121
+[melody2chord:lyrics_90] First chord now at tick: 0
+[melody2chord:lyrics_90] Last chord at tick: 36840
+[melody2chord:lyrics_90] Output saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_90/chord/chord_gen_filled_empty/sample01_shifted_chord_gen_filled_empty_bars.mid
+[melody2chord:lyrics_90] === Quantizing melody to 1/16 notes ===
+[melody2chord:lyrics_90] TPQ: 480
+[melody2chord:lyrics_90] Ticks per 16th note: 120.0
+[melody2chord:lyrics_90] Quantized 138 notes to 1/16 note positions
+[melody2chord:lyrics_90] Output saved to: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_90/chord/chord_gen_quantized/sample01_shifted_chord_gen_quantized.mid
+[melody2chord:lyrics_90] Extracted 81 beat-level chords from 'Chords' track
+[melody2chord:lyrics_90] Chord times remapped to 84 beat positions (subdivision: quarter notes)
+[melody2chord:lyrics_90] Filled 1 None chords
+[melody2chord:lyrics_90] ✓ Successfully processed: sample01_shifted
+[melody2chord:lyrics_90]   Key: Eb major (confidence: 0.66)
+[melody2chord:lyrics_90]   Tempo: 78.0 BPM (source: MIDI tempo)
+[melody2chord:lyrics_90]   Chord Text: /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_90/chord/chord_txt/sample01_shifted_chord_gen.txt
+[melody2chord:lyrics_90]   BTC Text:   /data/home/fundwotsai/MIDI-SAG/generated_midi_right_key/lyrics_90/chord/btc_txt/sample01_shifted_chord_gen.txt

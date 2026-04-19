@@ -1,0 +1,91 @@
+{
+    "id": 29,
+    "title_zh": "暮鼓晨鐘",
+    "global_prompt": "A meditative ambient piece with temple bells, wooden percussion, low drones, and deep male vocals. The sound is spiritual and calming, like a ritual at dawn in an ancient temple.",
+    "structure_en": {
+        "Intro": "Distant bell strikes with soft drone.",
+        "Verse": "Low with bell resonance and wooden percussion.",
+        "Chorus": "Layered with expanded resonance and rhythmic accents.",
+        "Outro": "Single bell strikes fade into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:08.00",
+                "line": "暮鼓聲聲震動山谷"
+            },
+            {
+                "timestamp": "00:13.40",
+                "line": "晨鐘悠悠喚醒大地"
+            },
+            {
+                "timestamp": "00:18.90",
+                "line": "心念隨聲逐漸安定"
+            },
+            {
+                "timestamp": "00:24.20",
+                "line": "靈魂浸入無邊靜謐"
+            },
+            {
+                "timestamp": "00:29.60",
+                "line": "木魚聲響伴隨微風"
+            },
+            {
+                "timestamp": "00:34.90",
+                "line": "回音延展穿越古今"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:40.30",
+                "line": "暮鼓晨鐘迴盪心房"
+            },
+            {
+                "timestamp": "00:45.70",
+                "line": "時光停駐無聲流淌"
+            },
+            {
+                "timestamp": "00:51.10",
+                "line": "靜思深處燃起光芒"
+            },
+            {
+                "timestamp": "00:56.40",
+                "line": "信念永遠不會消亡"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:22.20",
+                "line": "鐘聲漸遠仍在心中"
+            },
+            {
+                "timestamp": "01:28.00",
+                "line": "靜謐回響永恆守候"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 60,
+        "genres": [
+            "Ambient",
+            "Spiritual"
+        ],
+        "mood": [
+            "Calm",
+            "Sacred",
+            "Meditative"
+        ],
+        "instruments": [
+            "Bells",
+            "Wooden Percussion",
+            "Drones"
+        ],
+        "timbre": [
+            "Resonant",
+            "Deep",
+            "Peaceful"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

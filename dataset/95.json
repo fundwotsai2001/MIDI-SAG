@@ -1,0 +1,90 @@
+{
+    "id": 95,
+    "title_zh": "雪夜回聲",
+    "global_prompt": "A cinematic ballad with piano, strings, and male vocals. The mood is reflective and emotional, like echoes carried through a snowy night.",
+    "structure_en": {
+        "Intro": "Piano arpeggios with soft string backing.",
+        "Verse": "with piano and string swells.",
+        "Chorus": "Full orchestra with soaring harmonies.",
+        "Outro": "Piano echoes fade like distant snow."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "雪夜靜靜覆蓋心靈"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "回聲迴盪無盡思念"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "腳步停留記憶之間"
+            },
+            {
+                "timestamp": "00:23.30",
+                "line": "愛的火光仍在閃耀"
+            },
+            {
+                "timestamp": "00:28.60",
+                "line": "夢想綻放於白色深處"
+            },
+            {
+                "timestamp": "00:34.00",
+                "line": "希望低語穿越寒夜"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.30",
+                "line": "雪夜回聲守護心靈"
+            },
+            {
+                "timestamp": "00:44.70",
+                "line": "夢想燃燒無盡力量"
+            },
+            {
+                "timestamp": "00:50.10",
+                "line": "愛的旋律依舊悠揚"
+            },
+            {
+                "timestamp": "00:55.50",
+                "line": "希望閃耀直到天明"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.00",
+                "line": "雪聲依舊低語蒼穹"
+            },
+            {
+                "timestamp": "01:27.30",
+                "line": "心靈延續無限夢想"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 82,
+        "genres": [
+            "Ballad",
+            "Cinematic"
+        ],
+        "mood": [
+            "Reflective",
+            "Emotional",
+            "Tender"
+        ],
+        "instruments": [
+            "Piano",
+            "Strings"
+        ],
+        "timbre": [
+            "Soft",
+            "Majestic",
+            "Warm"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

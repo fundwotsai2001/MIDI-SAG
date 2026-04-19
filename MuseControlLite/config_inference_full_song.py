@@ -18,7 +18,7 @@ def get_config():
 
         "vocal_audio_file": "/data/home/fundwotsai/MIDI-SAG/Chord_progression_editability_demo/sample02.wav",
 
-        "vocal_midi_file": "/data/home/fundwotsai/MIDI-SAG/Chord_progression_editability_demo/sample01.mid",
+        # "vocal_midi_file": "/data/home/fundwotsai/MIDI-SAG/Chord_progression_editability_demo/sample01.mid",
 
         "vocal_beat_file": None,
 
@@ -45,7 +45,7 @@ def get_config():
         
         "guidance_scale_audio": 1.0,
         
-        "denoise_step": 100,
+        "denoise_step": 50,
 
         "sigma_min": 0.3, # sigma_min and sigma_max are for the scheduler.
 
@@ -73,6 +73,8 @@ def get_config():
         ###############
 
         "no_text": False, # Optional, set to true if no text prompt is needed (possible for audio inpainting or outpainting)
+
+        "evaluate_chord_rhythm": False,
 
         "text_file": "/volume/nas-fundwo-storage/fundwo-test/MuseControlLite_song_generation/prompts_no_vocal.json",
 

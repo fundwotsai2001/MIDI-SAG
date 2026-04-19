@@ -23,7 +23,7 @@ def load_audio_file(filename, target_sr=44100, target_samples=2097152, segment_s
             Stereo(),
         )
         audio = encoding(audio)
-        audio = audio[:, int(segment_starts*44100):]
+        audio = audio[:, int(segment_starts*44100):int(segment_starts*44100)+target_samples]
         return audio
     except RuntimeError:
         print(f"Failed to decode audio file: {filename}")
@@ -142,7 +142,6 @@ def extract_chords_lab(chord_path, segment_starts=0):
     CHORDS = Chords()
     with open(chord_path, 'r') as f:
         chord_infos = f.read().splitlines()
-    print("chord_infos", chord_infos)
     chroma = np.zeros((12, 2097152))
     segment_ends = segment_starts + 2097152 / 44100
     for info in chord_infos:

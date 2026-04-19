@@ -1,0 +1,92 @@
+{
+    "id": 175,
+    "title_zh": "火山裂痕",
+    "global_prompt": "An epic cinematic score with taiko drums, brass, and male vocals. Explosive and powerful, like cracks forming on a volcano before eruption.",
+    "structure_en": {
+        "Intro": "Low taiko drums with brass stabs.",
+        "Verse": "over drums and strings.",
+        "Chorus": "Full orchestra erupts with brass.",
+        "Outro": "Drums slow down, brass sustains into silence."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "火山深處低鳴不止"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "裂痕蔓延大地顫抖"
+            },
+            {
+                "timestamp": "00:17.90",
+                "line": "火光閃爍撕裂蒼穹"
+            },
+            {
+                "timestamp": "00:23.30",
+                "line": "聲音推動暗潮翻湧"
+            },
+            {
+                "timestamp": "00:28.70",
+                "line": "鼓聲敲擊熾熱節奏"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "回聲攀上高聳雲層"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "火山裂痕吞沒黑夜"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "烈焰翻湧撐開大地"
+            },
+            {
+                "timestamp": "00:50.40",
+                "line": "號角響起驅散沉寂"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "聲浪衝破無邊蒼茫"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "火光熄滅留下餘溫"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "裂痕隱入靜默深處"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 104,
+        "genres": [
+            "Cinematic",
+            "Epic"
+        ],
+        "mood": [
+            "Explosive",
+            "Powerful",
+            "Dramatic"
+        ],
+        "instruments": [
+            "Taiko Drums",
+            "Brass",
+            "Choir",
+            "Strings"
+        ],
+        "timbre": [
+            "Heavy",
+            "Majestic",
+            "Resonant"
+        ],
+        "vocal_gender": "Male",
+        "duration_target_sec": 95
+    }
+}

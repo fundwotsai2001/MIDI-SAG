@@ -325,17 +325,15 @@ def warp_midi_to_beats(input_midi_path, output_midi_path, beat_times, beats_per_
         Returns:
             (beat_index, relative_position) where relative_position is 0 to 1
         """
-        # Handle time before first beat
+        # Handle time before first beat — continuous linear extrapolation so
+        # multiple pickup notes keep their relative spacing instead of all
+        # collapsing onto tick 0.
         if time_seconds < beat_times[0]:
             offset = beat_times[0] - time_seconds
-            # If within one beat of the first beat, snap to beat 0
-            if offset <= mean_ibi:
-                return 0, 0.0
-            # Estimate beat before first beat
-            pre_beat_duration = mean_ibi
-            beats_before = offset / pre_beat_duration
-            beat_idx = -int(np.ceil(beats_before))
-            rel_pos = 1.0 - (offset % pre_beat_duration) / pre_beat_duration
+            beats_before = offset / mean_ibi  # how many beats back, continuous
+            beat_idx_f = -beats_before
+            beat_idx = int(np.floor(beat_idx_f))
+            rel_pos = beat_idx_f - beat_idx  # in [0, 1)
             return beat_idx, rel_pos
         
         # Binary search for the beat interval
@@ -1413,14 +1411,15 @@ def calculate_segmentation(content_bars):
     return result
 
 
-def get_auto_config(tokens, midi_path=None):
+def get_auto_config(tokens, midi_path=None, tempo=None):
     """
     Get automatic configuration for AccoMontage based on MIDI analysis
-    
+
     Args:
         tokens: List of tokens from tokenizer
         midi_path: Optional path to MIDI file for more accurate analysis
-    
+        tempo: Optional tempo (BPM). If provided, used for quantization instead of reading from MIDI.
+
     Returns:
         dict: {
             'note_shift': int,
@@ -1431,10 +1430,10 @@ def get_auto_config(tokens, midi_path=None):
     # Use file-based analysis if midi_path is provided (more accurate)
     if midi_path is not None:
         analysis = analyze_midi_structure_from_file(midi_path)
-        
+
         # Calculate what chorderator will actually see
         # This is crucial: chorderator rounds UP to 4-bar boundaries
-        chorderator_bars = calculate_chorderator_bars(midi_path, note_shift=analysis['note_shift'])
+        chorderator_bars = calculate_chorderator_bars(midi_path, tempo=tempo, note_shift=analysis['note_shift'])
         
         # Use chorderator's fixed_end_bars for segmentation
         # This ensures our segmentation matches what chorderator will actually process
@@ -1785,54 +1784,93 @@ def export_chords_txt(midi_file_path, output_txt_path=None, key_name=None, mode=
 
 _PITCH_CLASS_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
-# Templates ordered by specificity (larger templates first).
-# Intervals are semitones above the root.
+# Full vocabulary of qualities supported by btc_chords.Chords._shorthands.
+# Each entry maps a template (intervals above the root, in semitones) to the
+# quality suffix written after the root; an empty suffix means bare major
+# (btc parses "A" == "A:maj").
 _CHORD_TEMPLATES = [
-    (frozenset({0, 4, 7, 11}), ':maj7'),
-    (frozenset({0, 3, 7, 10}), ':min7'),
-    (frozenset({0, 4, 7, 10}), ':7'),
-    (frozenset({0, 3, 6, 9}),  ':dim7'),
-    (frozenset({0, 3, 6, 10}), ':hdim7'),
-    (frozenset({0, 4, 7}),  ''),       # major
-    (frozenset({0, 3, 7}),  ':min'),
-    (frozenset({0, 3, 6}),  ':dim'),
-    (frozenset({0, 4, 8}),  ':aug'),
-    (frozenset({0, 2, 7}),  ':sus2'),
-    (frozenset({0, 5, 7}),  ':sus4'),
+    # 6-note extensions
+    (frozenset({0, 2, 4, 5, 7, 10}), ':11'),
+    (frozenset({0, 2, 3, 5, 7, 10}), ':min11'),
+    # 5-note extensions
+    (frozenset({0, 2, 4, 7, 10}),    ':9'),
+    (frozenset({0, 2, 4, 7, 11}),    ':maj9'),
+    (frozenset({0, 2, 3, 7, 10}),    ':min9'),
+    (frozenset({0, 4, 7, 9, 10}),    ':13'),
+    (frozenset({0, 4, 7, 9, 11}),    ':maj13'),
+    (frozenset({0, 3, 7, 9, 10}),    ':min13'),
+    # 4-note tetrachords
+    (frozenset({0, 4, 7, 11}),       ':maj7'),
+    (frozenset({0, 3, 7, 10}),       ':min7'),
+    (frozenset({0, 4, 7, 10}),       ':7'),
+    (frozenset({0, 3, 6, 9}),        ':dim7'),
+    (frozenset({0, 3, 6, 10}),       ':hdim7'),
+    (frozenset({0, 3, 7, 11}),       ':minmaj7'),
+    (frozenset({0, 4, 7, 9}),        ':maj6'),
+    (frozenset({0, 3, 7, 9}),        ':min6'),
+    (frozenset({0, 2, 4, 7}),        ':add9'),
+    (frozenset({0, 2, 7, 10}),       ':7sus2'),
+    (frozenset({0, 5, 7, 10}),       ':7sus4'),
+    # 3-note triads
+    (frozenset({0, 4, 7}),           ''),           # major (bare root)
+    (frozenset({0, 3, 7}),           ':min'),
+    (frozenset({0, 3, 6}),           ':dim'),
+    (frozenset({0, 4, 8}),           ':aug'),
+    (frozenset({0, 2, 7}),           ':sus2'),
+    (frozenset({0, 5, 7}),           ':sus4'),
+    # 2-note intervals
+    (frozenset({0, 7}),              ':5'),   # power chord
+    (frozenset({0, 5}),              ':4'),   # perfect 4th
+    (frozenset({0, 9}),              ':6'),   # major 6th
+    # 1-note
+    (frozenset({0}),                 ':1'),
 ]
 
 
 def _identify_chord_from_pitches(pitches):
-    """Identify a BTC-format chord label from a list of MIDI pitch numbers."""
+    """Identify a BTC-format chord label from a list of MIDI pitch numbers.
+
+    Always returns a label that btc_chords.Chords.chord() can parse, chosen by
+    scoring every (root, quality) pair against the input pitch-class set:
+      1. minimise unexplained input tones (|input - template|)
+      2. minimise implied template tones absent from the voicing
+      3. prefer roots that are actually voiced
+      4. prefer root == bass (so we only add /bass when musically warranted)
+      5. tie-break by larger template (more specific label)
+    """
     if not pitches:
         return 'N'
 
+    input_pcs = frozenset(p % 12 for p in pitches)
     bass_pc = min(pitches) % 12
-    pcs = set(p % 12 for p in pitches)
 
+    best_score = None
     best_label = None
-    best_score = (-1, -1)  # (template_size, bass_bonus)
-
     for root_pc in range(12):
-        intervals = frozenset((pc - root_pc) % 12 for pc in pcs)
+        intervals = frozenset((pc - root_pc) % 12 for pc in input_pcs)
+        bass_interval = (bass_pc - root_pc) % 12
         for template, quality in _CHORD_TEMPLATES:
-            if template.issubset(intervals):
-                bass_bonus = 1 if root_pc == bass_pc else 0
-                score = (len(template), bass_bonus)
-                if score > best_score:
-                    best_score = score
-                    root_name = _PITCH_CLASS_NAMES[root_pc]
-                    if root_pc != bass_pc:
-                        bass_name = _PITCH_CLASS_NAMES[bass_pc]
-                        best_label = f"{root_name}{quality}/{bass_name}"
-                    else:
-                        best_label = f"{root_name}{quality}"
+            missing = len(intervals - template)
+            implied = len(template - intervals)
+            score = (
+                -missing,
+                -implied,
+                1 if root_pc in input_pcs else 0,
+                1 if root_pc == bass_pc else 0,
+                # Slash note should be a real chord tone; penalise otherwise.
+                1 if bass_interval in template else 0,
+                len(template),
+            )
+            if best_score is None or score > best_score:
+                best_score = score
+                root_name = _PITCH_CLASS_NAMES[root_pc]
+                if root_pc == bass_pc:
+                    best_label = f"{root_name}{quality}"
+                else:
+                    bass_name = _PITCH_CLASS_NAMES[bass_pc]
+                    best_label = f"{root_name}{quality}/{bass_name}"
 
-    if best_label is not None:
-        return best_label
-
-    # Fallback: return bass note as major
-    return _PITCH_CLASS_NAMES[bass_pc]
+    return best_label
 
 
 def _extract_chords_from_track(chord_track, tpq):
@@ -1868,6 +1906,10 @@ def _extract_chords_from_track(chord_track, tpq):
 
     chords_per_beat = ['N'] * total_beats
     for start_beat, end_beat, label in chord_spans:
+        # Sub-beat decorations (end_beat <= start_beat after rounding) would
+        # otherwise be dropped entirely — guarantee each onset labels at least
+        # the beat it starts on.
+        end_beat = max(end_beat, start_beat + 1)
         for b in range(start_beat, min(end_beat, total_beats)):
             chords_per_beat[b] = label
 
@@ -1908,6 +1950,19 @@ def export_chords_txt_chorder(midi_file_path, output_txt_path=None, beats=True, 
     if chord_track is not None:
         chords = _extract_chords_from_track(chord_track, tpq)
         print(f"Extracted {len(chords)} beat-level chords from '{chord_track.name}' track")
+
+        # Chorderator anchors chord bar 1 beat 1 to the first melody note's
+        # position (== note_shift), NOT to the MIDI bar boundary. When beat_times
+        # is supplied we want audio bar 1 beat 1 (== beat_times[0]) to line up
+        # with the first *real* chord, so drop the leading N-beats produced by
+        # that anchor offset.
+        if beat_times is not None:
+            first_chord_tick = min(n.start for n in chord_track.notes)
+            lead_beats = int(round(first_chord_tick / tpq))
+            # Only trim if those beats really are N (safety against weird inputs)
+            if lead_beats > 0 and all(c == 'N' for c in chords[:lead_beats]):
+                chords = chords[lead_beats:]
+                print(f"Dropped {lead_beats} leading N-beats to align first chord to beat_times[0]")
     else:
         from chorder import Dechorder
         chords_raw = Dechorder.dechord(midi)
@@ -1993,7 +2048,9 @@ def fill_none_chords_in_txt(input_txt_path, output_txt_path=None):
 
     Mid-song None rows are filled by carrying the previous valid chord forward.
     Leading None rows (before any valid chord exists) are backfilled from the
-    first valid chord found in the file.
+    first valid chord found in the file. If the first emitted chord starts after
+    time 0, extend that first valid chord back to 0.0 so the exported text/BTC
+    covers leading silence or pickup audio as well.
 
     Args:
         input_txt_path: Path to input chord txt file
@@ -2040,6 +2097,14 @@ def fill_none_chords_in_txt(input_txt_path, output_txt_path=None):
                 lines[i][2] = first_valid_chord
                 none_count += 1
 
+    # If export was downbeat-anchored, there may be no explicit rows before the
+    # first valid chord at all. Extend that first chord back to 0.0 so the
+    # downstream BTC/chord conditioning covers the song from the beginning.
+    leading_gap_extended = 0.0
+    if lines and lines[0][2].lower() not in ('none', 'n') and lines[0][0] > 0:
+        leading_gap_extended = lines[0][0]
+        lines[0][0] = 0.0
+
     # Write output
     if output_txt_path is None:
         base = str(Path(input_txt_path).with_suffix(''))
@@ -2051,6 +2116,8 @@ def fill_none_chords_in_txt(input_txt_path, output_txt_path=None):
 
     if none_count > 0:
         print(f"Filled {none_count} None chords")
+    if leading_gap_extended > 0:
+        print(f"Extended first chord back to 0.000s (covered leading gap of {leading_gap_extended:.3f}s)")
 
     return output_txt_path
 
@@ -2366,8 +2433,261 @@ def fill_empty_bars_with_chords(input_melody_path, midi_file_path, empty_bars, o
         print(f"First chord now at tick: {new_chord_track.notes[0].time}")
         print(f"Last chord at tick: {new_chord_track.notes[-1].time}")
     print(f"Output saved to: {output_path}")
-    
+
     return output_path
+
+
+def fill_internal_empty_bars(midi_path, chord_track_name="Chords"):
+    """
+    Fill mid-song empty chord bars by replaying the surrounding progression.
+    For a gap of K bars, copy the K bars immediately preceding the gap (so
+    the listener perceives a phrase repeat rather than a held drone). If
+    there aren't K preceding non-empty bars, fall back to the K bars after
+    the gap; if the gap is longer than the available source, cycle through it.
+    """
+    from symusic import Note
+    score = Score(midi_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    bar_ticks = tpq * 4
+
+    chord_track = next((t for t in score.tracks if t.name == chord_track_name), None)
+    if chord_track is None or not chord_track.notes:
+        return midi_path
+
+    notes = list(chord_track.notes)
+    # Chorderator sometimes emits downbeat events 1 tick early (e.g. tick 3839
+    # instead of 3840). Bucket with a 32nd-note tolerance so those events land
+    # in the bar they were musically intended for.
+    tol = tpq // 8
+
+    def bar_of(tick):
+        return (tick + tol) // bar_ticks
+
+    first_bar = min(bar_of(n.time) for n in notes)
+    last_bar  = max(bar_of(n.time) for n in notes)
+    by_bar = {}
+    for n in notes:
+        by_bar.setdefault(bar_of(n.time), []).append(n)
+
+    nonempty_bars = sorted(by_bar.keys())
+    nonempty_set = set(nonempty_bars)
+
+    # Group consecutive empty bars into (start, end_inclusive) gaps.
+    gaps = []
+    bar = first_bar
+    while bar <= last_bar:
+        if bar in nonempty_set:
+            bar += 1
+            continue
+        start = bar
+        while bar <= last_bar and bar not in nonempty_set:
+            bar += 1
+        gaps.append((start, bar - 1))
+
+    added = 0
+    filled_summary = []
+    for gap_start, gap_end in gaps:
+        gap_len = gap_end - gap_start + 1
+        # Source: the K=gap_len most recent contiguous non-empty bars BEFORE the gap
+        src_bars = [b for b in nonempty_bars if b < gap_start][-gap_len:]
+        if not src_bars:
+            # Fall back to bars AFTER the gap
+            src_bars = [b for b in nonempty_bars if b > gap_end][:gap_len]
+        if not src_bars:
+            continue  # entire chord track is empty (shouldn't happen here)
+
+        for i, dst_bar in enumerate(range(gap_start, gap_end + 1)):
+            src_bar = src_bars[i % len(src_bars)]
+            shift = (dst_bar - src_bar) * bar_ticks
+            for n in by_bar[src_bar]:
+                chord_track.notes.append(Note(
+                    time=n.time + shift,
+                    duration=n.duration,
+                    pitch=n.pitch,
+                    velocity=n.velocity,
+                ))
+                added += 1
+        filled_summary.append(f"bars {gap_start}-{gap_end}←{src_bars}")
+
+    if added:
+        chord_track.notes.sort(key=lambda n: (n.time, n.pitch))
+        score.dump_midi(midi_path)
+        print(f"Filled {len(gaps)} internal chord gaps ({added} notes): "
+              f"{filled_summary[:6]}{'...' if len(filled_summary) > 6 else ''}")
+    return midi_path
+
+
+def cover_pickup_melody_with_chord(midi_path, melody_track_name="Melody",
+                                   chord_track_name="Chords"):
+    """
+    Extend the first chord event backward so the melody pickup has chord
+    coverage in the MIDI representation. Text/BTC export handles the leading
+    silence separately; this helper only patches the chord track inside the
+    MIDI so it reads better musically/visually.
+    """
+    from symusic import Note
+    score = Score(midi_path, ttype="tick")
+
+    chord_track = next((t for t in score.tracks if t.name == chord_track_name), None)
+    melody_track = next((t for t in score.tracks if t.name == melody_track_name), None)
+    if chord_track is None or not chord_track.notes:
+        return midi_path
+    if melody_track is None or not melody_track.notes:
+        return midi_path
+
+    first_chord_tick = min(n.time for n in chord_track.notes)
+    first_melody_tick = min(n.time for n in melody_track.notes)
+    if first_melody_tick >= first_chord_tick:
+        return midi_path
+
+    pickup_duration = first_chord_tick - first_melody_tick
+    first_chord_notes = [n for n in chord_track.notes if n.time == first_chord_tick]
+    for n in first_chord_notes:
+        chord_track.notes.append(Note(
+            time=first_melody_tick,
+            duration=pickup_duration,
+            pitch=n.pitch,
+            velocity=n.velocity,
+        ))
+    chord_track.notes.sort(key=lambda n: (n.time, n.pitch))
+    score.dump_midi(midi_path)
+    print(f"Added pickup chord ({len(first_chord_notes)} pitches) over "
+          f"ticks [{first_melody_tick}, {first_chord_tick}] "
+          f"({pickup_duration/score.ticks_per_quarter:.2f} beats)")
+    return midi_path
+
+
+def scale_midi_ticks(src_path, dst_path, scale):
+    """
+    Scale every time-indexed MIDI event by `scale`, keeping tpq unchanged.
+
+    Used to emulate "N chords per bar" for chorderator: scaling the melody by
+    2x makes chorderator see each real half-bar as a full bar, so it picks a
+    distinct chord for each half-bar based on that half-bar's melody content.
+    Apply the inverse scale (e.g. 0.5) to the generated chord MIDI to restore
+    real-time alignment.
+    """
+    score = Score(src_path, ttype="tick")
+
+    def _s(t):
+        return int(round(t * scale))
+
+    for track in score.tracks:
+        for n in track.notes:
+            n.time = _s(n.time)
+            n.duration = max(1, _s(n.duration))
+        for c in track.controls:
+            c.time = _s(c.time)
+        for p in track.pedals:
+            p.time = _s(p.time)
+            p.duration = max(1, _s(p.duration))
+        for pb in track.pitch_bends:
+            pb.time = _s(pb.time)
+    # Scale tempo BPM too: stretching ticks by `scale` with unchanged BPM would
+    # stretch wall-clock by `scale`, confusing downstream tools (chorderator)
+    # that convert between tick and seconds. Keep wall-clock constant.
+    for tempo in score.tempos:
+        tempo.time = _s(tempo.time)
+        tempo.qpm = tempo.qpm * scale
+    for ts in score.time_signatures:
+        ts.time = _s(ts.time)
+    for ks in score.key_signatures:
+        ks.time = _s(ks.time)
+    for m in score.markers:
+        m.time = _s(m.time)
+
+    score.dump_midi(dst_path)
+    return dst_path
+
+
+def align_chord_track_to_bar(midi_path, beats_per_bar=4, chord_track_name="Chords",
+                             chord_resolution_beats=None):
+    """
+    Snap every chord onset to the nearest grid point defined by
+    `chord_resolution_beats` (default == beats_per_bar, i.e., bar grid).
+
+    Chorderator places its chord-bar-1-beat-1 at the melody's first note, so
+    chord changes can sit off the audio downbeat by a fractional bar. Earlier
+    steps like fill_empty_bars_with_chords can also leave onsets on a different
+    grid (real bars) than chorderator's (note_shift-offset). Per-onset snapping
+    reconciles both — every onset lands on the nearest grid point regardless of
+    which pipeline step produced it. When several original onsets collapse into
+    the same snapped bucket, keep the latest onset's pitch set (usually the
+    chorderator-native chord rather than a prepended fill) but extend that
+    snapped chord to the next snapped bucket. This prevents short ornamental
+    re-voicings from overwriting a bar-level chord and leaving audible gaps.
+
+    BTC export is unaffected (must be called after BTC is written).
+    """
+    from symusic import Note
+    from collections import defaultdict
+
+    score = Score(midi_path, ttype="tick")
+    tpq = score.ticks_per_quarter
+    resolution = chord_resolution_beats or beats_per_bar
+    grid_ticks = tpq * resolution
+
+    chord_track = next((t for t in score.tracks if t.name == chord_track_name), None)
+    if chord_track is None or not chord_track.notes:
+        return midi_path
+
+    def snap(t):
+        return int(round(t / grid_ticks) * grid_ticks)
+
+    # Group by original onset, then bucket those onsets by the snapped grid.
+    # If several original onsets land in the same bucket, keep the latest
+    # group's pitches (preserving the existing chord label behavior) but stretch
+    # that snapped chord to the next snapped bucket so short decorations do not
+    # create bar-long gaps.
+    by_onset = defaultdict(list)
+    for n in chord_track.notes:
+        by_onset[n.time].append(n)
+
+    snapped = defaultdict(list)
+    for onset in sorted(by_onset):
+        snapped[snap(onset)].append((onset, by_onset[onset]))
+
+    snapped_onsets = sorted(snapped.keys())
+
+    new_notes = []
+    snap_count = 0
+    extended_count = 0
+    merged_buckets = 0
+    for i, new_onset in enumerate(snapped_onsets):
+        entries = snapped[new_onset]
+        if len(entries) > 1:
+            merged_buckets += 1
+
+        # Keep the latest onset's pitches inside this snapped bucket.
+        original_onset, notes = entries[-1]
+        next_onset = snapped_onsets[i + 1] if i + 1 < len(snapped_onsets) else None
+        original_end = max(n.time + n.duration for n in notes)
+        target_end = next_onset if next_onset is not None else max(original_end, new_onset + grid_ticks)
+        if target_end <= new_onset:
+            target_end = max(original_end, new_onset + grid_ticks)
+        snapped_duration = max(1, target_end - new_onset)
+
+        seen_pitches = set()
+        for n in sorted(notes, key=lambda note: note.pitch):
+            if n.pitch in seen_pitches:
+                continue
+            seen_pitches.add(n.pitch)
+            if n.time != new_onset:
+                snap_count += 1
+            if n.duration != snapped_duration:
+                extended_count += 1
+            new_notes.append(Note(time=new_onset, duration=snapped_duration,
+                                  pitch=n.pitch, velocity=n.velocity))
+    new_notes.sort(key=lambda n: (n.time, n.pitch))
+    chord_track.notes = new_notes
+
+    if snap_count or extended_count or merged_buckets:
+        print(f"Snapped {snap_count} chord notes to {resolution}-beat grid "
+              f"(total chord onsets: {len(snapped_onsets)}, "
+              f"merged buckets: {merged_buckets}, extended notes: {extended_count})")
+    score.dump_midi(midi_path)
+    return midi_path
+
 
 def estimate_tempo_from_notes(input_melody_path):
     """

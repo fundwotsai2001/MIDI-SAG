@@ -1,0 +1,90 @@
+{
+    "id": 146,
+    "title_zh": "朝露花徑",
+    "global_prompt": "A gentle folk ballad with acoustic guitar, violin, and female vocals. Fresh and serene, like walking a garden path covered in morning dew.",
+    "structure_en": {
+        "Intro": "Guitar arpeggio with violin harmonics.",
+        "Verse": "with guitar and light strings.",
+        "Chorus": "Full violin melody lifts above guitar strums.",
+        "Outro": "Soft guitar closes with fading violin."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.20",
+                "line": "清晨露珠閃爍花徑"
+            },
+            {
+                "timestamp": "00:12.60",
+                "line": "微風輕拂花瓣顫動"
+            },
+            {
+                "timestamp": "00:18.00",
+                "line": "腳步輕盈隨曲前行"
+            },
+            {
+                "timestamp": "00:23.40",
+                "line": "光影流淌映照眼眸"
+            },
+            {
+                "timestamp": "00:28.80",
+                "line": "手心握著一段和聲"
+            },
+            {
+                "timestamp": "00:34.20",
+                "line": "花香伴隨旋律飄遠"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.60",
+                "line": "朝露花徑閃爍清澈"
+            },
+            {
+                "timestamp": "00:45.00",
+                "line": "歌聲灑落晨曦微光"
+            },
+            {
+                "timestamp": "00:50.30",
+                "line": "小提琴聲如水流轉"
+            },
+            {
+                "timestamp": "00:55.70",
+                "line": "此刻靜好無限蔓延"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:21.10",
+                "line": "露水仍在葉尖閃爍"
+            },
+            {
+                "timestamp": "01:27.50",
+                "line": "小徑輕吟柔和歌聲"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 80,
+        "genres": [
+            "Folk",
+            "Ballad"
+        ],
+        "mood": [
+            "Fresh",
+            "Serene",
+            "Gentle"
+        ],
+        "instruments": [
+            "Acoustic Guitar",
+            "Violin"
+        ],
+        "timbre": [
+            "Soft",
+            "Bright",
+            "Natural"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}

@@ -1,0 +1,89 @@
+{
+    "id": 112,
+    "title_zh": "初夏微風",
+    "global_prompt": "A light folk-pop song with ukulele, hand percussion, and female vocals. The mood is breezy and joyful, like early summer wind on a clear day.",
+    "structure_en": {
+        "Intro": "Ukulele strumming with light percussion.",
+        "Verse": "with ukulele and shakers.",
+        "Chorus": "with upbeat rhythms.",
+        "Outro": "Ukulele fades with bird sounds."
+    },
+    "lyrics_zh": {
+        "Verse": [
+            {
+                "timestamp": "00:07.00",
+                "line": "初夏微風輕輕拂面"
+            },
+            {
+                "timestamp": "00:12.40",
+                "line": "笑語迴盪在藍色天空"
+            },
+            {
+                "timestamp": "00:17.80",
+                "line": "花影隨風搖曳身旁"
+            },
+            {
+                "timestamp": "00:23.10",
+                "line": "夢想展翅翱翔雲端"
+            },
+            {
+                "timestamp": "00:28.50",
+                "line": "時光緩緩如歌般流"
+            },
+            {
+                "timestamp": "00:33.80",
+                "line": "愛意在光裡綻放明亮"
+            }
+        ],
+        "Chorus": [
+            {
+                "timestamp": "00:39.20",
+                "line": "初夏微風吹散陰霾"
+            },
+            {
+                "timestamp": "00:44.60",
+                "line": "夢想輕快自由飛舞"
+            },
+            {
+                "timestamp": "00:50.00",
+                "line": "愛的旋律溫柔歌唱"
+            },
+            {
+                "timestamp": "00:55.30",
+                "line": "希望閃耀在晴朗之中"
+            }
+        ],
+        "Outro": [
+            {
+                "timestamp": "01:20.70",
+                "line": "微風依舊輕輕吹拂"
+            },
+            {
+                "timestamp": "01:27.00",
+                "line": "笑語回響無盡夏日"
+            }
+        ]
+    },
+    "metadata": {
+        "tempo_bpm": 94,
+        "genres": [
+            "Folk Pop"
+        ],
+        "mood": [
+            "Breezy",
+            "Joyful",
+            "Light"
+        ],
+        "instruments": [
+            "Ukulele",
+            "Percussion"
+        ],
+        "timbre": [
+            "Bright",
+            "Gentle",
+            "Cheerful"
+        ],
+        "vocal_gender": "Female",
+        "duration_target_sec": 95
+    }
+}
