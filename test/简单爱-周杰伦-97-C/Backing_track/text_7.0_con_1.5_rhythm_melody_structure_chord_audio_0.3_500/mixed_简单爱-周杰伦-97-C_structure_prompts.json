@@ -1,0 +1,35 @@
+{
+  "song_id": "简单爱-周杰伦-97-C",
+  "vocal_audio_file": "/data/home/fundwotsai/MIDI-SAG/demo_website/experiment_1/gt_vocal_MIDI/简单爱-周杰伦-97-C.wav",
+  "mixed_audio_file": "/data/home/fundwotsai/MIDI-SAG/test/简单爱-周杰伦-97-C/Backing_track/text_7.0_con_1.5_rhythm_melody_structure_chord_audio_0.3_500/mixed_简单爱-周杰伦-97-C_full.wav",
+  "segments": [
+    {
+      "index": 0,
+      "start_s": 0.0,
+      "end_s": 27.53,
+      "tag": "intro",
+      "prompt": "Tranquil and dreamy, featuring soft piano, synth pads, and a slow, ethereal, meditative atmosphere."
+    },
+    {
+      "index": 1,
+      "start_s": 27.53,
+      "end_s": 66.19,
+      "tag": "verse",
+      "prompt": "Gentle and sentimental instrumental pop with electric piano (Rhodes), cello, strings, and a poignant, nostalgic, reflective mood."
+    },
+    {
+      "index": 2,
+      "start_s": 66.19,
+      "end_s": 96.0,
+      "tag": "chorus",
+      "prompt": "Upbeat, inspiring, and cinematic with drums, piano, strings, bass guitar, and a soaring, uplifting, emotional, hopeful energy."
+    },
+    {
+      "index": 3,
+      "start_s": 96.0,
+      "end_s": 125.02065759637188,
+      "tag": "chorus",
+      "prompt": "Upbeat, inspiring, and cinematic with drums, piano, strings, bass guitar, and a soaring, uplifting, emotional, hopeful energy."
+    }
+  ]
+}

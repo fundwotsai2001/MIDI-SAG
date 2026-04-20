@@ -1,6 +1,8 @@
 import argparse
 import chorderator as cdt
 import os
+import shutil
+import tempfile
 import mido
 import json
 import numpy as np
@@ -24,7 +26,6 @@ from demo_utils import (get_key,
                        sync_output_tempo_with_input,
                        preprocess_melody,
                        align_chord_gen_tpq,
-                       quantize_melody_to_16th,
                        load_beat_times,
                        estimate_tempo_from_beats,
                        warp_midi_to_beats,
@@ -104,6 +105,17 @@ def melody_key_detect(midi_path):
     return {'key': best_key, 'mode': best_mode, 'confidence': float(best_r)}
 
 
+# Keys accepted by --key. "auto" runs MIDI-metadata + Bellman-Budge detection;
+# any other value is interpreted as a manual override (append "m" for minor).
+AVAILABLE_KEYS = [
+    'auto',
+    'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb',
+    'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B',
+    'Cm', 'C#m', 'Dbm', 'Dm', 'D#m', 'Ebm', 'Em', 'Fm', 'F#m', 'Gbm',
+    'Gm', 'G#m', 'Abm', 'Am', 'A#m', 'Bbm', 'Bm',
+]
+
+
 def parse_downbeat_phase(value):
     if value is None:
         return None
@@ -138,6 +150,12 @@ if __name__ == '__main__':
                              'this is the index into the detected-only beat file; otherwise it is a '
                              'phase in [0, 4*beat_subdivision-1] into --beat_file. '
                              'Use None or auto to detect automatically.')
+    parser.add_argument('--key', type=str, default='auto', choices=AVAILABLE_KEYS,
+                        metavar='KEY',
+                        help='Musical key of the melody. Accepts major roots (C, C#, Db, D, ..., B) '
+                             'and their minor counterparts with an "m" suffix (Cm, C#m, ..., Bm). '
+                             'Default "auto" reads MIDI key_signature metadata and falls back to '
+                             'the Bellman-Budge heuristic over the melody pitch histogram.')
     args = parser.parse_args()
 
     input_melody_path = args.midi_path
@@ -161,21 +179,23 @@ if __name__ == '__main__':
 
     # Create output directory structure
     output_base_dir = args.output_dir
-    processed_melody_dir = os.path.join(output_base_dir, "processed_melody")
-    chord_gen_dir = os.path.join(output_base_dir, "chord_gen")
     chord_gen_filled_dir = os.path.join(output_base_dir, "chord_gen_filled_empty")
-    chord_gen_quantized_dir = os.path.join(output_base_dir, "chord_gen_quantized")
-    chord_txt_with_none_dir = os.path.join(output_base_dir, "chord_txt_with_None")
-    chord_txt_dir = os.path.join(output_base_dir, "chord_txt")
     btc_txt_dir = os.path.join(output_base_dir, "btc_txt")
+
+    os.makedirs(chord_gen_filled_dir, exist_ok=True)
+    os.makedirs(btc_txt_dir, exist_ok=True)
+
+    # Intermediate artifacts live in a tempdir and are removed on exit.
+    _tmp_root = tempfile.mkdtemp(prefix="demo_SOME_")
+    processed_melody_dir = os.path.join(_tmp_root, "processed_melody")
+    chord_gen_dir = os.path.join(_tmp_root, "chord_gen")
+    chord_txt_with_none_dir = os.path.join(_tmp_root, "chord_txt_with_None")
+    chord_txt_dir = os.path.join(_tmp_root, "chord_txt")
 
     os.makedirs(processed_melody_dir, exist_ok=True)
     os.makedirs(chord_gen_dir, exist_ok=True)
-    os.makedirs(chord_gen_filled_dir, exist_ok=True)
-    os.makedirs(chord_gen_quantized_dir, exist_ok=True)
     os.makedirs(chord_txt_with_none_dir, exist_ok=True)
     os.makedirs(chord_txt_dir, exist_ok=True)
-    os.makedirs(btc_txt_dir, exist_ok=True)
 
     print(f"\n=== Processing: {song_name} ===")
     print(f"Output will be saved to: {output_base_dir}/")
@@ -297,27 +317,37 @@ if __name__ == '__main__':
         if len(tokens) == 1:
             tokens = tokens[0]
 
-        # Get key analysis — prefer MIDI key_signature metadata, fall back to heuristic
-        _midi_key_sig = None
-        for _track in mido.MidiFile(input_melody_path).tracks:
-            for _msg in _track:
-                if _msg.type == 'key_signature':
-                    _midi_key_sig = _msg.key  # e.g. 'Db', 'Am', 'F#'
-                    break
-            if _midi_key_sig:
-                break
-
-        if _midi_key_sig is not None:
-            _is_minor = _midi_key_sig.endswith('m')
+        # Key analysis: honor --key when specified; otherwise prefer MIDI
+        # key_signature metadata and fall back to the Bellman-Budge heuristic.
+        if args.key != 'auto':
+            _is_minor = args.key.endswith('m')
             key_analysis = {
-                'key': _midi_key_sig[:-1] if _is_minor else _midi_key_sig,
+                'key': args.key[:-1] if _is_minor else args.key,
                 'mode': 'minor' if _is_minor else 'major',
                 'confidence': 1.0,
             }
-            print(f"Detected key: {key_analysis['key']} {key_analysis['mode']} (from MIDI key signature)")
+            print(f"Using user-specified key: {key_analysis['key']} {key_analysis['mode']}")
         else:
-            key_analysis = melody_key_detect(input_melody_path)
-            print(f"Detected key: {key_analysis['key']} {key_analysis['mode']} (confidence: {key_analysis['confidence']:.2f}, Bellman-Budge)")
+            _midi_key_sig = None
+            for _track in mido.MidiFile(input_melody_path).tracks:
+                for _msg in _track:
+                    if _msg.type == 'key_signature':
+                        _midi_key_sig = _msg.key  # e.g. 'Db', 'Am', 'F#'
+                        break
+                if _midi_key_sig:
+                    break
+
+            if _midi_key_sig is not None:
+                _is_minor = _midi_key_sig.endswith('m')
+                key_analysis = {
+                    'key': _midi_key_sig[:-1] if _is_minor else _midi_key_sig,
+                    'mode': 'minor' if _is_minor else 'major',
+                    'confidence': 1.0,
+                }
+                print(f"Detected key: {key_analysis['key']} {key_analysis['mode']} (from MIDI key signature)")
+            else:
+                key_analysis = melody_key_detect(input_melody_path)
+                print(f"Detected key: {key_analysis['key']} {key_analysis['mode']} (confidence: {key_analysis['confidence']:.2f}, Bellman-Budge)")
 
         cdt_key_attr = get_key_for_cdt(tokens.tokens, key_analysis)
         cdt_mode_attr = get_mode_for_cdt(tokens.tokens, key_analysis)
@@ -372,13 +402,8 @@ if __name__ == '__main__':
             filled_output
         )
 
-        # Create quantized (1/16 note) version
-        quantized_output = os.path.join(chord_gen_quantized_dir, f"{demo_name}_chord_gen_quantized.mid")
-        quantize_melody_to_16th(filled_output, quantized_output)
-
         # Forward-fill any mid-song bar where chorderator emitted no chord.
         fill_internal_empty_bars(filled_output)
-        fill_internal_empty_bars(quantized_output)
 
         # Snap chord-event boundaries to MIDI grid (DAW-friendly).
         # For chords_per_bar==2, snap to half-bar so the post-fill chord
@@ -386,8 +411,6 @@ if __name__ == '__main__':
         # boundaries.
         chord_resolution_beats = 4 // args.chords_per_bar
         align_chord_track_to_bar(filled_output,
-                                 chord_resolution_beats=chord_resolution_beats)
-        align_chord_track_to_bar(quantized_output,
                                  chord_resolution_beats=chord_resolution_beats)
 
         # Export chord text with None values
@@ -406,15 +429,16 @@ if __name__ == '__main__':
         # Extend the first chord back over the melody pickup in the MIDI too.
         # Text/BTC leading silence is handled separately in fill_none_chords_in_txt.
         cover_pickup_melody_with_chord(filled_output)
-        cover_pickup_melody_with_chord(quantized_output)
 
         print(f"✓ Successfully processed: {song_name}")
         print(f"  Key: {key_analysis['key']} {key_analysis['mode']} (confidence: {key_analysis['confidence']:.2f})")
         print(f"  Tempo: {estimated_bpm:.1f} BPM (source: {'beat file' if beat_file_path else 'MIDI tempo'})")
-        print(f"  Chord Text: {txt_file}")
         print(f"  BTC Text:   {btc_file}")
+        print(f"  Filled MIDI: {filled_output}")
 
     except Exception as e:
         print(f"✗ Failed to process: {song_name}")
         print(f"  Error: {str(e)}")
         raise
+    finally:
+        shutil.rmtree(_tmp_root, ignore_errors=True)

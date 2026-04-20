@@ -7,17 +7,25 @@ OUTPUT_DIR="/data/home/fundwotsai/MIDI-SAG/test/${SONG_NAME}"
 #   47s       → MuseControlLite_inference_47s_scale_up.py, one text prompt per run
 #   full_song → MuseControlLite_inference_continuation.py, uses STRUCTURE_* arrays
 MODE="full_song"
-
 MUSECONTROLLITE_CHECKPOINT="./MIDI-SAG_checkpoints/MuseControlLite_checkpoint"
 # Chord style for harmonization: POP_STANDARD | POP_COMPLEX | DARK | RANDB | NOCONSTRAINT
 CHORD_STYLE="POP_COMPLEX"
 # Chords per bar: 1 (default, bar-level) or 2 (half-bar; 2nd half = next bar's chord).
 CHORDS_PER_BAR=1
+# Musical key of the vocal melody passed to AccoMontage2/demo_SOME.py.
+#   Major: C  C#  Db  D  D#  Eb  E  F  F#  Gb  G  G#  Ab  A  A#  Bb  B
+#   Minor: Cm C#m Dbm Dm D#m Ebm Em Fm F#m Gbm Gm G#m Abm Am A#m Bbm Bm
+#   auto : read MIDI key_signature, fall back to Bellman-Budge heuristic
+KEY="auto"
 # Index into the detected-only beat file (…_beat_times_detected_only.txt)
 # selecting which detected beat is bar 1 beat 1. Downbeats then occur at
 # that anchor ± 4·beat_interval·x for integer x. Set to None to let
-# AccoMontage2/demo_SOME.py detect the downbeat phase automatically.
-DOWNBEAT_PHASE=None
+# AccoMontage2/demo_SOME.py detect the downbeat phase automatically (sometimes it is not accurate).
+DOWNBEAT_PHASE=3
+# DBN beat tracker BPM bounds (passed to Singing-Vocal-Beat-Tracking/inference_vad.py).
+# Leave empty to use madmom defaults.
+MIN_BPM=90
+MAX_BPM=100
 
 # ── 47s mode config ──────────────────────────────────────────────────────────
 # One prompt per run; the inference script is called once per entry.
@@ -30,13 +38,14 @@ BACKING_TEXT_PROMPTS=(
 
 # ── Full-song (continuation) mode config ─────────────────────────────────────
 # One entry per segment; STRUCTURE_STARTS, STRUCTURE_TAGS, STRUCTURE_PROMPTS
-# must all have the same length. Tags: intro | verse | chorus | bridge | outro | break | inst | solo
+# must all have the same length. Tags should be in this set (intro, verse, chorus, bridge, outro, break, inst, solo)
 STRUCTURE_PROMPTS=(
     "Tranquil and dreamy, featuring soft piano, synth pads, and a slow, ethereal, meditative atmosphere."
     "Gentle and sentimental instrumental pop with electric piano (Rhodes), cello, strings, and a poignant, nostalgic, reflective mood."
     "Upbeat, inspiring, and cinematic with drums, piano, strings, bass guitar, and a soaring, uplifting, emotional, hopeful energy."
     "Upbeat, inspiring, and cinematic with drums, piano, strings, bass guitar, and a soaring, uplifting, emotional, hopeful energy."
 )
+# The gap between each structure starts should be shorter than 47 seconds (the last segment could not be longer then 47 second either, i.e, vocal_audio_length - final_structure_start < 47 seconds)
 STRUCTURE_STARTS=( 0.00  27.53  66.19 96 )
 STRUCTURE_TAGS=(   intro   verse   chorus chorus)
 
@@ -59,10 +68,15 @@ fi
 
 # ── Pipeline ──────────────────────────────────────────────────────────────────
 # 1. Vocal beat tracking
+BPM_ARGS=()
+[ -n "$MIN_BPM" ] && BPM_ARGS+=(--min_bpm "$MIN_BPM")
+[ -n "$MAX_BPM" ] && BPM_ARGS+=(--max_bpm "$MAX_BPM")
+
 python Singing-Vocal-Beat-Tracking/inference_vad.py \
     --audio_path "$VOCAL_AUDIO_PATH" \
     --model_path MIDI-SAG_checkpoints/model-16.pt \
-    --use_vad --fill_silence --vad_merge_gap 3.0 --first_bpm_margin 10\
+    --use_vad --fill_silence --vad_merge_gap 3.0 --first_bpm_margin 10 \
+    "${BPM_ARGS[@]}" \
     --output_dir "$OUTPUT_DIR/vocal_beat"
 
 # 2. Vocal MIDI transcription
@@ -83,7 +97,8 @@ python AccoMontage2/demo_SOME.py \
     --beat_subdivision 1 \
     --downbeat_phase "$DOWNBEAT_PHASE" \
     --chord_style "$CHORD_STYLE" \
-    --chords_per_bar 1
+    --chords_per_bar "$CHORDS_PER_BAR" \
+    --key "$KEY"
 
 # 4. Backing track generation
 mkdir -p "$OUTPUT_DIR/Backing_track"

@@ -624,7 +624,9 @@ def infer_beats_vad_stitch_fill(
     vad_beat_buffer=0.1,
     fill_silence=True,
     fill_k=8,
-    fps=50
+    fps=50,
+    dbn_min_bpm=None,
+    dbn_max_bpm=None,
 ):
     """
     Returns:
@@ -703,8 +705,11 @@ def infer_beats_vad_stitch_fill(
 
         preds_beat, _ = infer_segment_preds(model, processor, seg)
 
-        # unconstrained beat detection
-        bt = predictions_to_beat_times(preds_beat, method=method, threshold=threshold)
+        # Apply user-provided BPM bounds (if any) to the first-pass detection.
+        bt = predictions_to_beat_times(
+            preds_beat, method=method, threshold=threshold,
+            dbn_min_bpm=dbn_min_bpm, dbn_max_bpm=dbn_max_bpm,
+        )
         bt_global = bt + ps
         bt_global = bt_global[(bt_global >= s) & (bt_global <= e)]
         bt_global = np.array(sorted(bt_global), dtype=np.float64)
@@ -746,6 +751,10 @@ def infer_beats_vad_stitch_fill(
         if needs_redetect:
             dbn_min = max(1.0, min_bpm - first_bpm_margin)
             dbn_max = min_bpm + first_bpm_margin
+            if dbn_min_bpm is not None:
+                dbn_min = max(dbn_min, dbn_min_bpm)
+            if dbn_max_bpm is not None:
+                dbn_max = min(dbn_max, dbn_max_bpm)
             print(f"[bpm_lock] re-detecting segment [{r['s']:.2f}-{r['e']:.2f}]: "
                   f"original {r['bpm']:.1f} BPM >= 1.2*{min_bpm:.1f}={1.2*min_bpm:.1f}, "
                   f"constraining to [{dbn_min:.1f}, {dbn_max:.1f}]")
@@ -1113,56 +1122,25 @@ def save_results(audio, sample_rate, beat_times, predictions, audio_path, output
     metronome_duration : float
         Duration of each metronome click in seconds (default: 0.01)
     """
-    # Create output directory
     os.makedirs(output_dir, exist_ok=True)
-    
-    # Get base filename from audio path
+
     base_name = os.path.splitext(os.path.basename(audio_path))[0]
-    
-    # Save audio (copy original or save processed)
-    audio_output_path = os.path.join(output_dir, f"{base_name}_audio.wav")
-    # Ensure audio is mono and in correct format
+
     if audio.ndim > 1:
         audio_to_save = audio.mean(axis=1)
     else:
         audio_to_save = audio
-    sf.write(audio_output_path, audio_to_save, sample_rate)
-    print(f"Audio saved to: {audio_output_path}")
-    
-    # Save beat times as text file
+
     beat_times_path = os.path.join(output_dir, f"{base_name}_beat_times.txt")
     with open(beat_times_path, 'w') as f:
         f.write("# Beat times in seconds\n")
         for beat_time in beat_times:
             f.write(f"{beat_time:.6f}\n")
     print(f"Beat times saved to: {beat_times_path}")
-    
-    # Save beat times as numpy array
-    beat_times_npy_path = os.path.join(output_dir, f"{base_name}_beat_times.npy")
-    np.save(beat_times_npy_path, beat_times)
-    print(f"Beat times (numpy) saved to: {beat_times_npy_path}")
-    
-    # Save raw predictions
-    if isinstance(predictions, torch.Tensor):
-        predictions_np = predictions.detach().cpu().numpy()
-    else:
-        predictions_np = predictions
-    predictions_path = os.path.join(output_dir, f"{base_name}_predictions.npy")
-    np.save(predictions_path, predictions_np)
-    print(f"Raw predictions saved to: {predictions_path}")
-    
-    # Create and save predictions plot (before conversion to beat times)
-    predictions_plot_path = os.path.join(output_dir, f"{base_name}_predictions_plot.png")
-    plot_predictions(predictions, predictions_plot_path, sample_rate=sample_rate)
-    
-    # Create and save audio with beats plot
-    plot_path = os.path.join(output_dir, f"{base_name}_plot.png")
-    plot_audio_with_beats(audio_to_save, sample_rate, beat_times, plot_path)
-    
-    # Add metronome clicks and save
+
     audio_with_metronome = add_metronome_to_audio(
-        audio_to_save, 
-        sample_rate, 
+        audio_to_save,
+        sample_rate,
         beat_times,
         click_duration=metronome_duration,
         click_frequency=metronome_frequency,
@@ -1171,7 +1149,7 @@ def save_results(audio, sample_rate, beat_times, predictions, audio_path, output
     metronome_output_path = os.path.join(output_dir, f"{base_name}_with_metronome.wav")
     sf.write(metronome_output_path, audio_with_metronome, sample_rate)
     print(f"Audio with metronome saved to: {metronome_output_path}")
-    
+
     return output_dir
 def main():
     parser = argparse.ArgumentParser(description='Inference for Singing-Vocal-Beat-Tracking + VAD + Fill Silence (uses original save_results)')
@@ -1220,6 +1198,13 @@ def main():
     parser.add_argument('--fill_silence', action='store_true', help='Infer beats during silent gaps using nearby tempo')
     parser.add_argument('--fill_k', type=int, default=8)
 
+    # DBN BPM bounds (applied to the first-pass detection; also clamp the
+    # lock_first_bpm re-detection bounds so they cannot escape this range)
+    parser.add_argument('--min_bpm', type=float, default=None,
+                        help='Lower bound for DBN beat tracker (BPM). Omit for madmom default.')
+    parser.add_argument('--max_bpm', type=float, default=None,
+                        help='Upper bound for DBN beat tracker (BPM). Omit for madmom default.')
+
     args = parser.parse_args()
 
     model = load_model(args.model_path, args.device)
@@ -1243,7 +1228,9 @@ def main():
         vad_beat_buffer=args.vad_beat_buffer,
         fill_silence=args.fill_silence,
         fill_k=args.fill_k,
-        fps=50
+        fps=50,
+        dbn_min_bpm=args.min_bpm,
+        dbn_max_bpm=args.max_bpm,
     )
 
     print(f"Total beats (detected+inferred): {len(beat_times_all)}")
