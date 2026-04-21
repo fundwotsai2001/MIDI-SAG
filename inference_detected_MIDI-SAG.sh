@@ -24,8 +24,8 @@ KEY="auto"
 DOWNBEAT_PHASE=3
 # DBN beat tracker BPM bounds (passed to Singing-Vocal-Beat-Tracking/inference_vad.py).
 # Leave empty to use madmom defaults.
-MIN_BPM=90
-MAX_BPM=100
+MIN_BPM=60
+MAX_BPM=160
 
 # ── 47s mode config ──────────────────────────────────────────────────────────
 # One prompt per run; the inference script is called once per entry.

@@ -25,7 +25,7 @@ You will need a token generated from [huggingface](https://huggingface.co/settin
 huggingface-cli login
 ```
 ## Inference
-There are two files for inference `inference_detected_MIDI-SAG.sh.sh` and `inference_gt_MIDI-SAG.sh.sh`. 
+There are two files for inference `inference_detected_MIDI-SAG.sh` and `inference_gt_MIDI-SAG.sh`. 
 
 ```
 # when ground truth vocal MIDI is present
