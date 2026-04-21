@@ -21,7 +21,7 @@ KEY="auto"
 # selecting which detected beat is bar 1 beat 1. Downbeats then occur at
 # that anchor ± 4·beat_interval·x for integer x. Set to None to let
 # AccoMontage2/demo_SOME.py detect the downbeat phase automatically (sometimes it is not accurate).
-DOWNBEAT_PHASE=3
+DOWNBEAT_PHASE=None
 # DBN beat tracker BPM bounds (passed to Singing-Vocal-Beat-Tracking/inference_vad.py).
 # Leave empty to use madmom defaults.
 MIN_BPM=60
