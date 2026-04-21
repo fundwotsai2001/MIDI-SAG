@@ -18,12 +18,11 @@ from pathlib import Path
 import torch.nn as nn
 import re
 # ── RMVPE / F0 melody encoder ─────────────────────────────────────────
-_MUSECTRLLITE_DIR = os.path.dirname(os.path.abspath(__file__))
 from rmvpe import RMVPE  # noqa: E402
 import librosa
 import math
-RMVPE_CKPT     = os.path.join(_MUSECTRLLITE_DIR, "SongEcho/rmvpe_model.pt")
-F0_MELODY_CKPT = os.path.join(_MUSECTRLLITE_DIR, "SongEcho/melody_encoder.pt")
+RMVPE_CKPT     = "./MIDI-SAG_checkpoints/rmvpe_model.pt"
+F0_MELODY_CKPT = "./MIDI-SAG_checkpoints/melody_encoder.pt"
 SR_RMVPE   = 16000
 HOP_RMVPE  = 160      # 10 ms frames
 FMIN_RMVPE = 50
