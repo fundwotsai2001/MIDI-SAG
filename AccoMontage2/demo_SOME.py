@@ -393,7 +393,9 @@ if __name__ == '__main__':
         requantize_chord_gen_melody(chord_gen_output)
 
         # Fill empty bars
-        empty_bars = auto_config['analysis']['empty_bars']
+        # auto_config was computed from the (possibly scaled) cdt_melody_path,
+        # so empty_bars is in scaled-bar units; convert back to real bars.
+        empty_bars = auto_config['analysis']['empty_bars'] // args.chords_per_bar
         filled_output = os.path.join(chord_gen_filled_dir, f"{demo_name}_chord_gen_filled_empty_bars.mid")
         fill_empty_bars_with_chords(
             processed_melody_path,

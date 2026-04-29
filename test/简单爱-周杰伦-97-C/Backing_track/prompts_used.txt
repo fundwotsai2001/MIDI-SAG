@@ -1,7 +1,0 @@
-inference_script=MuseControlLite/MuseControlLite_inference_continuation.py
-
-[structure_segments]
-1	0.00	intro	Tranquil and dreamy, featuring soft piano, synth pads, and a slow, ethereal, meditative atmosphere.
-2	27.53	verse	Gentle and sentimental instrumental pop with electric piano (Rhodes), cello, strings, and a poignant, nostalgic, reflective mood.
-3	66.19	chorus	Upbeat, inspiring, and cinematic with drums, piano, strings, bass guitar, and a soaring, uplifting, emotional, hopeful energy.
-4	96	chorus	Upbeat, inspiring, and cinematic with drums, piano, strings, bass guitar, and a soaring, uplifting, emotional, hopeful energy.

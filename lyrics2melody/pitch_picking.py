@@ -1,4 +1,5 @@
 # choose_svs_singer_octave.py
+from __future__ import annotations
 import argparse, io, os, tempfile
 import numpy as np
 import pretty_midi as pm
