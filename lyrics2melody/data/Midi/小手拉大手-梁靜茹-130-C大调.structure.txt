@@ -1,2 +1,0 @@
-STRUCTURE_STARTS=( 0.00  30.23  73.85 )
-STRUCTURE_TAGS=(   intro   verse   chorus )

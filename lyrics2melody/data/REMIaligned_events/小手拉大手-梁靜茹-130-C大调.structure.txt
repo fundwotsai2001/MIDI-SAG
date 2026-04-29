@@ -1,2 +1,0 @@
-STRUCTURE_STARTS=( 0.00  30.23  45.00 )
-STRUCTURE_TAGS=(   verse   bridge   chorus )

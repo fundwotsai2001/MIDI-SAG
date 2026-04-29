@@ -39,3 +39,4 @@ MUSDB_test_set
 test
 evaluate_200_songs.sh
 lyrics2singing_ablation.sh
+lyrics2melody
