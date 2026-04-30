@@ -22,11 +22,10 @@ import json
 from utils.extract_conditions import compute_dynamics, extract_melody_one_hot, evaluate_f1_rhythm, calculate_beats_and_downbeats, create_activations_from_timestamps, compute_rhythm_beatnet
 from typing import Optional
 # ── RMVPE / F0 melody encoder ─────────────────────────────────────────
-_MUSECTRLLITE_DIR = os.path.dirname(os.path.abspath(__file__))
 from rmvpe import RMVPE  # noqa: E402
 
-RMVPE_CKPT     = os.path.join(_MUSECTRLLITE_DIR, "SongEcho/rmvpe_model.pt")
-F0_MELODY_CKPT = os.path.join(_MUSECTRLLITE_DIR, "SongEcho/melody_encoder.pt")
+RMVPE_CKPT     = "/data/home/fundwotsai/MIDI-SAG/MIDI-SAG_checkpoints/rmvpe_model.pt"
+F0_MELODY_CKPT = "/data/home/fundwotsai/MIDI-SAG/MIDI-SAG_checkpoints/melody_encoder.pt"
 SR_RMVPE   = 16000
 HOP_RMVPE  = 160      # 10 ms frames
 FMIN_RMVPE = 50
