@@ -445,7 +445,6 @@ def main(config):
             ).audios
             backing_audio = waveform[0].float().cpu()
             backing_audio = (backing_audio.to(torch.float32) / 32768.0).clamp(-1, 1)
-
             mix = mix_audio(waveform_vocal_slice, backing_audio, target_dbfs=-18.0, out_peak_dbfs=-1.0)
             prompt_label = _safe_filename_component(prompt_text)
             mixed_file_path = os.path.join(

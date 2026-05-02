@@ -184,4 +184,4 @@ class SoulXSinger(nn.Module):
         
         generated_audio = self.vocoder(generated_mel.transpose(1, 2)[0:1, ...])
         
-        return generated_audio
+        return generated_audio, f0_shift

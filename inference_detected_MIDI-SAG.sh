@@ -81,7 +81,7 @@ BPM_ARGS=()
 
 python Singing-Vocal-Beat-Tracking/inference_vad.py \
     --audio_path "$VOCAL_AUDIO_PATH" \
-    --model_path MIDI-SAG_checkpoints/model-16.pt \
+    --model_path MIDI-SAG_checkpoints/vocal_beat_detector.pt \
     --use_vad --fill_silence --vad_merge_gap 3.0 --first_bpm_margin 10 \
     "${BPM_ARGS[@]}" \
     --output_dir "$OUTPUT_DIR/vocal_beat"
@@ -108,8 +108,8 @@ python AccoMontage2/demo_SOME.py \
     --key "$KEY"
 
 # ── 4. Backing track generation ──────────────────────────────────────────────
-mkdir -p "$OUTPUT_DIR/Backing_track"
-PROMPT_LOG_PATH="$OUTPUT_DIR/Backing_track/prompts_used.txt"
+mkdir -p "$OUTPUT_DIR/Mixed_track"
+PROMPT_LOG_PATH="$OUTPUT_DIR/Mixed_track/prompts_used.txt"
 
 case "$MODE" in
   47s)
@@ -123,7 +123,7 @@ case "$MODE" in
         --vocal_beat_file "$BEAT_PATH" \
         --vocal_downbeat_file "$DOWNBEAT_PATH" \
         --checkpoint_path "$MUSECONTROLLITE_CHECKPOINT" \
-        --output_dir "$OUTPUT_DIR/Backing_track/"; then
+        --output_dir "$OUTPUT_DIR/Mixed_track/"; then
         {
             printf 'inference_script=%s\n\n[text_prompts]\n' "$INFERENCE_SCRIPT"
             for i in "${!BACKING_TEXT_PROMPTS[@]}"; do
@@ -167,7 +167,7 @@ case "$MODE" in
         --vocal_beat_file "$BEAT_PATH" \
         --vocal_downbeat_file "$DOWNBEAT_PATH" \
         --checkpoint_path "$MUSECONTROLLITE_CHECKPOINT" \
-        --output_dir "$OUTPUT_DIR/Backing_track/" \
+        --output_dir "$OUTPUT_DIR/Mixed_track/" \
         "${STRUCT_ARGS[@]}"; then
         {
             printf 'inference_script=%s\n\n[structure_segments]\n' "$INFERENCE_SCRIPT"

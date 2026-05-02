@@ -84,6 +84,7 @@ def process(args, config, model: torch.nn.Module):
     generated_len = int(target_meta_list[-1]["time"][1] / 1000 * config.audio.sample_rate)
     generated_merged = np.zeros(generated_len, dtype=np.float32)
 
+    recorded_shift = None
     for idx, target_meta in enumerate(
         tqdm(target_meta_list, total=len(target_meta_list), desc="Inferring segments"),
     ):
@@ -97,7 +98,7 @@ def process(args, config, model: torch.nn.Module):
         }
 
         with torch.no_grad():
-            generated_audio = model.infer(
+            generated_audio, f0_shift = model.infer(
                 infer_data,
                 auto_shift=args.auto_shift,
                 pitch_shift=args.pitch_shift,
@@ -105,6 +106,8 @@ def process(args, config, model: torch.nn.Module):
                 cfg=config.infer.cfg,
                 control=args.control,
             )
+        if recorded_shift is None:
+            recorded_shift = f0_shift
 
         generated_audio = generated_audio.squeeze().cpu().numpy()
         slot_size = end_sample_idx - start_sample_idx
@@ -112,6 +115,11 @@ def process(args, config, model: torch.nn.Module):
             generated_merged[start_sample_idx:end_sample_idx] = generated_audio[:slot_size]
         else:
             generated_merged[start_sample_idx:start_sample_idx + generated_audio.shape[0]] = generated_audio
+
+    shift_path = os.path.join(args.save_dir, "pitch_shift.txt")
+    with open(shift_path, "w") as f:
+        f.write(str(recorded_shift if recorded_shift is not None else 0))
+    print(f"Pitch shift used: {recorded_shift} semitones (saved to {shift_path})")
 
     merged_path = os.path.join(args.save_dir, "generated.wav")
     sf.write(merged_path, generated_merged, 24000)

@@ -5,8 +5,9 @@ ORIGINAL_LYRIC_PATH="./example_input/lyrics.txt"
 OUTPUT_DIR="./output_composerflow"
 
 # SoulX-Singer voice prompt (reference speaker for vocal synthesis)
-SOULX_PROMPT_WAV="example/audio/zh_target.mp3"
-SOULX_PROMPT_META="example/audio/zh_target.json"
+SINGER_GENDER="male"
+SOULX_PROMPT_WAV="../example_input/zh_target.mp3"
+SOULX_PROMPT_META="../example_input/zh_target.json"
 
 # Mode selector: "47s" | "full_song"
 #   47s       → MuseControlLite_inference_47s_scale_up.py, one text prompt per run
@@ -35,11 +36,11 @@ BACKING_TEXT_PROMPTS=( "$BACKING_TEXT_PROMPT" )
 # Tags not listed here fall back to BACKING_TEXT_PROMPT above.
 # Valid tags: intro, verse, chorus, bridge, outro, break, inst, solo
 declare -A STRUCTURE_TAG_PROMPTS=(
-    [intro]="Soft synthesizer pads open slowly, ethereal and tranquil, meditative and dreamy, a gentle wash of sound"
-    [verse]="Melancholic yet hopeful acoustic feel with fingerpicked acoustic guitar, electric piano, bass, and steady drums"
-    [chorus]="Energetic rock with driving drums, electric guitar riffs, bass guitar, and an uplifting, emotional release"
+    [intro]="A slow, gentle fingerpicked acoustic guitar melody, soft and reflective, building quietly with a hint of melancholy"
+    [verse]="Melancholic yet hopeful acoustic folk feel with fingerpicked acoustic guitar, electric piano"
+    [chorus]="Energetic rock with driving drums, electric guitar riffs, bass guitar, and an uplifting, motivational, emotional release."
     [bridge]="Reflective instrumental passage with piano, synth pad, bass, and gentle percussion"
-    [outro]="Soft synthesizer pads fading slowly, ethereal and tranquil, peaceful resolution"
+    [outro]="Reflective instrumental passage with piano, synth pad, bass, and gentle percussion"
     [break]="Minimal instrumental break with sparse percussion and ambient textures"
     [inst]="Instrumental section with expressive lead melody and full band accompaniment"
     [solo]="Virtuosic instrumental solo with dynamic expression and energy"
@@ -67,16 +68,16 @@ CHORD_DIR="$MIDI_DIR/chord/$CHORD_STYLE"
 SONG_NAME="sample01"
 HARMONIZE_DIR="$OUTPUT_DIR/Harmonization_results"
 CHORD_PATH="$HARMONIZE_DIR/btc_txt/${SONG_NAME}_chord_gen.txt"
-PROMPT_LOG_PATH="$OUTPUT_DIR/Backing_track/prompts_used.txt"
+PROMPT_LOG_PATH="$OUTPUT_DIR/Mixed_track/prompts_used.txt"
 
 # ── 1. CSL-L2M: Lyrics → MIDI ───────────────────────────────────────────────
 mkdir -p "$MIDI_DIR"
 cd /data/home/fundwotsai/MIDI-SAG/lyrics2melody_new
 python -u generate.py \
-    config/CSLL2M.yaml pretrained_CSLL2M.pt \
+    config/CSLL2M.yaml ../MIDI-SAG_checkpoints/pretrained_CSLL2M.pt \
     "$MIDI_DIR" 1 "$ORIGINAL_LYRIC_PATH"
 python -u read_midi.py $GENERATED_MIDI $LYRIC_PATH
-python -u  pitch_picking.py $GENERATED_MIDI --bpm $BPM_PATH
+python -u pitch_picking.py $GENERATED_MIDI --bpm $BPM_PATH --singer $SINGER_GENDER
 python -u read_midi_lyrics_timestamp.py $MIDI_DIR
 python -u match_segment_times.py $ORIGINAL_LYRIC_PATH $TIME_LYRIC_PATH $STRUCT_time_LIST $STRUCT_label_LIST
 
@@ -87,7 +88,7 @@ python midi2json.py "$GENERATED_MIDI" "$TARGET_META" --language "Mandarin"
 # ── 3. SoulX-Singer: MIDI + JSON → Vocal audio ──────────────────────────────
 python -m cli.inference \
     --device cuda \
-    --model_path pretrained_models/SoulX-Singer/model.pt \
+    --model_path ../MIDI-SAG_checkpoints/SoulX-Singer/model.pt \
     --config soulxsinger/config/soulxsinger.yaml \
     --prompt_wav_path "$SOULX_PROMPT_WAV" \
     --prompt_metadata_path "$SOULX_PROMPT_META" \
@@ -95,7 +96,7 @@ python -m cli.inference \
     --phoneset_path soulxsinger/utils/phoneme/phone_set.json \
     --save_dir "$SOULX_SAVE_DIR" \
     --control score \
-    --pitch_shift 0
+    # --auto_shift
 
 # ── 4. AccoMontage2: MIDI → Chord harmonization ─────────────────────────────
 cd /data/home/fundwotsai/MIDI-SAG
@@ -116,7 +117,7 @@ if [ -z "$VOCAL_AUDIO_PATH" ]; then
     exit 1
 fi
 
-mkdir -p "$OUTPUT_DIR/Backing_track"
+mkdir -p "$OUTPUT_DIR/Mixed_track"
 
 case "$MODE" in
   47s)
@@ -129,7 +130,7 @@ case "$MODE" in
         --chord_file "$CHORD_PATH" \
         --vocal_midi_file "$GENERATED_MIDI" \
         --checkpoint_path "$MUSECONTROLLITE_CHECKPOINT" \
-        --output_dir "$OUTPUT_DIR/Backing_track/"; then
+        --output_dir "$OUTPUT_DIR/Mixed_track/"; then
         {
             printf 'inference_script=%s\n\n[text_prompts]\n' "$INFERENCE_SCRIPT"
             for i in "${!BACKING_TEXT_PROMPTS[@]}"; do
@@ -176,7 +177,7 @@ case "$MODE" in
         --chord_file "$CHORD_PATH" \
         --vocal_midi_file "$GENERATED_MIDI" \
         --checkpoint_path "$MUSECONTROLLITE_CHECKPOINT" \
-        --output_dir "$OUTPUT_DIR/Backing_track/" \
+        --output_dir "$OUTPUT_DIR/Mixed_track/" \
         "${STRUCT_ARGS[@]}"; then
         {
             printf 'inference_script=%s\n\n[structure_segments]\n' "$INFERENCE_SCRIPT"

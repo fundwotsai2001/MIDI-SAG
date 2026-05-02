@@ -55,7 +55,7 @@ STRUCTURE_TAGS=(   intro   verse   chorus )
 
 # ── Derived paths ─────────────────────────────────────────────────────────────
 CHORD_PATH="$OUTPUT_DIR/Harmonization_results/btc_txt/${SONG_NAME}_chord_gen.txt"
-PROMPT_LOG_PATH="$OUTPUT_DIR/Backing_track/prompts_used.txt"
+PROMPT_LOG_PATH="$OUTPUT_DIR/Mixed_track/prompts_used.txt"
 
 ###############################################################################
 # you do not need to modify the following 
@@ -70,7 +70,7 @@ python AccoMontage2/demo_SOME.py \
     --key "$KEY"
 
 # ── 2. Backing track generation ─────────────────────────────────────────────
-mkdir -p "$OUTPUT_DIR/Backing_track"
+mkdir -p "$OUTPUT_DIR/Mixed_track"
 
 case "$MODE" in
   47s)
@@ -83,7 +83,7 @@ case "$MODE" in
         --chord_file "$CHORD_PATH" \
         --vocal_midi_file "$VOCAL_MIDI_PATH" \
         --checkpoint_path "$MUSECONTROLLITE_CHECKPOINT" \
-        --output_dir "$OUTPUT_DIR/Backing_track/"; then
+        --output_dir "$OUTPUT_DIR/Mixed_track/"; then
         {
             printf 'inference_script=%s\n\n[text_prompts]\n' "$INFERENCE_SCRIPT"
             for i in "${!BACKING_TEXT_PROMPTS[@]}"; do
@@ -126,7 +126,7 @@ case "$MODE" in
         --chord_file "$CHORD_PATH" \
         --vocal_midi_file "$VOCAL_MIDI_PATH" \
         --checkpoint_path "$MUSECONTROLLITE_CHECKPOINT" \
-        --output_dir "$OUTPUT_DIR/Backing_track/" \
+        --output_dir "$OUTPUT_DIR/Mixed_track/" \
         "${STRUCT_ARGS[@]}"; then
         {
             printf 'inference_script=%s\n\n[structure_segments]\n' "$INFERENCE_SCRIPT"

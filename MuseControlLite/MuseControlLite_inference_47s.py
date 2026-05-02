@@ -207,6 +207,8 @@ def main(config):
         backing_audio = (backing_audio.to(torch.float32) / 32768.0).clamp(-1, 1)
 
         mix = mix_audio(waveform_vocal_slice, backing_audio, target_dbfs=-18.0, out_peak_dbfs=-1.0)
+        backing_file_path = os.path.join(output_dir, f"backing_{song_name}_{prompt_texts}.wav")
+        sf.write(backing_file_path, backing_audio.T.float().cpu().numpy(), pipe.vae.sampling_rate)
         mixed_file_path = os.path.join(output_dir, f"mixed_{song_name}_{prompt_texts}.wav")
         sf.write(mixed_file_path, mix.T.float().cpu().numpy(), pipe.vae.sampling_rate)
 
