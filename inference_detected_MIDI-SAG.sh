@@ -7,12 +7,12 @@ OUTPUT_DIR="./output_midi_sag/${SONG_NAME}"
 # Mode selector: "47s" | "full_song"
 #   47s       → MuseControlLite_inference_47s_scale_up.py, one text prompt per run
 #   full_song → MuseControlLite_inference_continuation.py, uses STRUCTURE_* arrays
-MODE="full_song"
+MODE="47s"
 MUSECONTROLLITE_CHECKPOINT="./MIDI-SAG_checkpoints/MuseControlLite_checkpoint"
 # Chord style for harmonization: POP_STANDARD | POP_COMPLEX | DARK | RANDB | NOCONSTRAINT
-CHORD_STYLE="POP_COMPLEX"
+CHORD_STYLE="POP_STANDARD"
 # Chords per bar: 1 (default, bar-level) or 2 (half-bar; 2nd half = next bar's chord).
-CHORDS_PER_BAR=2
+CHORDS_PER_BAR=1
 # Musical key of the vocal melody passed to AccoMontage2/demo_SOME.py.
 #   Major: C  C#  Db  D  D#  Eb  E  F  F#  Gb  G  G#  Ab  A  A#  Bb  B
 #   Minor: Cm C#m Dbm Dm D#m Ebm Em Fm F#m Gbm Gm G#m Abm Am A#m Bbm Bm

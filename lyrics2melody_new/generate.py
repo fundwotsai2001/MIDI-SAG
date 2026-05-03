@@ -520,7 +520,7 @@ if __name__ == "__main__":
   merged_lyrics = list(chain.from_iterable(seq_lyrics))
   seq_lyrics_tokens=convert_lyrics(seq_lyrics, lyric2idx)
   enc_inp, enc_padding_mask, enc_lens = get_encoder_input_data(seq_lyrics_tokens)
-  folder = "/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/sentence_struct_1000"
+  folder = "./sentence_struct_1000"
   matches = find_best_matches(folder, segment_labels, lines)
   piece = matches.split('/')[-1]
   # piece = '伴自己-常石磊-90-B.pkl'
@@ -611,18 +611,18 @@ if __name__ == "__main__":
 
   
   if config['model']['use_musc_ctls']:
-    p_ND = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/ND_seq_d64', piece))
-    p_Align = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/Align_seq_d64', piece))
-    p_PM = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/PM_seq_d64', piece))
-    p_MCD = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/MCD_seq_d64', piece))
-    p_DMM = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/DMM_seq_d64', piece))
-    p_AA = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/AA_seq_d64', piece))
-    p_CM = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/CM_seq_d64', piece))
-    p_PV = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/PV_seq_d64', piece))
-    p_PR = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/PR_seq_d64', piece))
-    p_DM = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/DM_seq_d64', piece))
-    p_DV = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/DV_seq_d64', piece))
-    p_DR = pickle_load(os.path.join('/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new/share_StatisticalAttributes/DR_seq_d64', piece))
+    p_ND = pickle_load(os.path.join('./share_StatisticalAttributes/ND_seq_d64', piece))
+    p_Align = pickle_load(os.path.join('./share_StatisticalAttributes/Align_seq_d64', piece))
+    p_PM = pickle_load(os.path.join('./share_StatisticalAttributes/PM_seq_d64', piece))
+    p_MCD = pickle_load(os.path.join('./share_StatisticalAttributes/MCD_seq_d64', piece))
+    p_DMM = pickle_load(os.path.join('./share_StatisticalAttributes/DMM_seq_d64', piece))
+    p_AA = pickle_load(os.path.join('./share_StatisticalAttributes/AA_seq_d64', piece))
+    p_CM = pickle_load(os.path.join('./share_StatisticalAttributes/CM_seq_d64', piece))
+    p_PV = pickle_load(os.path.join('./share_StatisticalAttributes/PV_seq_d64', piece))
+    p_PR = pickle_load(os.path.join('./share_StatisticalAttributes/PR_seq_d64', piece))
+    p_DM = pickle_load(os.path.join('./share_StatisticalAttributes/DM_seq_d64', piece))
+    p_DV = pickle_load(os.path.join('./share_StatisticalAttributes/DV_seq_d64', piece))
+    p_DR = pickle_load(os.path.join('./share_StatisticalAttributes/DR_seq_d64', piece))
 
     p_struct =torch.tensor(segment_labels, device=device) # {'Verse':0, 'Chorus':1, 'Insertion':2, 'Bridge':3, 'Outro':4}
     p_key =torch.tensor([7], device=device) #{'A':0, 'Ab':1, 'Am':2, 'B':3, 'Bb':4, 'Bbm':5, 'Bm':6, 'C':7, 'C#m':8, 'Cm':9, 'D':10, 'D#m':11, 'Db':12, 'Dm':13, 'E':14, 'Eb':15, 'Em':16, 'F':17, 'F#':18, 'F#m':19, 'Fm':20, 'G':21, 'G#m':22, 'Gm':23}

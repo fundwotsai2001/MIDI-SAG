@@ -7,7 +7,7 @@ OUTPUT_DIR="./output_composerflow"
 
 # SoulX-Singer voice prompt (reference speaker for vocal synthesis)
 SINGER_GENDER="male" # use male or female, the pitch picking has to know the gender to select the region
-SOULX_PROMPT_WAV="/data/home/fundwotsai/MIDI-SAG/example_input/too_much_such.wav" # The voice prompt should be less then 10 seconds
+SOULX_PROMPT_WAV="./example_input/too_much_such.wav" # The voice prompt should be less then 10 seconds
 PROMPT_LANGUAGE="English" # The voice prompt can be either Chinese, English or Cantonese
 VOCAL_SEP=False # if the vocal prompt contains backing track; set True if the wav has backing music
 # Mode selector: "47s" | "full_song"
@@ -16,7 +16,7 @@ VOCAL_SEP=False # if the vocal prompt contains backing track; set True if the wa
 MODE="full_song"
 MUSECONTROLLITE_CHECKPOINT="./MIDI-SAG_checkpoints/MuseControlLite_checkpoint"
 # Chord style for harmonization: POP_STANDARD | POP_COMPLEX | DARK | RANDB | NOCONSTRAINT
-CHORD_STYLE="POP_COMPLEX"
+CHORD_STYLE="POP_STANDARD"
 CHORDS_PER_BAR=1
 # Musical key of the vocal melody passed to AccoMontage2/demo_SOME.py.
 #   Major: C  C#  Db  D  D#  Eb  E  F  F#  Gb  G  G#  Ab  A  A#  Bb  B

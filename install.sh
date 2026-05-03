@@ -10,19 +10,20 @@ pip install miditok
 pip install "huggingface-hub>=0.24.0,<1.0"
 pip install nemo_toolkit[asr] 
 pip install openai-whisper 
-# # Download the SoulX-Singer SVS model
-hf download Soul-AILab/SoulX-Singer --local-dir MIDI-SAG_checkpoints/SoulX-Singer
-Download models required for preprocessing
-hf download Soul-AILab/SoulX-Singer-Preprocess --local-dir MIDI-SAG_checkpoints/SoulX-Singer-Preprocess
 
-                                                                                                 
+# Download the pretrained RMVPE model                                                                                           
 wget https://github.com/yxlllc/RMVPE/releases/download/230917/rmvpe.zip -O /tmp/RMVPE.zip      
 unzip /tmp/RMVPE.zip                                                                                            
 rm /tmp/RMVPE.zip  
-
-
+# Download the pretrained GAME model
 wget https://github.com/openvpi/GAME/releases/download/v1.0.0/GAME-1.0-medium.zip -O /tmp/game_model.zip                                                         
 unzip /tmp/game_model.zip -d GAME/  
-
+# Download the pretrained MuseControlLite and the vocal beat detector
 gdown 1o6eUCYwUcIzZeqEycar6AHTSQ-vYcL_q --folder
+# Download the pretrained CSLL2M model
 gdown 1ylVTiDd_fwif2ISQzn9bxxYSkfEzXjQu -O ./MIDI-SAG_checkpoints/pretrained_CSLL2M.pt
+
+# Download the SoulX-Singer SVS model
+hf download Soul-AILab/SoulX-Singer --local-dir MIDI-SAG_checkpoints/SoulX-Singer
+# Download models required for preprocessing
+hf download Soul-AILab/SoulX-Singer-Preprocess --local-dir MIDI-SAG_checkpoints/SoulX-Singer-Preprocess
