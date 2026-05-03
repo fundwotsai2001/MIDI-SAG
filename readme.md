@@ -178,6 +178,12 @@ ${OUTPUT_DIR}/
 }
 ```
 
+## License
+
+This project is released under the [Apache License 2.0](LICENSE). See the [`LICENSE`](LICENSE) file for the full text.
+
+Note that bundled third-party components (AccoMontage2, GAME, SoulX-Singer, CSL-L2M, Stable Audio Open, Singing-Vocal-Beat-Tracking) retain their original licenses; please consult each upstream repository before redistribution or commercial use.
+
 ## Acknowledgements
 
 This project builds on the following open-source projects:
