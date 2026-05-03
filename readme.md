@@ -1,4 +1,4 @@
-# MIDI-SAG: MIDI-Informed Singing Accompaniment Generation
+# <img src="lyrics.png" alt="" width="40" align="left" />&nbsp;&nbsp;&nbsp;&nbsp;MIDI-SAG: MIDI-Informed Singing Accompaniment Generation
 
 Generate full-song backing tracks conditioned on vocal melody, with structure-aware continuation and controllable chord styles.
 
@@ -13,7 +13,7 @@ Three usage modes are available:
 
 - **Detected** -- input is vocal audio only. The pipeline auto-detects beats, transcribes vocal MIDI via GAME, harmonizes chords with AccoMontage2, and generates the backing track.
 - **Ground-truth** -- input is vocal audio + a pre-existing vocal MIDI. Skips beat tracking and transcription; uses the provided MIDI directly for harmonization.
-- **ComposeFlow** -- input is a lyrics text file. End-to-end pipeline from text to full song: lyrics-to-melody (CSL-L2M), melody-to-singing-voice (SoulX-Singer), then harmonization and backing track generation.
+- **ComposeFlow** -- input is a lyrics text file. End-to-end pipeline from text to full song: lyrics-to-melody (CSL-L2M), melody-to-singing-voice (SoulX-Singer), then harmonization and backing track generation. You can use the voice prompt from the ./example_input folder or use your own audio files (shorter than 10 seconds).
 
 ## Pipeline
 
@@ -77,39 +77,94 @@ Three scripts correspond to the three modes:
 ./inference_ComposeFlow.sh
 ```
 
-Edit the config section at the top of each script before running. Key parameters:
+Edit the config section at the top of each script before running.
+
+### Common parameters (all three scripts)
 
 | Parameter | Values | Description |
 |-----------|--------|-------------|
-| `MODE` | `47s`, `full_song` | Single-segment or structure-aware full-song generation |
+| `MODE` | `47s`, `full_song` | Single-segment (≤47 s) or structure-aware full-song generation |
+| `MUSECONTROLLITE_CHECKPOINT` | path | MuseControlLite checkpoint directory |
 | `CHORD_STYLE` | `POP_STANDARD`, `POP_COMPLEX`, `DARK`, `RANDB`, `NOCONSTRAINT` | Chord vocabulary constraint for harmonization |
-| `CHORDS_PER_BAR` | `1`, `2` | Bar-level or half-bar chord resolution |
-| `KEY` | `C`, `Cm`, `auto`, ... | Musical key (`auto` for automatic detection) |
-| `STRUCTURE_TAG_PROMPTS` | associative array | Per-section text prompts (intro, verse, chorus, ...) for `full_song` mode |
-| `STRUCTURE_STARTS` / `STRUCTURE_TAGS` | arrays | Section boundary timestamps and labels |
+| `CHORDS_PER_BAR` | `1`, `2` | Bar-level or half-bar chord resolution (half-bar uses the next bar's chord for the 2nd half) |
+| `KEY` | `C`, `Cm`, `auto`, ... | Musical key. `auto` reads `key_signature` from the MIDI and falls back to a Bellman-Budge heuristic |
+| `BACKING_TEXT_PROMPT` | string | Default text prompt; also used as a fallback in `full_song` mode for tags missing from `STRUCTURE_TAG_PROMPTS` |
+| `BACKING_TEXT_PROMPTS` | array | (47s mode) One generation per entry, all under a single model load |
+| `STRUCTURE_TAG_PROMPTS` | assoc. array | (full_song mode) Per-tag prompts. Valid tags: `intro`, `verse`, `chorus`, `bridge`, `outro`, `break`, `inst`, `solo` |
+| `STRUCTURE_STARTS` / `STRUCTURE_TAGS` | arrays | (full_song mode) Section boundary timestamps and labels. Each gap and the trailing segment must be < 47 s |
+
+### Detected-mode only (`inference_detected_MIDI-SAG.sh`)
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `VOCAL_AUDIO_PATH` | path | Vocal audio input |
+| `DOWNBEAT_PHASE` | int or `None` | Index into the detected-only beat file selecting bar 1, beat 1. `None` lets AccoMontage2 detect the downbeat phase automatically (sometimes inaccurate) |
+| `MIN_BPM` / `MAX_BPM` | int (empty for default) | DBN beat-tracker BPM bounds passed to `Singing-Vocal-Beat-Tracking/inference_vad.py` |
+
+### Ground-truth-mode only (`inference_gt_MIDI-SAG.sh`)
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `VOCAL_AUDIO_PATH` | path | Vocal audio input |
+| `VOCAL_MIDI_PATH` | path | Pre-existing vocal MIDI (skips beat tracking + transcription) |
+
+### ComposeFlow-only (`inference_ComposeFlow.sh`)
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `ORIGINAL_LYRIC_PATH` | path | Lyrics file (one phrase per line; blank lines separate sections) |
+| `SINGER_GENDER` | `male`, `female` | Used by pitch picking to select the vocal range |
+| `SOULX_PROMPT_WAV` | path | Reference voice clip for SoulX-Singer (must be < 10 s). Examples are in `./example_input/` |
+| `PROMPT_LANGUAGE` | `English`, `Chinese`, `Cantonese` | Language of the voice prompt |
+| `VOCAL_SEP` | `True`, `False` | Set `True` if the prompt WAV contains backing music that needs to be separated |
+
+> **Note (ComposeFlow)**: `STRUCTURE_STARTS` and `STRUCTURE_TAGS` are **auto-derived** from the lyrics→melody pipeline — do not set them by hand. Only `STRUCTURE_TAG_PROMPTS` need editing for `full_song` mode.
 
 ## Output Structure
 
+### Detected / Ground-truth modes
+
 ```
 ${OUTPUT_DIR}/
-├── Backing_track/
+├── Mixed_track/
 │   ├── prompts_used.txt
-│   └── text_7.0_con_1.5_rhythm_melody_structure_chord_audio_0.3_500/
+│   └── text_<gs_text>_con_<gs_con>.../
 │       ├── mixed_${SONG_NAME}_full.wav
-│       └── mixed_${SONG_NAME}_structure_prompts.json
+│       └── mixed_${SONG_NAME}_structure_prompts.json   # full_song mode
 ├── Harmonization_results/
 │   ├── btc_txt/
 │   │   └── ${SONG_NAME}_chord_gen.txt
 │   └── chord_gen_filled_empty/
 │       └── ${SONG_NAME}_chord_gen_filled_empty_bars.mid
-├── vocal_beat/
+├── vad_audio/                                           # detected mode, 47s only
+│   └── ${SONG_NAME}.wav
+├── vocal_beat/                                          # detected mode only
 │   └── ${SONG_NAME}/
 │       ├── ${SONG_NAME}_beat_times.txt
 │       ├── ${SONG_NAME}_beat_times_detected_only.txt
 │       ├── ${SONG_NAME}_downbeat_times.txt
 │       └── ${SONG_NAME}_with_metronome.wav
-└── vocal_MIDI/
+└── vocal_MIDI/                                          # detected mode only
     └── ${SONG_NAME}.mid
+```
+
+### ComposeFlow mode
+
+```
+${OUTPUT_DIR}/
+├── Mixed_track/                       # backing track + prompts_used.txt
+├── Harmonization_results/             # AccoMontage2 chord output
+├── lyrics2melody/                     # CSL-L2M outputs
+│   ├── sample01.mid
+│   ├── sample01.json                  # BPM
+│   ├── sample01_times.txt             # lyric timestamps
+│   ├── sample01_struct_time.json      # auto-derived STRUCTURE_STARTS
+│   ├── sample01_struct_label.json     # auto-derived STRUCTURE_TAGS
+│   └── sample01_soulx.json            # SoulX-Singer target metadata
+├── prompt_transcription/              # preprocessed voice-prompt metadata
+│   └── metadata.json
+└── vocal_audio/                       # SoulX-Singer synthesized vocal
+    └── *.wav
 ```
 
 ## Citation
