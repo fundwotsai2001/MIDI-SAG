@@ -1,10 +1,13 @@
 import json
+import os
 import shutil
 import soundfile as sf
 from pathlib import Path
 import librosa
 
 from preprocess.utils import convert_metadata, merge_short_segments
+
+_PRETRAINED = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "MIDI-SAG_checkpoints")
 
 from preprocess.tools import (
     F0Extractor,
@@ -25,29 +28,29 @@ class PreprocessPipeline:
 
         if vocal_sep:
             self.vocal_separator = VocalSeparator(
-                sep_model_path="pretrained_models/SoulX-Singer-Preprocess/mel-band-roformer-karaoke/mel_band_roformer_karaoke_becruily.ckpt",
-                sep_config_path="pretrained_models/SoulX-Singer-Preprocess/mel-band-roformer-karaoke/config_karaoke_becruily.yaml",
-                der_model_path="pretrained_models/SoulX-Singer-Preprocess/dereverb_mel_band_roformer/dereverb_mel_band_roformer_anvuew_sdr_19.1729.ckpt",
-                der_config_path="pretrained_models/SoulX-Singer-Preprocess/dereverb_mel_band_roformer/dereverb_mel_band_roformer_anvuew.yaml",
+                sep_model_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/mel-band-roformer-karaoke/mel_band_roformer_karaoke_becruily.ckpt"),
+                sep_config_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/mel-band-roformer-karaoke/config_karaoke_becruily.yaml"),
+                der_model_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/dereverb_mel_band_roformer/dereverb_mel_band_roformer_anvuew_sdr_19.1729.ckpt"),
+                der_config_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/dereverb_mel_band_roformer/dereverb_mel_band_roformer_anvuew.yaml"),
                 device=device
             )
         else:
             self.vocal_separator = None
         self.f0_extractor = F0Extractor(
-            model_path="pretrained_models/SoulX-Singer-Preprocess/rmvpe/rmvpe.pt",
+            model_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/rmvpe/rmvpe.pt"),
             device=device,
         )
         self.vocal_detector = VocalDetector(
-            cut_wavs_output_dir=  f"{save_dir}/cut_wavs",
+            cut_wavs_output_dir=f"{save_dir}/cut_wavs",
         )
         self.lyric_transcriber = LyricTranscriber(
-            zh_model_path="pretrained_models/SoulX-Singer-Preprocess/speech_seaco_paraformer_large_asr_nat-zh-cn-16k-common-vocab8404-pytorch",
-            en_model_path="pretrained_models/SoulX-Singer-Preprocess/parakeet-tdt-0.6b-v2/parakeet-tdt-0.6b-v2.nemo",
+            zh_model_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/speech_seaco_paraformer_large_asr_nat-zh-cn-16k-common-vocab8404-pytorch"),
+            en_model_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/parakeet-tdt-0.6b-v2/parakeet-tdt-0.6b-v2.nemo"),
             device=device
         )
         self.note_transcriber = NoteTranscriber(
-            rosvot_model_path="pretrained_models/SoulX-Singer-Preprocess/rosvot/rosvot/model.pt", 
-            rwbd_model_path="pretrained_models/SoulX-Singer-Preprocess/rosvot/rwbd/model.pt", 
+            rosvot_model_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/rosvot/rosvot/model.pt"),
+            rwbd_model_path=os.path.join(_PRETRAINED, "SoulX-Singer-Preprocess/rosvot/rwbd/model.pt"),
             device=device
         )
 

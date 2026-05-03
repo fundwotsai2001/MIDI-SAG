@@ -130,53 +130,40 @@ class _ASRZhModel:
 
 
 class _ASREnModel:
-    """English ASR wrapper for NeMo Parakeet-TDT."""
+    """English ASR wrapper using OpenAI Whisper (word-level timestamps)."""
 
     def __init__(self, model_path: str, device: str):
         try:
-            import nemo.collections.asr as nemo_asr  # type: ignore
-        except Exception as e:  # pragma: no cover
+            import whisper  # type: ignore
+        except ImportError as e:
             raise ImportError(
-                "NeMo (nemo_toolkit) is required for ASR English but is not available in this Python env. "
-                "Install it in the active environment, then retry."
+                "openai-whisper is required for English ASR. "
+                "Install it with: pip install openai-whisper"
             ) from e
-
-        self.model = nemo_asr.models.ASRModel.restore_from(
-            restore_path=model_path,
-            map_location=device,
-        )
-        self.model.eval()
+        self.whisper = whisper
+        self.device = device
+        # model_path ignored; whisper downloads its own weights
+        self.model = whisper.load_model("large-v2", device=device)
 
     @staticmethod
     def _clean_word(word: str) -> str:
         return re.sub(r"[\?\.,:]", "", word).strip()
 
-    @staticmethod
-    def _extract_word_segments(output: Any) -> List[Dict[str, Any]]:
-        ts = getattr(output, "timestamp", None)
-        if not ts or not isinstance(ts, dict):
-            return []
-        word_ts = ts.get("word")
-        return word_ts if isinstance(word_ts, list) else []
-
     def process(self, wav_fn: str) -> Tuple[List[str], List[float]]:
-        outputs = self.model.transcribe(
-            [wav_fn],
-            timestamps=True,
-            batch_size=1,
-            num_workers=0,
+        result = self.model.transcribe(
+            wav_fn,
+            language="en",
+            word_timestamps=True,
         )
-        output = outputs[0] if outputs else None
 
         raw_words: List[str] = []
         raw_timestamps: List[List[float]] = []
-        if output is not None:
-            for w in self._extract_word_segments(output):
-                s, e = float(w.get("start", 0.0)), float(w.get("end", 0.0))
-                word = self._clean_word(str(w.get("word", "")))
+        for seg in result.get("segments", []):
+            for w in seg.get("words", []):
+                word = self._clean_word(w.get("word", "").strip())
                 if word:
                     raw_words.append(word)
-                    raw_timestamps.append([s, e])
+                    raw_timestamps.append([float(w["start"]), float(w["end"])])
 
         words, durs = _build_words_with_gaps(raw_words, raw_timestamps, wav_fn)
 

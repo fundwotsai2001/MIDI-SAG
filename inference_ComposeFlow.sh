@@ -1,3 +1,4 @@
+#!/bin/bash
 ###############################################################################
 # ── User config ──────────────────────────────────────────────────────────────
 # Input lyrics file (one line per lyric phrase; blank lines separate sections)
@@ -5,10 +6,10 @@ ORIGINAL_LYRIC_PATH="./example_input/lyrics.txt"
 OUTPUT_DIR="./output_composerflow"
 
 # SoulX-Singer voice prompt (reference speaker for vocal synthesis)
-SINGER_GENDER="male"
-SOULX_PROMPT_WAV="../example_input/zh_target.mp3"
-SOULX_PROMPT_META="../example_input/zh_target.json"
-
+SINGER_GENDER="male" # use male or female, the pitch picking has to know the gender to select the region
+SOULX_PROMPT_WAV="/data/home/fundwotsai/MIDI-SAG/example_input/too_much_such.wav" # The voice prompt should be less then 10 seconds
+PROMPT_LANGUAGE="English" # The voice prompt can be either Chinese, English or Cantonese
+VOCAL_SEP=False # if the vocal prompt contains backing track; set True if the wav has backing music
 # Mode selector: "47s" | "full_song"
 #   47s       → MuseControlLite_inference_47s_scale_up.py, one text prompt per run
 #   full_song → MuseControlLite_inference_continuation.py, uses structure tag prompts
@@ -16,7 +17,6 @@ MODE="full_song"
 MUSECONTROLLITE_CHECKPOINT="./MIDI-SAG_checkpoints/MuseControlLite_checkpoint"
 # Chord style for harmonization: POP_STANDARD | POP_COMPLEX | DARK | RANDB | NOCONSTRAINT
 CHORD_STYLE="POP_COMPLEX"
-# Chords per bar: 1 (default, bar-level) or 2 (half-bar; 2nd half = next bar's chord).
 CHORDS_PER_BAR=1
 # Musical key of the vocal melody passed to AccoMontage2/demo_SOME.py.
 #   Major: C  C#  Db  D  D#  Eb  E  F  F#  Gb  G  G#  Ab  A  A#  Bb  B
@@ -51,6 +51,7 @@ declare -A STRUCTURE_TAG_PROMPTS=(
 # you do not need to modify the following
 # ── Resolve relative user paths to absolute (before any cd) ──────────────────
 ORIGINAL_LYRIC_PATH="$(readlink -f "$ORIGINAL_LYRIC_PATH")"
+SOULX_PROMPT_WAV="$(readlink -f "$SOULX_PROMPT_WAV")"
 mkdir -p "$OUTPUT_DIR"
 OUTPUT_DIR="$(cd "$OUTPUT_DIR" && pwd)"
 
@@ -65,6 +66,7 @@ STRUCT_time_LIST="$MIDI_DIR/sample01_struct_time.json"
 GENERATED_MIDI="$MIDI_DIR/sample01.mid"
 TARGET_META="$MIDI_DIR/sample01_soulx.json"
 CHORD_DIR="$MIDI_DIR/chord/$CHORD_STYLE"
+SOULX_PROMPT_TRANSCRIPTION_DIR="$OUTPUT_DIR/prompt_transcription"
 SONG_NAME="sample01"
 HARMONIZE_DIR="$OUTPUT_DIR/Harmonization_results"
 CHORD_PATH="$HARMONIZE_DIR/btc_txt/${SONG_NAME}_chord_gen.txt"
@@ -84,6 +86,17 @@ python -u match_segment_times.py $ORIGINAL_LYRIC_PATH $TIME_LYRIC_PATH $STRUCT_t
 # ── 2. Convert generated MIDI → SoulX-Singer JSON ───────────────────────────
 cd /data/home/fundwotsai/MIDI-SAG/SoulX-Singer
 python midi2json.py "$GENERATED_MIDI" "$TARGET_META" --language "Mandarin"
+
+# ── 2.5. Preprocess vocal prompt WAV → metadata JSON ────────────────────────
+mkdir -p "$SOULX_PROMPT_TRANSCRIPTION_DIR"
+python -m preprocess.pipeline \
+    --audio_path "$SOULX_PROMPT_WAV" \
+    --save_dir "$SOULX_PROMPT_TRANSCRIPTION_DIR" \
+    --language "$PROMPT_LANGUAGE" \
+    --device cuda \
+    --vocal_sep $VOCAL_SEP \
+    --max_merge_duration 90000
+SOULX_PROMPT_META="$SOULX_PROMPT_TRANSCRIPTION_DIR/metadata.json"
 
 # ── 3. SoulX-Singer: MIDI + JSON → Vocal audio ──────────────────────────────
 python -m cli.inference \

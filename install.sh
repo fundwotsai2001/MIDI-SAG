@@ -8,6 +8,8 @@ pip install torchcodec
 pip install chorder
 pip install miditok
 pip install "huggingface-hub>=0.24.0,<1.0"
+pip install nemo_toolkit[asr] 
+pip install openai-whisper 
 # # Download the SoulX-Singer SVS model
 hf download Soul-AILab/SoulX-Singer --local-dir MIDI-SAG_checkpoints/SoulX-Singer
 Download models required for preprocessing

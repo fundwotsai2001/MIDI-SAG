@@ -1,5 +1,8 @@
 import re
 
+import nltk
+nltk.download('averaged_perceptron_tagger_eng', quiet=True)
+
 import ToJyutping
 from g2pM import G2pM
 from g2p_en import G2p as G2pE
