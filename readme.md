@@ -1,6 +1,6 @@
-# <img src="lyrics.png" alt="" width="40" align="left" />&nbsp;&nbsp;&nbsp;&nbsp;MIDI-SAG: MIDI-Informed Singing Accompaniment Generation
+# <img src="lyrics.png" alt="" width="40" align="left" />&nbsp;MIDI-SAG: MIDI-Informed Singing Accompaniment Generation
 
-Generate full-song backing tracks conditioned on vocal melody, with structure-aware continuation and controllable chord styles.
+Generate full-song backing tracks conditioned on vocal melody, with structure-aware continuation and controllable chord styles. Additionally, we proposed a lyrics-to-song pipeline.
 
 [![arXiv](https://img.shields.io/badge/arXiv-2602.22029-b31b1b.svg)](https://arxiv.org/abs/2602.22029)
 [![Demo](https://img.shields.io/badge/Demo-Page-blue)](https://composerflow.github.io/web/)
@@ -13,7 +13,7 @@ Three usage modes are available:
 
 - **Detected** -- input is vocal audio only. The pipeline auto-detects beats, transcribes vocal MIDI via GAME, harmonizes chords with AccoMontage2, and generates the backing track.
 - **Ground-truth** -- input is vocal audio + a pre-existing vocal MIDI. Skips beat tracking and transcription; uses the provided MIDI directly for harmonization.
-- **ComposeFlow** -- input is a lyrics text file. End-to-end pipeline from text to full song: lyrics-to-melody (CSL-L2M), melody-to-singing-voice (SoulX-Singer), then harmonization and backing track generation. You can use the voice prompt from the ./example_input folder or use your own audio files (shorter than 10 seconds).
+- **ComposeFlow** -- input is a lyrics text file. End-to-end pipeline from text to full song: lyrics-to-melody (CSL-L2M), melody-to-singing-voice (SoulX-Singer), then harmonization and backing track generation. You can use the voice prompt from the ./example_input folder or use your own audio files (shorter than 10 seconds). **Note that the open source version isn't perfect, since the "Inference support for MIDI-based input" of SoulX-Singer is our implementation.**
 
 ## Pipeline
 
