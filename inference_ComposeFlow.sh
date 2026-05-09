@@ -2,13 +2,13 @@
 ###############################################################################
 # ── User config ──────────────────────────────────────────────────────────────
 # Input lyrics file (one line per lyric phrase; blank lines separate sections)
-ORIGINAL_LYRIC_PATH="./example_input/lyrics.txt"
-OUTPUT_DIR="./output_composerflow"
+ORIGINAL_LYRIC_PATH="./example_input/lyrics_25.txt"
+OUTPUT_DIR="./output_composerflow/25/"
 
 # SoulX-Singer voice prompt (reference speaker for vocal synthesis)
-SINGER_GENDER="male" # use male or female, the pitch picking has to know the gender to select the region
-SOULX_PROMPT_WAV="./example_input/too_much_such.wav" # The voice prompt should be less then 10 seconds
-PROMPT_LANGUAGE="English" # The voice prompt can be either Chinese, English or Cantonese
+SINGER_GENDER="female" # use male or female, the pitch picking has to know the gender to select the region
+SOULX_PROMPT_WAV="./example_input/zh_prompt.mp3" # The voice prompt should be less then 10 seconds
+PROMPT_LANGUAGE="Mandarin" # The voice prompt can be either Mandarin, English or Cantonese
 VOCAL_SEP=False # if the vocal prompt contains backing track; set True if the wav has backing music
 # Mode selector: "47s" | "full_song"
 #   47s       → MuseControlLite_inference_47s_scale_up.py, one text prompt per run
@@ -35,12 +35,13 @@ BACKING_TEXT_PROMPTS=( "$BACKING_TEXT_PROMPT" )
 # Default text prompt per structure tag (edit to taste).
 # Tags not listed here fall back to BACKING_TEXT_PROMPT above.
 # Valid tags: intro, verse, chorus, bridge, outro, break, inst, solo
+
 declare -A STRUCTURE_TAG_PROMPTS=(
-    [intro]="A slow, gentle fingerpicked acoustic guitar melody, soft and reflective, building quietly with a hint of melancholy"
-    [verse]="Melancholic yet hopeful acoustic folk feel with fingerpicked acoustic guitar, electric piano"
-    [chorus]="Energetic rock with driving drums, electric guitar riffs, bass guitar, and an uplifting, motivational, emotional release."
+    [intro]="Clean electric guitar arpeggios with reverb."
+    [verse]="Female vocal with guitars and light drums."
+    [chorus]="Full band with soaring guitar harmonies and stronger rhythm."
     [bridge]="Reflective instrumental passage with piano, synth pad, bass, and gentle percussion"
-    [outro]="Reflective instrumental passage with piano, synth pad, bass, and gentle percussion"
+    [outro]="Guitars sustain while drums slowly fade."
     [break]="Minimal instrumental break with sparse percussion and ambient textures"
     [inst]="Instrumental section with expressive lead melody and full band accompaniment"
     [solo]="Virtuosic instrumental solo with dynamic expression and energy"
