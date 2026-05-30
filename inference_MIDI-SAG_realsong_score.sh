@@ -8,11 +8,11 @@
 #   Section text:  share_singing/aliged_real_music_sectioned_captions/<id>.json
 # No singing-voice generation, VAD, beat-tracking, or MIDI transcription:
 # the gt pipeline takes the vocal audio + MIDI directly.
-MIDI_DIR="/data/home/fundwotsai/MIDI-SAG/share_singing/midi_shifted"
-VOCAL_DIR="/data/home/fundwotsai/MIDI-SAG/share_singing/singing_voice"
+MIDI_DIR="/data/home/fundwotsai/MIDI-SAG/share_singing/midi_real"
+VOCAL_DIR="/data/home/fundwotsai/MIDI-SAG/share_singing/singing_voice_real_region"
 STRUCTURE_TIMES_JSON="/data/home/fundwotsai/MIDI-SAG/share_singing/structure_times.json"
 CAPTIONS_DIR="/data/home/fundwotsai/MIDI-SAG/share_singing/aliged_real_music_sectioned_captions"
-OUTPUT_ROOT="./output_midi_sag"
+OUTPUT_ROOT="./output_midi_sag_realsong_score"
 
 # Structure tags are fixed: structure_times.json always provides 3 starts and
 # the section captions always provide intro/verse/chorus prompts.

@@ -1,47 +1,45 @@
 #!/usr/bin/env bash
-# Sing MIDIs from the `share` folder with FastSinger, with optional structural filtering.
+# Sing the real-region MIDIs (midi_real) with FastSinger WITHOUT any pitch shift.
 #
-#   1. (optional) Select songs whose structure is intro -> verse -> chorus and
-#      whose verse starts within VERSE_MAX seconds (the MAX_SONGS earliest).
-#   2. Pitch-shift each MIDI into a comfortable range and pick a male/female
-#      singer via lyrics2melody_new/pitch_picking.py (as in lyrics2singing_ablation.sh).
-#   3. Reconstruct a FastSinger lyric .txt from each MIDI's embedded lyrics.
-#   4. Run FastSinger once (single model load) over the whole batch.
-#   5. Write structure start seconds for the rendered songs.
+# The melody in midi_real is already in the real song's key/register, so it is
+# sung exactly as written. The ONLY pitch-based decision is which singer fits
+# the melody best (male -> id 5, female -> id 6); no transposition is applied.
 #
-# Outputs under OUT_ROOT: midi_shifted/ (shifted MIDIs), wav/ (singing voice),
-# structure_times.json (structure start seconds), plus lyrics/, meta_pp/, meta.json.
+#   1. prepare_real_region_jobs.py: per song, score the melody at shift 0 against
+#      the male/female profiles, pick the singer, reconstruct the lyric .txt, and
+#      emit meta_real_region.json (midi_path -> midi_real, pitch_shifts:[0]).
+#   2. Run FastSinger once (single model load) over the whole batch.
+#
+# Output: $WAV_DIR (singing_voice_real_region), plus lyrics_real_region/,
+# meta_pp_real_region/, meta_real_region.json under $OUT_ROOT.
 #
 # Usage:
-#   bash sing_share.sh                                  # all songs, auto singer
-#   VERSE_MAX=16.4 MAX_SONGS=200 RESET=1 bash sing_share.sh   # filtered 200-song run
-#   LIMIT=3 bash sing_share.sh                          # smoke test on first 3 songs
+#   bash sing_share.sh                                   # all songs, auto singer
+#   SINGER=female bash sing_share.sh                     # force a singer
+#   LIMIT=3 bash sing_share.sh                           # smoke test on first 3
+#   RESET=1 bash sing_share.sh                           # clear previous outputs first
 set -euo pipefail
 
-SHARE_DIR=${SHARE_DIR:-/data/home/fundwotsai/MIDI-SAG_not_using/share}
 OUT_ROOT=${OUT_ROOT:-/data/home/fundwotsai/MIDI-SAG/share_singing}
+MIDI_DIR=${MIDI_DIR:-$OUT_ROOT/midi_real}
+WAV_DIR=${WAV_DIR:-$OUT_ROOT/singing_voice_real_region}
 FASTSINGER_DIR=${FASTSINGER_DIR:-/data/home/fundwotsai/MIDI-SAG/fastsinger}
 PITCH_PICKING_DIR=${PITCH_PICKING_DIR:-/data/home/fundwotsai/MIDI-SAG/lyrics2melody_new}
-STRUCT_DIR=${STRUCT_DIR:-/data/home/fundwotsai/MIDI-SAG_not_using/sentence_struct}
 CONDA_ENV=${CONDA_ENV:-fastsinger}
 SINGER=${SINGER:-auto}
 LIMIT=${LIMIT:-0}
-SAMPLE=${SAMPLE:-0}
-SEED=${SEED:-0}
-VERSE_MAX=${VERSE_MAX:-0}
-MAX_SONGS=${MAX_SONGS:-0}
 GPU=${GPU:-0}
 OVERWRITE=${OVERWRITE:-0}
 RESET=${RESET:-0}
 
-META_PATH="$OUT_ROOT/meta.json"
+META_PATH="$OUT_ROOT/meta_real_region.json"
 
 cd "$FASTSINGER_DIR"
 
 if [[ "$RESET" != "0" ]]; then
-  echo "=== RESET: clearing previous outputs under $OUT_ROOT ==="
-  rm -rf "$OUT_ROOT/wav" "$OUT_ROOT/midi_shifted" "$OUT_ROOT/lyrics" "$OUT_ROOT/meta_pp"
-  rm -f "$OUT_ROOT/meta.json" "$OUT_ROOT/structure_times.json"
+  echo "=== RESET: clearing previous real-region outputs ==="
+  rm -rf "$WAV_DIR" "$OUT_ROOT/lyrics_real_region" "$OUT_ROOT/meta_pp_real_region"
+  rm -f "$META_PATH"
 fi
 
 OVERWRITE_FLAG=()
@@ -49,31 +47,21 @@ if [[ "$OVERWRITE" != "0" ]]; then
   OVERWRITE_FLAG=(--overwrite)
 fi
 
-echo "=== Selecting + pitch shifting + preparing lyric files and meta.json ==="
-conda run --no-capture-output -n "$CONDA_ENV" python prepare_share_jobs.py \
-  --share_dir "$SHARE_DIR" \
+echo "=== Preparing lyric files + singer selection (no pitch shift) ==="
+conda run --no-capture-output -n "$CONDA_ENV" python prepare_real_region_jobs.py \
+  --midi_dir "$MIDI_DIR" \
   --out_root "$OUT_ROOT" \
+  --wav_dir "$WAV_DIR" \
   --pitch_picking_dir "$PITCH_PICKING_DIR" \
-  --struct_dir "$STRUCT_DIR" \
   --singer "$SINGER" \
   --limit "$LIMIT" \
-  --sample "$SAMPLE" \
-  --seed "$SEED" \
-  --verse_max "$VERSE_MAX" \
-  --max_songs "$MAX_SONGS" \
   "${OVERWRITE_FLAG[@]}"
 
-echo "=== Singing with FastSinger ==="
+echo "=== Singing with FastSinger (untransposed) ==="
 CUDA_VISIBLE_DEVICES="$GPU" conda run --no-capture-output -n "$CONDA_ENV" python inference.py \
   --model_id suming_MBJCUganFM_rmvpe_bs32_autoalign_slur_flag \
   --model_epoch 400 \
   --shift_consonant_forward_alignment \
   --meta_json_path "$META_PATH"
 
-echo "=== Writing structure start seconds ==="
-conda run --no-capture-output -n "$CONDA_ENV" python write_structure_times.py \
-  --midi_dir "$OUT_ROOT/midi_shifted" \
-  --struct_dir "$STRUCT_DIR" \
-  --out_path "$OUT_ROOT/structure_times.json"
-
-echo "=== Done. Outputs under $OUT_ROOT (wav/, midi_shifted/, structure_times.json) ==="
+echo "=== Done. Singing voices under $WAV_DIR ==="

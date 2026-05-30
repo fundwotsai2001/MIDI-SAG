@@ -605,6 +605,38 @@ def main(config):
             structure_tag = ['verse']
             structure_prompt_list = [_text_prompt]
 
+        # The model can only synthesize one window (2097152/44100 s) per forward
+        # pass. A planned section longer than that window (most commonly the final
+        # section, whose end is the full vocal duration) would otherwise be
+        # truncated to a single window, leaving the rest of the section uncovered.
+        # Split any over-length section into consecutive sub-windows (each at most
+        # one window long) sharing the same tag/prompt, so the existing per-segment
+        # continuation loop generates the whole section instead of failing/cutting
+        # it short. Sections that already fit within one window are left untouched.
+        _window_seconds = 2097152 / 44100
+        _section_ends = structure_starts_seconds[1:] + [_vocal_duration]
+        _split_starts, _split_tags, _split_prompts = [], [], []
+        for _sec_start, _sec_end, _sec_tag, _sec_prompt in zip(
+            structure_starts_seconds, _section_ends, structure_tag, structure_prompt_list
+        ):
+            _split_starts.append(_sec_start)
+            _split_tags.append(_sec_tag)
+            _split_prompts.append(_sec_prompt)
+            _sub_start = _sec_start + _window_seconds
+            while _sub_start < _sec_end - 1e-6:
+                _split_starts.append(_sub_start)
+                _split_tags.append(_sec_tag)
+                _split_prompts.append(_sec_prompt)
+                _sub_start += _window_seconds
+        if len(_split_starts) != len(structure_starts_seconds):
+            print(
+                f"[structure] split {len(structure_starts_seconds)} planned section(s) into "
+                f"{len(_split_starts)} window(s) so none exceeds {_window_seconds:.3f}s"
+            )
+        structure_starts_seconds = _split_starts
+        structure_tag = _split_tags
+        structure_prompt_list = _split_prompts
+
         gt_chord_path = CHORD_FILE
         config['chord_info'] = CHORD_FILE
         config['vocal_audio_files'] = VOCAL_FILE
