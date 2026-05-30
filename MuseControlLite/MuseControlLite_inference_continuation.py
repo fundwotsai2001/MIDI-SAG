@@ -668,8 +668,20 @@ def main(config):
                 _window_start_s = config['structure_start_seconds'][segments]
                 _ref_end   = int(config['structure_start_seconds'][segments]*44100)
                 _ref_start = max(0, int((config['structure_ends_seconds'][segments] - 2097152 / 44100) * 44100))
+                # The window is one model frame long (2097152/44100 s) and is normally
+                # anchored to END at the section end, so it starts before the section
+                # start and the preceding backing is used as reference. When a section
+                # is longer than one window (e.g. the final section when
+                # vocal_duration - last_start >= 2097152/44100), that anchoring would
+                # push _ref_start past the section start (_ref_start > _ref_end),
+                # leaving the section start uncovered and producing an empty/negative
+                # reference slice that crashes the VAE. In that case anchor the window
+                # at the section start instead and generate exactly one full window
+                # (2097152/44100 s) from there, with no audio reference.
+                if _ref_start > _ref_end:
+                    _ref_start = _ref_end
                 _window_start_s = _ref_start / 44100
-                if "audio" in config["condition_type"] and segments != 0:
+                if "audio" in config["condition_type"] and segments != 0 and _ref_end > _ref_start:
                     print("config['structure_start_seconds']", config['structure_start_seconds'])
                     
                     audio = backing_audio[:, _ref_start:_ref_end].unsqueeze(0).to(weight_dtype).cuda()

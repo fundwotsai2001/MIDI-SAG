@@ -41,3 +41,5 @@ evaluate_200_songs.sh
 lyrics2singing_ablation.sh
 lyrics2melodypretrained_models/
 MIDI-SAG_checkpoints
+inference_ComposeFlow_in_house.sh
+share_singing

@@ -169,7 +169,7 @@ def build_model(config, weight_dtype):
     from pipeline.stable_audio_multi_cfg_pipe import StableAudioPipeline
 
     pipe = StableAudioPipeline.from_pretrained(
-        "/volume/nas-fundwo-storage/fundwo-test/MuseControlLite/stable-audio", torch_dtype=weight_dtype
+        "stabilityai/stable-audio-open-1.0", torch_dtype=weight_dtype
     )
     pipe.scheduler.config.sigma_max = config["sigma_max"]
     pipe.scheduler.config.sigma_min = config["sigma_min"]

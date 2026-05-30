@@ -2397,11 +2397,24 @@ def fill_empty_bars_with_chords(input_melody_path, midi_file_path, empty_bars, o
             unique_notes.append(note)
     new_chord_track.notes = unique_notes
     
-    # STEP 3: Add melody track from chord file
+    # STEP 3: Add melody track from chord file.
+    # Anchor it to the INPUT melody's true first-note position rather than
+    # reusing shift_ticks_original. Chorderator re-emits its melody track at the
+    # melody's original pickup offset, so adding shift_ticks_original (sized for
+    # re-aligning the bar-0 chord track) would push the melody an extra
+    # `empty_bars` bars late whenever the pickup is a whole bar. Computing the
+    # shift from the input melody's onset is correct whether chorderator kept
+    # the pickup (shift -> 0) or stripped it to bar 0 (shift -> pickup bars).
     new_melody_track = Track(name="Melody")
     melody_track_from_chord = chord_score.tracks[piano_track_idx]
+    if melody_track_from_chord.notes and original_score.tracks and original_score.tracks[piano_track_idx].notes:
+        desired_first = min(n.start for n in original_score.tracks[piano_track_idx].notes)
+        current_first = convert_tick(min(n.start for n in melody_track_from_chord.notes))
+        melody_shift = desired_first - current_first
+    else:
+        melody_shift = shift_ticks_original
     for note in melody_track_from_chord.notes:
-        new_start = convert_tick(note.start) + shift_ticks_original
+        new_start = convert_tick(note.start) + melody_shift
         new_duration = convert_tick(note.end - note.start)
         new_note = Note(
             time=new_start,
